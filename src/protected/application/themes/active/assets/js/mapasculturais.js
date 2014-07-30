@@ -5,11 +5,11 @@ $(function(){
     MapasCulturais.Modal.initKeyboard('.js-dialog');
     MapasCulturais.Modal.initDialogs('.js-dialog');
     MapasCulturais.Modal.initButtons('.js-open-dialog');
-    
+
     MapasCulturais.EditBox.initBoxes('.js-editbox');
     MapasCulturais.EditBox.initButtons('.js-open-editbox');
-    
-    
+
+
     MapasCulturais.Video.setupVideoGallery('.js-videogallery');
     MapasCulturais.Search.init(".js-search");
 
@@ -218,7 +218,7 @@ MapasCulturais.Modal = {
 
 MapasCulturais.EditBox = {
     time: 'fast',
-    
+
     setPosition: function($box, target){
         if($box.hasClass('mc-left')){
             $box.position({
@@ -249,7 +249,7 @@ MapasCulturais.EditBox = {
             });
         }
     },
-    
+
     initKeyboard: function (selector){
         $(document.body).keyup(function (e){
             if(e.keyCode == 27){
@@ -263,40 +263,40 @@ MapasCulturais.EditBox = {
     },
 
     initBoxes: function(selector){
-        
+
         $(selector).each(function(){
             var $dialog = $(this);
-            
+
             if($dialog.find('.js-dialog-disabled').length)
                 return;
 
             if($dialog.data('dialog-init'))
                 return;
-            
+
             if($dialog.data('init'))
                 return;
-            
+
             $dialog.data('init', true);
 
             /*$dialog.hide();  Moved to style.css */
-            
+
             $dialog.addClass('edit-box');
-            
+
             $dialog.data('dialog-init', 1);
             if($dialog.attr('title')){
                 $dialog.prepend('<header><h1>' + $(this).attr('title') + '</h1></header>');
             }
             var submit_label = $dialog.data('submit-label') ? $dialog.data('submit-label') : 'Enviar';
             var cancel_label = $dialog.data('cancel-label') ? $dialog.data('cancel-label') : 'Cancelar';
-            
+
             $dialog.append('<footer><button type="submit" class="mc-submit">' + submit_label + '</button> <button class="mc-cancel botao simples">' + cancel_label + '</button></footer><div class="mc-arrow"></div>');
-            
+
             // close button
             $dialog.find('.mc-cancel').click(function (){
                 MapasCulturais.EditBox.close($dialog);
                 return false;
             });
-            
+
             // submit form
             $dialog.find('footer button.mc-submit').click(function(){
                 $dialog.find('form').submit();
@@ -314,16 +314,20 @@ MapasCulturais.EditBox = {
 
         });
         $(selector).click(function(){
-            if($(this).hasClass('inactive'))
+            var $button = $(this);
+            if($button.hasClass('inactive'))
                 return false;
 
-            var dialog_selector = $(this).data('target');
-            
-            MapasCulturais.EditBox.open(dialog_selector, $(this));
-            
-            if( $(this).data('dialog-callback') )
-                eval( $(this).data('dialog-callback'))($(this));
-            
+            var dialog_selector = $button.data('target');
+
+            MapasCulturais.EditBox.open(dialog_selector, $button);
+
+            if($button.data('dialog-title'))
+                $(dialog_selector).find('header h1').html($button.data('dialog-title'));
+
+            if( $button.data('dialog-callback') )
+                eval( $button.data('dialog-callback'))($button);
+
             return false;
         });
     },
@@ -340,64 +344,19 @@ MapasCulturais.EditBox = {
     open: function(selector, $button){
         var $dialog = $(selector);
         $dialog.find('div.mensagem.erro').html('').hide();
-        $dialog.find('.js-ajax-upload-progress').hide();
+        
+        MapasCulturais.AjaxUploader.resetProgressBar(selector);
+
         $dialog.show();
         $dialog.find('input,textarea').not(':hidden').first().focus();
+        $dialog.css('opacity',0);
         MapasCulturais.EditBox.setPosition($dialog, $button);
-        MapasCulturais.EditBox.setPosition($dialog, $button);
+        setTimeout(function(){
+            MapasCulturais.EditBox.setPosition($dialog, $button);
+            $dialog.css('opacity',1);
+        },25);
+
         return;
-    }
-};
-
-MapasCulturais.MetaListUpdateDialog = function ($caller){
-    var $dialog = $($caller.data('dialog'));
-    var $form = $dialog.find('.js-metalist-form');
-    var group = $dialog.data('metalist-group');
-
-    var item = $caller.data('item') || {};
-
-    $form.data('metalist-action', $caller.data('metalist-action'));
-    $form.data('metalist-group', group);
-
-    if($caller.data('metalist-action') == 'edit'){
-        $form.find('input.js-metalist-group').attr('name', '').val('');
-        $form.attr('action', MapasCulturais.baseURL + 'metalist/single/' + item.id);
-    }else{
-        $form.find('input.js-metalist-group').attr('name', 'group').val(group);
-        $form.attr('action', $dialog.data('action-url'));
-    }
-
-    $form.data('response-target', $caller.data('response-target'));
-
-    // define os labels do form
-    $form.find('label.js-metalist-title span').html($dialog.data('metalist-title-label'));
-    $form.find('label.js-metalist-value span').html($dialog.data('metalist-value-label'));
-    $form.find('label.js-metalist-description span').html($dialog.data('metalist-description-label'));
-
-    // define os valores dos inputs do form
-    $form.find('input.js-metalist-title').val(item.title);
-    $form.find('input.js-metalist-value').val(item.value);
-    $form.find('textarea.js-metalist-description').val(item.description);
-
-
-
-    var responseTemplate = '';
-    //If Edit or insert:
-    if($caller.data('metalist-action') == 'edit'){
-        responseTemplate = $dialog.data('response-template');
-    }else{
-        $dialog.find('h2').html($caller.data('dialog-title'));
-        responseTemplate = $caller.data('response-template');
-    }
-
-    $form.find('script.js-response-template').text(responseTemplate);
-    console.log(''  )
-
-    //if this metalist is of videos,changing a video url results in getting its title from its provider's api and set it to its title field
-    if(group == 'videos') {
-        $form.find('input.js-metalist-value').on('change', function(){
-            MapasCulturais.Video.getAndSetVideoData($(this).val(), $form.find('input.js-metalist-title'), MapasCulturais.Video.setTitle);
-        });
     }
 };
 
