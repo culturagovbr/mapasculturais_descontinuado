@@ -229,7 +229,7 @@ tr th { text-align: left; }
 /*avatar*/
 .avatar { float: left; margin-right: .75rem; margin-bottom: 1.5rem; background: #ccc; }
 /*botões*/
-.botao, .botao-grande { display: inline-block; border-radius: 2px; cursor: pointer; font-family: "Open Sans", sans-serif; -webkit-transition: all .3s; transition: all .3s; }
+.botao, .botao-grande { display: inline-block; border: none; border-radius: 2px; cursor: pointer; font-family: "Open Sans", sans-serif; -webkit-transition: all .3s; transition: all .3s; }
 .botao:hover, .botao-grande:hover { box-shadow: rgba(0,0,0, .25) 0 1px 2px 0; -webkit-box-shadow: rgba(0,0,0, .25) 0 1px 2px 0;text-decoration: none; }
 .botao { height: 1.875rem; padding: 0 .5rem; font-size: .75rem; line-height: 1.875rem; }
 .botao.principal { color: #fff; background: #f90; border: 1px solid #f90; }
@@ -461,23 +461,105 @@ body.editable #main-section { margin-top: 136px; }
 .estatisticas { float: left; margin-right: 10px; margin-bottom: 1.5rem; padding-left: 5px; border-left: 1px solid #fff; }
 .estatistica { font-size: 2rem; line-height: 2rem; font-weight: bold; }
 .label-das-estatisticas { font-size: .75rem; }
+
 /* Busca Geral */
-#form-de-busca-geral { text-align: center; }
-#form-de-busca-geral input:focus { outline: none; }
-#form-de-busca-geral .campo-de-busca { width: 500px; height: 2.5rem; margin-right: 5px; box-sizing: border-box; -moz-box-sizing: border-box; border: none; font-size: .875rem; }
-#form-de-busca-geral input[type="submit"] { height: 2.5rem; }
-#form-de-busca-geral .icon_check { vertical-align: middle; margin-left: .5rem; }
+.home-search { 
+    margin-bottom: 3rem;
+    text-align: center; 
+}
+
+.home-search label {
+    color: #fff;
+}
+
+.home-search input:focus { 
+    outline: none; 
+}
+
+.home-search .campo-de-busca { 
+    box-sizing: border-box; 
+    -moz-box-sizing: border-box; 
+    border: none;
+    font-size: .875rem;
+    line-height: 2.5rem;
+    height: 2.5rem;
+    margin-right: -6px;
+    width: 340px;
+}
+
+.home-search .icon_check { 
+    vertical-align: middle; 
+    margin-left: .5rem; 
+}
+
 /*filtro da home*/
-#filtro-da-capa { height: 2.5rem; background: #000; color: #fff; font-size: .875rem; line-height: 2.5rem; font-weight: bold; text-align: left; }
-#filtro-da-capa .placeholder:after { margin-left: .75rem; line-height: 2.5rem; font-size: 1.5rem; color: #fff; }
-#filtro-da-capa li { padding: 0 .75rem; cursor: pointer; }
-#filtro-da-capa .submenu-dropdown { top: 48px; background: #000; }
-#filtro-da-capa .submenu-dropdown:before { color: #000; }
-#filtro-da-capa .icone { margin-right: 5px; vertical-align: initial; font-size: 1rem; }
-#filtro-de-eventos:hover { background-color: #b3b921; }
-#filtro-de-agentes:hover { background-color: #1dabc6; }
-#filtro-de-espacos:hover { background-color: #e83f96; }
-#filtro-de-projetos:hover { background-color: #cc0033; }
+.home-search__filter { 
+    background: #fff;
+    border-left: 1px dotted #999;
+    border-radius: 0;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    color: #999; 
+    font-size: .875rem;
+    font-weight: bold;
+    height: 2.5rem;
+    line-height: 2.5rem; 
+    text-align: left;
+}
+
+.home-search__filter .placeholder:after { 
+    color: #000; 
+    margin-left: .75rem;
+    font-size: 1.5rem; 
+    line-height: 2.5rem;
+}
+
+.home-search__filter li { 
+    padding: 0 .75rem; 
+    cursor: pointer; 
+}
+
+.home-search__filter .submenu-dropdown { 
+    background: #fff; 
+    top: 100%; 
+}
+
+.home-search__filter .submenu-dropdown:before { 
+    color: #fff; 
+}
+
+.home-search__filter .icone { 
+    margin-right: 5px; 
+    vertical-align: initial; 
+    font-size: 1rem; 
+}
+
+.home-search__filter .submenu-dropdown .home-search__filter-event:hover { 
+    background-color: #b3b921; 
+}
+
+.home-search__filter .submenu-dropdown .home-search__filter-agent:hover { 
+    background-color: #1dabc6; 
+}
+
+.home-search__filter .submenu-dropdown .home-search__filter-space:hover { 
+    background-color: #e83f96; 
+}
+
+.home-search__filter .submenu-dropdown .home-search__filter-project:hover { 
+    background-color: #cc0033; 
+}
+
+.home-search .botao {
+    background-color: #000;
+    color: #fff;
+    font-size: .875rem;
+    font-weight: bold;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    padding: 0 1.5rem;
+}
+
 .destaque-aleatorio { position: relative; margin-bottom: 1.5rem; margin-top: 4.5rem; border-radius: 2px; overflow: hidden; }
 .destaque-content { display: block; position: absolute; top: 100%; bottom: 0; padding: 1.5rem; background: #000; color: #fff; font-weight: normal; font-size: .875rem; -webkit-transition: top .5s; transition: top .5s; }
 .destaque-content:hover { text-decoration: none; }
