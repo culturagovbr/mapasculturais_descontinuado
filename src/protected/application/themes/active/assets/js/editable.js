@@ -101,6 +101,7 @@ MapasCulturais.Remove = {
                 var href = $this.data('href');
 
                 $.getJSON(href,function(r){
+                    console.log(r);
                     if(r.error){
                         MapasCulturais.Messages.error(r.data);
                     }else{
@@ -108,7 +109,10 @@ MapasCulturais.Remove = {
                         if($this.data('remove-callback'))
                             cb = $this.data('remove-callback');
                         $target.remove();
-                        cb();
+                        if(typeof cb === 'string')
+                            eval(cb);
+                        else
+                            cb();
                     }
                 });
             });
@@ -356,13 +360,11 @@ MapasCulturais.Editables = {
 
 MapasCulturais.AjaxUploader = {
     resetProgressBar: function(containerSelector, acivate){
-        console.log(containerSelector);
         var bar = $(containerSelector).find('.js-ajax-upload-progress .bar');
         var percent = $(containerSelector).find('.js-ajax-upload-progress .percent');
         var percentVal = '0%';
-        bar.width(percentVal);
+        bar.stop().width(percentVal);
         percent.html(percentVal);
-        console.log('bar',bar);
         if(!acivate)
             $(containerSelector).find('.js-ajax-upload-progress .progress').addClass('inactive');
         else
@@ -383,6 +385,7 @@ MapasCulturais.AjaxUploader = {
                 var percentVal = percentComplete + '%';
                 bar.animate({'width':percentVal});
                 percent.html(percentVal);
+                console.log('percent',percentComplete);
             },
             success: function (response, statusText, xhr, $form)  {
 
@@ -453,7 +456,9 @@ MapasCulturais.AjaxUploader = {
                 }
 
                 $form.get(0).reset();
-
+                if($form.parents('.js-editbox').data('success-callback'))
+                    eval($form.parents('.js-editbox').data('success-callback'));
+                
                 $form.parents('.js-editbox').find('.mc-cancel').click();
             },
 
