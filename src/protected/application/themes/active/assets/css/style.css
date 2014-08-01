@@ -484,7 +484,7 @@ body.editable #main-section { margin-top: 136px; }
     line-height: 2.5rem;
     height: 2.5rem;
     margin-right: -6px;
-    width: 340px;
+    width: 420px;
 }
 
 .home-search .icon_check { 
@@ -499,11 +499,10 @@ body.editable #main-section { margin-top: 136px; }
     border-radius: 0;
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
-    color: #999; 
     font-size: .875rem;
     font-weight: bold;
     height: 2.5rem;
-    line-height: 2.5rem; 
+    line-height: 2.5rem;
     text-align: left;
 }
 
@@ -963,6 +962,17 @@ div.ficha-spcultura .editable-buttons-bottom { float: left; }
 .grupo-descricao-automatica { padding-right: 2.5rem; position: relative; }
 .grupo-descricao-automatica .mensagem { margin-bottom: .75rem; }
 .grupo-descricao-automatica .botao { position: absolute; top: 0; right: 0; }
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
 
 /* =Responsive
 -------------------------------------------------------------- */

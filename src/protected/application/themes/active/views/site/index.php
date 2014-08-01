@@ -103,8 +103,8 @@ $url_search_projects = $app->createUrl('site', 'search')."##(global:(filterEntit
         <p>O SP Cultura é a plataforma livre, gratuita e colaborativa de mapeamento da Secretaria Municipal de Cultura de São Paulo sobre o cenário cultural paulistano. Ficou mais fácil se programar para conhecer as opções culturais que a cidade oferece: shows musicais, espetáculos teatrais, sessões de cinema, saraus, entre outras. Além de conferir a agenda de eventos, você também pode colaborar na gestão da cultura da cidade: basta criar seu perfil de <a href="<?php echo $url_search_agents ?>" >agente cultural</a>. A partir deste cadastro, fica mais fácil participar dos editais de fomento às artes da Prefeitura e também divulgar seus <a href="<?php echo $url_search_events; ?>">eventos</a>, <a href="<?php echo $url_search_spaces; ?>">espaços</a> ou <a href="<?php echo $url_search_projects; ?>">projetos</a>.</p>
         
         <form class="home-search  clearfix">
-            <label for="campo-de-busca">Digite uma palavra-chave</label>
-            <input id="campo-de-busca" class="campo-de-busca" type="text" name="campo-de-busca" placeholder="por exemplo: virada cultural" />
+            <label for="campo-de-busca" class="visuallyhidden">Digite uma palavra-chave</label>
+            <input id="campo-de-busca" class="campo-de-busca" type="text" name="campo-de-busca" placeholder="Digite uma palavra-chave, ex.: virada cultural" />
             <div id="filtro-da-capa" class="home-search__filter  dropdown" data-searh-url-template="<?php echo $app->createUrl('site','search'); ?>##(global:(enabled:({{entity}}:!t),filterEntity:{{entity}}),{{entity}}:(keyword:'{{keyword}}'))">
                 <div class="placeholder">Escolha uma área</div>
                 <div class="submenu-dropdown">
@@ -116,7 +116,7 @@ $url_search_projects = $app->createUrl('site', 'search')."##(global:(filterEntit
                     </ul>
                 </div>
             </div>
-            <button class="botao"><span class="icone icon_search"></span> Buscar!</button>
+            <button class="botao"><span class="icone icon_search"></span> Buscar</button>
         </form>
         
         <p class="textcenter"><a class="botao-grande" href="<?php echo $app->createUrl('panel') ?>">Colabore com o SP Cultura</a></p>
