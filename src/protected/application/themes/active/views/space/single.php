@@ -21,6 +21,28 @@ add_angular_entity_assets($entity);
 <div class="barra-esquerda barra-lateral espaco">
     <div class="setinha"></div>
     <?php $this->part('verified', array('entity' => $entity)); ?>
+    <div class="bloco">
+        <h3 class="subtitulo">Status</h3>
+        <?php if(is_editable()): ?>
+            <div id="editable-space-status" class="js-editable" data-edit="public" data-type="select" data-value="<?php echo $entity->public ? '1' : '0' ?>"  data-source="[{value: 0, text: 'privado e requer autorização para criar eventos'},{value: 1, text:'público e qualquer pessoa pode criar eventos'}]">
+                <?php if ($entity->public) : ?>
+                    <div class="venue-status"><div class="icone icon_group"></div>público</div>
+                    <p class="venue-status-definition">Qualquer pessoa pode criar eventos.</p>
+                <?php else: ?>
+                    <div class="venue-status"><div class="icone icon_lock"></div>privado</div>
+                    <p class="venue-status-definition">Requer autorização para criar eventos.</p>
+                <?php endif; ?>
+            </div>
+        <?php else: ?>
+            <?php if ($entity->public) : ?>
+                <div class="venue-status"><div class="icone icon_group"></div>público</div>
+                <p class="venue-status-definition">Qualquer pessoa pode criar eventos.</p>
+            <?php else: ?>
+                <div class="venue-status"><div class="icone icon_lock"></div>privado</div>
+                <p class="venue-status-definition">Requer autorização para criar eventos.</p>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
     <?php $this->part('redes-sociais', array('entity'=>$entity)); ?>
 </div>
 <article class="main-content espaco">
@@ -219,24 +241,28 @@ add_angular_entity_assets($entity);
 </article>
 <div class="barra-lateral espaco barra-direita">
     <div class="setinha"></div>
+    <?php if($this->controller->action == 'create'): ?>
+        <div class="bloco">Para adicionar arquivos para download ou links, primeiro é preciso salvar o espaço.</div>
+    <?php endif; ?>
     <!-- Related Agents BEGIN -->
     <?php $app->view->part('parts/related-agents.php', array('entity'=>$entity)); ?>
     <!-- Related Agents END -->
-    <div class="bloco">
-        <?php if($entity->children): ?>
-        <h3 class="subtitulo">Sub-espaços</h3>
-        <ul class="js-slimScroll">
-            <?php foreach($entity->children as $space): ?>
-            <li><a href="<?php echo $space->singleUrl; ?>"><?php echo $space->name; ?></a></li>
-            <?php endforeach; ?>
-        </ul>
-        <?php endif; ?>
+    <?php if($this->controller->action !== 'create'): ?>
+        <div class="bloco">
+            <?php if($entity->children): ?>
+            <h3 class="subtitulo">Sub-espaços</h3>
+            <ul class="js-slimScroll">
+                <?php foreach($entity->children as $space): ?>
+                <li><a href="<?php echo $space->singleUrl; ?>"><?php echo $space->name; ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
 
-        <?php if($entity->id && $entity->canUser('createChield')): ?>
-        <a class="botao adicionar" href="<?php echo $app->createUrl('space','create', array('parentId' => $entity->id)) ?>">adicionar sub-espaço</a>
-        <?php endif; ?>
-    </div>
-
+            <?php if($entity->id && $entity->canUser('createChield')): ?>
+            <a class="botao adicionar" href="<?php echo $app->createUrl('space','create', array('parentId' => $entity->id)) ?>">adicionar sub-espaço</a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
     <!-- Downloads BEGIN -->
     <?php $app->view->part('parts/downloads.php', array('entity'=>$entity)); ?>
     <!-- Downloads END -->

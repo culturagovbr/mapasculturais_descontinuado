@@ -35,6 +35,23 @@ $(function(){
     }
 
     MapasCulturais.spinnerURL = MapasCulturais.assetURL + '/img/spinner.gif';
+
+
+    // identify Internet Explorer
+    if(navigator.appName != 'Microsoft Internet Explorer' && !(navigator.appName == 'Netscape' && navigator.userAgent.indexOf('Trident') !== -1)){
+        //not IE
+    }else{
+        // is IE
+        $('body').addClass('ie');
+        //identify version
+        var ua = navigator.userAgent.toLowerCase();
+        if(!isNaN(version = parseInt(ua.split('msie')[1]))){ // 7, 8, 9, 10
+            $('body').addClass('ie'+version);
+        }else if( parseInt(ua.split('rv:')[1]) === 11) { // 11
+            $('body').addClass('ie11');
+        }
+    }
+
 });
 
 MapasCulturais.auth = {
@@ -112,13 +129,6 @@ MapasCulturais.confirm = function (message, cb){
 
 MapasCulturais.Modal = {
     time: 'fast',
-    cssInit: {position:'fixed', left:0, top:0, width: $(window).width(),  opacity:0 },
-    cssFinal: {left: $(window).width()/4, top:$(window).height()/4, width: $(window).width()/2, height: $(window).height()/2, opacity:1},
-
-    cssBg: {position:'fixed', background:'white', top:0, left:0, width:'100%', zIndex:999},
-    cssBgOpacity: .95,
-
-    $bg: null,
     initKeyboard: function (selector){
         $(document.body).keyup(function (e){
             if(e.keyCode == 27){
@@ -132,15 +142,8 @@ MapasCulturais.Modal = {
     },
 
     initDialogs: function(selector){
-        if(!MapasCulturais.Modal.$bg){
-            MapasCulturais.Modal.$bg = $('<div></div>');
-            MapasCulturais.Modal.$bg.css(this.cssBg);
-            MapasCulturais.Modal.$bg.click(function(){
-                MapasCulturais.Modal.close(selector);
-            });
-            $('body').append(MapasCulturais.Modal.$bg.hide());
-        }
         $(selector).each(function(){
+            $('body').append($(this));
             if($(this).find('.js-dialog-disabled').length)
                 return;
 
@@ -190,27 +193,28 @@ MapasCulturais.Modal = {
         var $dialog = $(selector);
         //alert('closing');
         $dialog.find('.editable').editable('hide');
-        $dialog.css(MapasCulturais.Modal.cssFinal).animate(MapasCulturais.Modal.cssInit, MapasCulturais.Modal.time, function(){
-            $dialog.hide();
-        });
-        MapasCulturais.Modal.$bg.animate({opacity:0}, MapasCulturais.Modal.time, function(){
-            $(this).hide();
-        });
+        $dialog.hide();
         return;
     },
 
     open: function(selector){
-        $('body').css('overflow','hidden');
         var $dialog = $(selector);
-        this.$bg.css({opacity:0, height:$('body').height()}).show().animate({opacity:this.cssBgOpacity},this.time);
 
         $dialog.find('div.mensagem.erro').html('').hide();
         $dialog.find('.js-ajax-upload-progress').hide();
-//        if($dialog.find('form').length)
-//            $dialog.find('form').get(0).reset();
-        $dialog.css(this.cssInit).show().animate(this.cssFinal, MapasCulturais.Modal.time, function(){
-            $dialog.find('input,textarea').not(':hidden').first().focus();
-        });
+        $dialog.css('opacity',0).show();
+        setTimeout(function(){
+           var top = $dialog.height() + 100 > $(window).height() ? $(window).scrollTop() + 100 : $(window).scrollTop() + ( $(window).height() - $dialog.height()) / 2 - 50;
+
+           $dialog.css({
+                top: top,
+                left: '50%',
+                marginLeft: -$dialog.width() / 2,
+                opacity: 1
+            });
+        },25);
+
+
         return;
     }
 };
@@ -344,7 +348,7 @@ MapasCulturais.EditBox = {
     open: function(selector, $button){
         var $dialog = $(selector);
         $dialog.find('div.mensagem.erro').html('').hide();
-        
+
         MapasCulturais.AjaxUploader.resetProgressBar(selector);
 
         $dialog.show();
@@ -515,20 +519,17 @@ MapasCulturais.Search = {
                 type:'select2',
                 name: $selector.data('field-name') ? $selector.data('field-name') : null,
                 select2:{
-                    initSelection : function (element, callback) {
-                        callback({id: $selector.data('value'), name: $selector.data('value-name')});
-                    },
                     width: $selector.data('search-box-width'),
                     placeholder: $selector.data('search-box-placeholder'),
-                    minimumInputLength: 2,
+                    minimumInputLength: 0,
                     allowClear: $selector.data('allow-clear'),
                     initSelection: function(e,cb){
-                        cb({id: 4, name:'teste'});
+                        cb({id: $selector.data('value'), name: $selector.data('editable').$element.html()});
                     },
                     ajax: {
                         url: MapasCulturais.baseURL + 'api/' + $selector.data('entity-controller') + '/find',
                         dataType: 'json',
-                        quietMillis: 100,
+                        quietMillis: 350,
                         data: function (term, page) { // page is the one-based page number tracked by Select2
                             var searchParams = MapasCulturais.Search.getEntityController(term, page, $selector);
 
@@ -543,12 +544,13 @@ MapasCulturais.Search = {
                         },
                         results: function (data, page) {
                             var more = data.length == MapasCulturais.Search.limit;
-
                             // notice we return the value of more so Select2 knows if more results can be loaded
+                            
                             return {results: data, more: more};
                         }
                     },
                     formatResult: function(entity){
+                        console.log('formatResult', entity);
                         var format = $selector.data('selection-format');
                         if(MapasCulturais.Search.formats[format] && MapasCulturais.Search.formats[format].result)
                             return MapasCulturais.Search.formats[format].result(entity, $selector);
@@ -557,11 +559,13 @@ MapasCulturais.Search = {
                     }, // omitted for brevity, see the source of this page
 
                     formatSelection: function(entity){
+                        console.log('formatSelection', entity);
                         var format = $selector.data('selection-format');
                         return MapasCulturais.Search.formats[format].selection(entity, $selector);
                     }, // omitted for brevity, see the source of this page
 
                     formatNoMatches: function(term){
+                        console.log('formatNoMatches', term);
                         var format = $selector.data('selection-format');
                         return MapasCulturais.Search.formats[format].noMatches(term, $selector);
                     },
@@ -721,8 +725,14 @@ MapasCulturais.Search = {
             },
 
             onClear: function($selector){
+            },
+            
+            ajaxData: function(searchParams){
+                searchParams['@permissions'] = '@control';
+                return searchParams;
             }
         },
+        
         chooseSpace: {
             onSave: function($selector){
                 var entity = $selector.data('entity'),
@@ -756,6 +766,7 @@ MapasCulturais.Search = {
             onClear: function($selector){ },
 
             ajaxData: function(searchParams, $selector){
+                
                 if($selector.data('value')){
                     searchParams.id = '!in('+$selector.data('value')+')';
                 }
@@ -763,7 +774,8 @@ MapasCulturais.Search = {
                 //if(!MapasCulturais.cookies.get('mapasculturais.adm'))
                 //    searchParams.owner = 'in(@me.spaces)';
 
-                searchParams['@select'] += ',shortDescription,';
+                searchParams['@select'] += ',shortDescription';
+                searchParams['@permissions'] += '@control';
                 return searchParams;
             }
         },
@@ -830,6 +842,11 @@ MapasCulturais.Search = {
             },
 
             onClear: function($selector){
+            },
+            
+            ajaxData: function(searchParams, $selector){
+                searchParams['@permissions'] = '@control';
+                return searchParams;
             }
         },
 
@@ -843,6 +860,11 @@ MapasCulturais.Search = {
             },
 
             onClear: function($selector){
+            },
+            
+            ajaxData: function(searchParams, $selector){
+                searchParams['@permissions'] = '@control';
+                return searchParams;
             }
         },
 
@@ -922,18 +944,14 @@ MapasCulturais.Search = {
             ajaxData: function(searchParams, $selector){
                 var excludedIds = MapasCulturais.request.controller === 'agent' && MapasCulturais.request.id? [MapasCulturais.request.id] : [];
 
-                excludedIds.push($selector.data('value'));
+//                excludedIds.push($selector.data('value'));
 
                 if ( excludedIds.length > 0)
                     searchParams.id = '!in('+excludedIds.toString()+')';
 
-                if(!MapasCulturais.cookies.get('mapasculturais.adm'))
-                    searchParams.user = 'eq(@me)';
-
-                if($selector.data('profiles-only'))
-                    searchParams.isUserProfile = 'eq(true)';
-
-                searchParams['@select'] += ',shortDescription,';
+                searchParams['@select'] += ',shortDescription';
+                searchParams['@permissions'] = '@control';
+                //searchParams['user'] = 'EQ(@User:' + MapasCulturais.entity.ownerUserId + ')';
                 return searchParams;
             }
         }

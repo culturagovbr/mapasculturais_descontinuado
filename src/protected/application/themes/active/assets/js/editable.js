@@ -135,7 +135,21 @@ MapasCulturais.Editables = {
             this.setButton(editableEntitySelector);
             this.initTaxonomies();
             this.initTypes();
+            
+            if(MapasCulturais.request.controller === 'space')
+                this.initSpacePublicEditable();
         }
+    },
+    
+    initSpacePublicEditable: function(){
+        $('#editable-space-status').on('hidden', function(e, reason) {
+            
+            if($(this).editable('getValue', true) == '1'){
+                $('#editable-space-status').html('<div class="venue-status"><div class="icone icon_group"></div>público</div><p class="venue-status-definition">Qualquer pessoa pode criar eventos.</p>');
+            }else{
+                $('#editable-space-status').html('<div class="venue-status"><div class="icone icon_lock"></div>privado</div><p class="venue-status-definition">Requer autorização para criar eventos.</p>');
+            }
+        });
     },
 
     initTaxonomies: function (){
@@ -325,8 +339,6 @@ MapasCulturais.Editables = {
 
 
                     }else{
-                        if(action === 'create')
-                            location.href = MapasCulturais.Editables.baseTarget+'/edit/'+response.id;
 
                         if($('.js-sp_distrito').length > 0      && response['sp_distrito'])         $('.js-sp_distrito').html(response['sp_distrito']);
                         if($('.js-sp_regiao').length > 0        && response['sp_regiao'])           $('.js-sp_regiao').html(response['sp_regiao']);
@@ -339,6 +351,9 @@ MapasCulturais.Editables = {
                                 removeClass('editable-unsaved').
                                 parent().
                                 removeClass('erro');
+
+                        if(action === 'create')
+                            location.href = MapasCulturais.Editables.baseTarget+'/edit/'+response.id;
                     }
 
                 },
@@ -458,7 +473,7 @@ MapasCulturais.AjaxUploader = {
                 $form.get(0).reset();
                 if($form.parents('.js-editbox').data('success-callback'))
                     eval($form.parents('.js-editbox').data('success-callback'));
-                
+
                 $form.parents('.js-editbox').find('.mc-cancel').click();
             },
 

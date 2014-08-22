@@ -2,29 +2,33 @@
 namespace MapasCulturais;
 
 $app = App::i();
+$em = $app->em;
+$conn = $em->getConnection();
 return array(
-    'teste de execução pelo deploy' => function() use($app){
-        $agents = $app->repo('Agent')->findAll();
-        
-        foreach($agents as $a){
-            echo "AGENTE: $a->name\n";
-        }
+    'alter table space add column public' => function() use ($conn){
+        $conn->executeQuery('ALTER TABLE space ADD COLUMN public BOOLEAN NOT NULL DEFAULT false;');
+    },
+    
+    'alter table agent add column parent_id' => function() use ($conn){
+        $conn->executeQuery('ALTER TABLE agent ADD COLUMN parent_id INTEGER;');
+        $conn->executeQuery('ALTER TABLE ONLY agent ADD CONSTRAINT agent_agent_fk FOREIGN KEY (parent_id) REFERENCES agent(id);');
     },
             
-    'Virada 2014 - set events is verified' => function() use($app){
-        $virada = $app->repo('Project')->find(4);
+    'alter occurrence fk' => function() use($conn) {
+        $conn->executeQuery("
+            ALTER TABLE public.event_occurrence_cancellation
+                DROP CONSTRAINT event_occurrence_fk,
+                ADD CONSTRAINT event_occurrence_fk
+                   FOREIGN KEY (event_occurrence_id)
+                   REFERENCES event_occurrence(id)
+                   ON DELETE CASCADE");
         
-        $events = $app->repo('Event')->findBy(array('project' => $virada));
-        
-        $i = 0;
-        foreach($events as $event){
-            $i++;
-            echo "$i - Definindo o evento \"{$event->name}\" como oficial.\n";
-            $event->isVerified = true;
-            $event->save();
-        }
-        
-        $app->em->flush();
-        
+        $conn->executeQuery("
+            ALTER TABLE public.event_occurrence_recurrence
+                DROP CONSTRAINT event_occurrence_fk,
+                ADD CONSTRAINT event_occurrence_fk
+                   FOREIGN KEY (event_occurrence_id)
+                   REFERENCES event_occurrence(id)
+                   ON DELETE CASCADE");
     }
 );

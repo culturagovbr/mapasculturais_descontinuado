@@ -12,23 +12,26 @@ if(is_editable()){
 
     $app->enqueueScript('vendor', 'jquery-ui-datepicker', '/vendor/jquery-ui.datepicker.js', array('jquery'));
     //$app->enqueueStyle('vendor',  'jquery-ui-datepicker', '/vendor/jquery-ui.datepicker.min.css');
+    
+    $app->hook('mapasculturais.scripts', function() use ($app, $entity){
+
+        $ids = array_map(function($e){
+
+            return $e->agent->id;
+        }, $entity->registrations);
+        ?>
+        <script type="text/javascript">
+            MapasCulturais.agentRelationDisabledCD = ['<?php echo $app->txt('project registration')?>'];
+        </script>
+        <?php
+    });
 }
 
 add_agent_relations_to_js($entity);
 add_angular_entity_assets($entity);
 
 add_entity_properties_metadata_to_js($entity);
-
-$ids = array_map(function($e){
-
-    return $e->agent->id;
-}, $entity->registrations);
 ?>
-<script type="text/javascript">
-    MapasCulturais.agentRelationGroupExludeIds = {};
-    MapasCulturais.agentRelationGroupExludeIds['<?php echo $app->projectRegistrationAgentRelationGroupName ?>'] = <?php echo json_encode($ids); ?>;
-</script>
-<?php //include(__DIR__.'/../../layouts/parts/editable-entity.php');  ?>
 <?php $this->part('editable-entity', array('entity'=>$entity, 'action'=>$action));  ?>
 
 <div class="barra-esquerda barra-lateral projeto">
@@ -267,23 +270,28 @@ $ids = array_map(function($e){
 </article>
 <div class="barra-lateral projeto barra-direita">
     <div class="setinha"></div>
+    <?php if($this->controller->action == 'create'): ?>
+        <div class="bloco">Para adicionar arquivos para download ou links, primeiro é preciso salvar o projeto.</div>
+    <?php endif; ?>
     <!-- Related Agents BEGIN -->
     <?php $app->view->part('parts/related-agents.php', array('entity'=>$entity)); ?>
     <!-- Related Agents END -->
-    <div class="bloco">
-        <?php if($entity->children): ?>
-        <h3 class="subtitulo">Sub-projetos</h3>
-        <ul class="js-slimScroll">
-            <?php foreach($entity->children as $space): ?>
-            <li><a href="<?php echo $space->singleUrl; ?>"><?php echo $space->name; ?></a></li>
-            <?php endforeach; ?>
-        </ul>
-        <?php endif; ?>
+    <?php if($this->controller->action !== 'create'): ?>
+        <div class="bloco">
+            <?php if($entity->children): ?>
+            <h3 class="subtitulo">Sub-projetos</h3>
+            <ul class="js-slimScroll">
+                <?php foreach($entity->children as $space): ?>
+                <li><a href="<?php echo $space->singleUrl; ?>"><?php echo $space->name; ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
 
-        <?php if($entity->id && $entity->canUser('createChield')): ?>
-        <a class="botao adicionar staging-hidden" href="<?php echo $app->createUrl('project','create', array('parentId' => $entity->id)) ?>">adicionar sub-projeto</a>
-        <?php endif; ?>
-    </div>
+            <?php if($entity->id && $entity->canUser('createChield')): ?>
+            <a class="botao adicionar staging-hidden" href="<?php echo $app->createUrl('project','create', array('parentId' => $entity->id)) ?>">adicionar sub-projeto</a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
     <!-- Downloads BEGIN -->
     <?php $app->view->part('parts/downloads.php', array('entity'=>$entity)); ?>
     <!-- Downloads END -->

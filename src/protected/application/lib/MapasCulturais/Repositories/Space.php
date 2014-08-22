@@ -1,7 +1,11 @@
 <?php
-namespace MapasCulturais\Entities\Repositories;
+namespace MapasCulturais\Repositories;
+use MapasCulturais\Traits;
 
-class Space extends CachedRepository{
+class Space extends \MapasCulturais\Repository{
+    use Traits\RepositoryKeyword,
+        Traits\RepositoryCache;
+    
     public function findByEventsAndDateInterval($event_ids = array(), $date_from = null, $date_to = null, $limit = null, $offset = null){
         if(!$event_ids)
             return array();
@@ -51,6 +55,10 @@ class Space extends CachedRepository{
                 eo.starts_on, eo.starts_at";
 
         $query = $this->_em->createNativeQuery($strNativeQuery, $rsm);
+
+        $app = \MapasCulturais\App::i();
+        if($app->config['app.useEventsCache'])
+            $query->useResultCache (true, $app->config['app.eventsCache.lifetime']);
 
         $query->setParameters(array(
             'date_from' => $date_from,

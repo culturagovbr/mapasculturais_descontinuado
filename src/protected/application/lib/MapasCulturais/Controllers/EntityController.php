@@ -438,26 +438,17 @@ abstract class EntityController extends \MapasCulturais\Controller{
      * @see \MapasCulturais\ApiOutput::outputItem()
      */
     public function API_findOne(){
-        $cache_id = $this->getApiCacheId($this->getData, array('findOne' => true));
-
-        if(!$this->apiCacheResponse($cache_id)){
-            $entity = $this->apiQuery($this->getData, array('findOne' => true));
-            $this->apiItemResponse($entity);
-        }
+        $entity = $this->apiQuery($this->getData, array('findOne' => true));
+        $this->apiItemResponse($entity);
     }
 
     public function API_find(){
-        $cache_id = $this->getApiCacheId($this->getData);
-
-        if(!$this->apiCacheResponse($cache_id)){
-            $data = $this->apiQuery($this->getData);
-            $this->apiResponse($data);
-        }
+        $data = $this->apiQuery($this->getData);
+        $this->apiResponse($data);
     }
 
     public function API_describe(){
         $class = $this->entityClassName;
-
         $this->apiResponse($class::getPropertiesMetadata());
     }
 
@@ -501,23 +492,6 @@ abstract class EntityController extends \MapasCulturais\Controller{
             unset($qdata['@count']);
 
         if(class_exists($this->entityClassName)){
-            if($app->config['app.useApiCache']){
-                $cache_id = $this->getApiCacheId($qdata, $options);
-
-                $app->hook('api.response(<<*>>).<<array|item>>(<<*>>):after', function($var1, $var2, $var3, $var4) use($app, $cache_id){
-
-                    $lifetime = @$app->config['app.apiCache.lifetime'] ? $app->config['app.apiCache.lifetime'] : 5 * 60;
-                    $cache = array(
-                        'contentType' => $this->contentType,
-                        'output' => $var4
-                    );
-
-                    if($app->config['app.log.apiCache'])
-                        $app->log->debug(print_r(array('cache_id' => $cache_id) + $cache, true));
-
-                    $app->cache->save($cache_id, $cache, $lifetime);
-                });
-            }
             if(!$qdata && !$counting)
                 $this->apiErrorResponse('no data');
 
@@ -567,12 +541,20 @@ abstract class EntityController extends \MapasCulturais\Controller{
             $offset = null;
             $limit = null;
             $page = null;
+            $keyword = null;
+            $permissions = null;
 
             $dqls = array();
             foreach($qdata as $key => $val){
                 $val = trim($val);
                 if(strtolower($key) == '@select'){
                     $select = explode(',', $val);
+                    continue;
+                }elseif(strtolower($key) == '@keyword'){
+                    $keyword = $val;
+                    continue;
+                }elseif(strtolower($key) == '@permissions'){
+                    $permissions = explode(',', $val);
                     continue;
                 }elseif(strtolower($key) == '@order'){
                     $order = $val;
@@ -677,9 +659,6 @@ abstract class EntityController extends \MapasCulturais\Controller{
                 $dqls[] = $this->_API_find_parseParam($keys[$key], $val);
             }
 
-            if($counting)
-                $order = '';
-
             if($order){
                 $new_order = array();
                 foreach(explode(',',$order) as $prop){
@@ -701,6 +680,8 @@ abstract class EntityController extends \MapasCulturais\Controller{
             }
 
             $dql_where = implode($op, $dqls);
+            
+                
 
             if($metadata_class)
                 $metadata_class = ", $metadata_class m";
@@ -711,12 +692,17 @@ abstract class EntityController extends \MapasCulturais\Controller{
                 $dql_where = $dql_where ? $dql_where . ' AND e.status > 0' : 'WHERE e.status > 0';
             }
 
-
-            $selecting = $counting ? 'COUNT(e)' : 'e';
+            if($keyword){
+                $repo = $this->repo();
+                if($repo->usesKeyword()){
+                    $ids = implode(',',$repo->getIdsByKeyword($keyword));
+                    $dql_where .= $ids ? "AND e.id IN($ids)" : 'AND e.id < 0';
+                }
+            }
 
             $final_dql = "
                 SELECT
-                    $selecting
+                    e
                 FROM
                     $class e
                     $dql_joins
@@ -730,16 +716,15 @@ abstract class EntityController extends \MapasCulturais\Controller{
             if($app->config['app.log.apiDql'])
                 $app->log->debug("API DQL: ".$final_dql);
             
-
-
-            if($page && $limit)
-                $offset = (($page - 1) * $limit);
-
             $query = $app->em->createQuery($final_dql);
+            
+            // cache
+            if($app->config['app.useApiCache']){
+                $query->useResultCache(true, $app->config['app.apiCache.lifetime']);
+            }
+            
             $query->setParameters($this->_apiFindParamList);
-            $query->setMaxResults($findOne ? 1 : $limit);
-            $query->setFirstResult($offset);
-
+            
             $processEntity = function($r) use($append_files_cb, $select){
                 
                 $entity = array();
@@ -765,31 +750,73 @@ abstract class EntityController extends \MapasCulturais\Controller{
                         if(is_object($prop_value) && $prop_value instanceof \Doctrine\Common\Collections\Collection)
                             $prop_value = $prop_value->toArray();
 
-                        $entity[$prop] = $prop_value;
-                    }  catch (\Exception $e){
-                    }
+                        if(strpos($prop, '.')){
+                            $props = explode('.',$prop);
+                            $carray =& $entity;
+                            for($i = 0; $i < count($props) -1; $i++){
+                                $p = $props[$i];
+                                if(!isset($carray[$p]))
+                                    $carray[$p] = array();
+                                $carray =& $carray[$p];
+                            }
+                            $carray[array_pop($props)] = $prop_value;
+                        }else{
+                            $entity[$prop] = $prop_value;
+                        }                        
+                    }  catch (\Exception $e){ }
                 }
                 return $entity;
             };
 
-            if($counting){
-                $num = $query->getSingleScalarResult();
-                return $num;
-
-            }elseif($findOne){
+            if($findOne){
+                $query->setMaxResults(1);
+                
                 if($r = $query->getOneOrNullResult()){
-                    $entity = $processEntity($r);
+                    
+                    if($permissions){
+                        foreach($permissions as $perm){
+                            if(!$r->canUser(trim($perm))){
+                                $r = null;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if($r)
+                        $entity = $processEntity($r);
                 }else{
                     $entity = null;
                 }
                 return $entity;
             }else{
+                
                 $rs = $query->getResult();
-
+                
+                
                 $result = array();
-                foreach($rs as $r){
-                    $result[] = $processEntity($r);
+                
+                if(is_array($permissions)){
+                    $rs = array_values(array_filter($rs, function($entity) use($permissions){
+                        foreach($permissions as $perm)
+                            if(!$entity->canUser($perm))
+                                return false;
+                            
+                        return true;
+                    }));
                 }
+                
+                if($counting)
+                    return count($rs);
+                
+                
+                if($page && $limit){
+                    $offset = (($page - 1) * $limit);
+                    $rs = array_slice($rs, $offset, $limit);
+                }
+                $result = array_map(function($entity) use ($processEntity){
+                    return $processEntity($entity);
+                }, $rs);
+                
                 return $result;
             }
         }

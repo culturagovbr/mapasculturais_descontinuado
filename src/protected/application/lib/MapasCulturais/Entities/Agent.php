@@ -14,7 +14,7 @@ use MapasCulturais\App;
  *
  * @ORM\Table(name="agent")
  * @ORM\Entity
- * @ORM\entity(repositoryClass="MapasCulturais\Entities\Repositories\CachedRepository")
+ * @ORM\entity(repositoryClass="MapasCulturais\Repositories\Agent")
  * @ORM\HasLifecycleCallbacks
  */
 class Agent extends \MapasCulturais\Entity
@@ -28,7 +28,8 @@ class Agent extends \MapasCulturais\Entity
         Traits\EntityTaxonomies,
         Traits\EntityAgentRelation,
         Traits\EntityVerifiable,
-        Traits\EntitySoftDelete;
+        Traits\EntitySoftDelete,
+        Traits\EntityNested;
 
     const STATUS_RELATED = -1;
     const STATUS_INVITED = -2;
@@ -39,7 +40,7 @@ class Agent extends \MapasCulturais\Entity
         ),
         'shortDescription' => array(
             'required' => 'A descrição curta é obrigatória'
-        ),
+        )
     );
 
     /**
@@ -109,6 +110,24 @@ class Agent extends \MapasCulturais\Entity
     protected $status = self::STATUS_ENABLED;
 
     /**
+     * @var \MapasCulturais\Entities\Agent
+     *
+     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     * })
+     */
+    protected $parent;
+
+
+    /**
+     * @var \MapasCulturais\Entities\Agent[] Chield projects
+     *
+     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\Agent", mappedBy="parent", fetch="LAZY", cascade={"remove"})
+     */
+    protected $_children;
+    
+    /**
      * @var bool
      *
      * @ORM\Column(name="is_user_profile", type="boolean", nullable=false)
@@ -144,19 +163,19 @@ class Agent extends \MapasCulturais\Entity
     /**
     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\Space", mappedBy="owner", cascade="remove", orphanRemoval=true)
     */
-    protected $spaces = array();
+    protected $_spaces = array();
 
 
     /**
     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\Project", mappedBy="owner", cascade="remove", orphanRemoval=true)
     */
-    protected $projects = array();
+    protected $_projects = array();
 
 
     /**
     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\Event", mappedBy="owner", cascade="remove", orphanRemoval=true)
     */
-    protected $events = array();
+    protected $_events = array();
     
     
     /**
@@ -185,6 +204,18 @@ class Agent extends \MapasCulturais\Entity
 
         $this->save(true);
     }
+    
+    function getProjects(){
+        return $this->fetchByStatus($this->_projects, self::STATUS_ENABLED);
+    }
+    
+    function getEvents(){
+        return $this->fetchByStatus($this->_events, self::STATUS_ENABLED);
+    }
+    
+    function getSpaces(){
+        return $this->fetchByStatus($this->_spaces, self::STATUS_ENABLED);
+    }
 
 
     function getOwnerUser(){
@@ -192,23 +223,41 @@ class Agent extends \MapasCulturais\Entity
     }
 
     function getOwner(){
-        return $this->user ?
-                $this->user->profile :
-                App::i()->user->profile;
+        if($this->parent){
+            return $this->parent;
+        }else{
+            return $this->user ? $this->user->profile : App::i()->user->profile;
+        }
     }
-
+    
     function setOwnerId($owner_id){
         $owner = App::i()->repo('Agent')->find($owner_id);
-        if($owner)
-            $this->setUser($owner->user);
+        if($owner){
+            $this->setParent($owner);
+        }else{
+            $this->setParent();
+        }
     }
-
+    
     function setUser($user){
-        $this->checkPermission('modifyOwner');
-        $user->checkPermission('modify');
+        $this->checkPermission('modify');
         $this->user = $user;
     }
-
+    
+    function setParent(Agent $parent = null){
+        if($parent != $this->parent){
+            $this->checkPermission('changeOwner');
+            $parent->checkPermission('modify');
+            $this->parent = $parent;
+            if(!is_null($parent)){
+                if($parent->id == $this->id)
+                    $this->parent = null;
+                
+                $this->setUser($parent->user);
+            }
+        }
+    }
+    
     function jsonSerialize() {
         $result = parent::jsonSerialize();
         unset($result['user']);
@@ -228,6 +277,19 @@ class Agent extends \MapasCulturais\Entity
             return false;
         else
             return parent::canUserRemove($user);
+    }
+    
+    protected function canUserChangeOwner($user){
+        if($this->isUserProfile)
+            return false;
+        
+        if($user->is('guest'))
+            return false;
+        
+        if($user->is('admin'))
+            return true;
+        
+        return $this->getOwner()->canUser('modify') && $this->canUser('modify');
     }
 
     //============================================================= //

@@ -1,11 +1,13 @@
 <?php
-namespace MapasCulturais\Entities\Repositories;
+namespace MapasCulturais\Repositories;
+use MapasCulturais\Traits;
 
-use Doctrine\ORM\EntityRepository;
-class Event extends CachedRepository{
-
+class Event extends \MapasCulturais\Repository{
+    use Traits\RepositoryKeyword,
+        Traits\RepositoryCache;
+    
     public function findBySpace($space, $date_from = null, $date_to = null, $limit = null, $offset = null){
-
+        
         if($space instanceof \MapasCulturais\Entities\Space){
             $ids = $space->id;
 
@@ -67,6 +69,10 @@ class Event extends CachedRepository{
 
         $query = $this->_em->createNativeQuery($strNativeQuery, $rsm);
 
+        $app = \MapasCulturais\App::i();
+        if($app->config['app.useEventsCache'])
+            $query->useResultCache (true, $app->config['app.eventsCache.lifetime']);
+
         $query->setParameters(array(
             'date_from' => $date_from,
             'date_to' => $date_to,
@@ -80,11 +86,12 @@ class Event extends CachedRepository{
 
         return $result;
     }
-
+    
     public function findByProject($project, $date_from = null, $date_to = null, $limit = null, $offset = null){
 
         if($project instanceof \MapasCulturais\Entities\Project){
-            $ids = $project->id;
+            $ids = $project->getChildrenIds();
+            $ids[] = $project->id;
 
         }elseif($project && is_array($project) && is_object($project[0]) ){
             $ids = array(-1);
@@ -143,6 +150,10 @@ class Event extends CachedRepository{
                 eo.starts_on, eo.starts_at";
 
         $query = $this->_em->createNativeQuery($strNativeQuery, $rsm);
+
+        $app = \MapasCulturais\App::i();
+        if($app->config['app.useEventsCache'])
+            $query->useResultCache (true, $app->config['app.eventsCache.lifetime']);
 
         $query->setParameters(array(
             'date_from' => $date_from,
@@ -219,6 +230,10 @@ class Event extends CachedRepository{
 
         $query = $this->_em->createNativeQuery($strNativeQuery, $rsm);
 
+        $app = \MapasCulturais\App::i();
+        if($app->config['app.useEventsCache'])
+            $query->useResultCache (true, $app->config['app.eventsCache.lifetime']);
+
         $query->setParameters(array(
             'date_from' => $date_from,
             'date_to' => $date_to,
@@ -280,6 +295,10 @@ class Event extends CachedRepository{
                 eo.starts_on, eo.starts_at";
 
         $query = $this->_em->createNativeQuery($strNativeQuery, $rsm);
+        
+        $app = \MapasCulturais\App::i();
+        if($app->config['app.useEventsCache'])
+            $query->useResultCache (true, $app->config['app.eventsCache.lifetime']);
 
         $query->setParameters(array(
             'date_from' => $date_from,
