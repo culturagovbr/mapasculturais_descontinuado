@@ -25,21 +25,32 @@ class User extends \MapasCulturais\Repository{
     public function createByAuthResponse($response){
         $this->_isCreating = true;
         $app = \MapasCulturais\App::i();
+        
+        $app->log->debug(print_r($response, true));
 
+        $info = isset($response['auth']['info']) && !empty($response['auth']['info']) ? $response['auth']['info'] : $response['auth']['raw'];
+        
          // cria o usuário
         $user = new Entities\User;
         $user->authProvider = $response['auth']['provider'];
         $user->authUid = $response['auth']['uid'];
-        $user->email = $response['auth']['info']['email'];
+        $user->email = $info['email'];
         $this->_em->persist($user);
 
         // cria um agente do tipo user profile para o usuário criado acima
         $agent = new Entities\Agent($user);
         $agent->isUserProfile = true;
-        if(isset($response['auth']['info']['name']))
-            $agent->name = $response['auth']['info']['name'];
-        elseif(isset($response['auth']['info']['first_name']) && isset($response['auth']['info']['last_name']))
-            $agent->name = $response['auth']['info']['first_name'] . ' ' . $response['auth']['info']['last_name'];
+        if(isset($info['name']))
+            $agent->name = $info['name'];
+        
+        elseif(isset($info['full_name']))
+            $agent->name = $info['full_name'];
+        
+        elseif(isset($info['first_name']) && isset($info['last_name']))
+            $agent->name = $info['first_name'] . ' ' . $info['last_name'];
+        
+        elseif(isset($info['first_name']))
+            $agent->name = $info['first_name'];
         else
             $agent->name = 'Sem nome';
 

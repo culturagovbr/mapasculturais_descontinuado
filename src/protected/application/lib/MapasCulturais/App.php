@@ -491,6 +491,7 @@ class App extends \Slim\Slim{
             $this->_register = $this->cache->fetch('mapasculturais.register');
         }else{
             $this->registerAuthProvider('OpenID');
+            $this->registerAuthProvider('Google');
 
             $this->registerController('site',    'MapasCulturais\Controllers\Site');
             $this->registerController('auth',    'MapasCulturais\Controllers\Auth');

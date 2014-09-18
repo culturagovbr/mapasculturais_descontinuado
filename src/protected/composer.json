@@ -14,5 +14,10 @@
         "mustache/mustache": "v2.5.1",
         "phpoffice/phpword": "dev-master",
         "michelf/php-markdown": "1.4.1"
-    }
+    },
+    
+    "repositories": [{
+        "type": "vcs",
+        "url": "https://github.com/hacklabr/opauth-oauth2.git"
+    }]
 }
