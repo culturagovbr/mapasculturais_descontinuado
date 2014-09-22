@@ -42,6 +42,18 @@ return array_merge($config,
         'auth.config' => array(),
         // */
 
+//      Example OpauthGoogle
+//        'auth.provider' => 'OpauthGoogle',
+//        'auth.config' => array(
+//            'client_id' => '1_5zhq2l7g9i0w8404gsgok8o4skw8gkwo8kg840gk0oc4ksskkg',
+//            'client_secret' => '3skn6rpxmrgg8cg800w880s0w88s00gc0kc0008gws484ok04g',
+//            'host' => 'http://localhost:8000/',
+//            'userinfo_path' => 'api/v1/person',
+//            'auth_path' => 'oauth/v2/auth',
+//            'token_path' => 'oauth/v2/token',
+//            'logout_path' => 'logout'
+//        ),
+
         'plugins.enabled' => array(
             'agenda-singles',
             'endereco'

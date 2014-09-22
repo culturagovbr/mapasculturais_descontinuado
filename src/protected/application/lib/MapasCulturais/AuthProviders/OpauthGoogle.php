@@ -12,7 +12,7 @@ class OpauthGoogle extends \MapasCulturais\AuthProvider{
         $config = array_merge(array(
             'timeout' => '24 hours',
             'salt' => 'LT_SECURITY_SALT_SECURITY_SALT_SECURITY_SALT_SECURITY_SALT_SECU',
-            
+
             'client_secret' => '',
             'cliente_id' => '',
             'path' => preg_replace('#^https?\:\/\/[^\/]*(/.*)#', '$1', $app->createUrl('auth'))
@@ -24,9 +24,14 @@ class OpauthGoogle extends \MapasCulturais\AuthProvider{
             'Strategy' => array(
                 'Google' => array(
                     'client_id' => $config['client_id'],
-                    'client_secret' => $config['client_secret']
+                    'client_secret' => $config['client_secret'],
+                    'host' => 'http://localhost:8088/',
+                    'userinfo_path' => $config['userinfo_path'],
+                    'auth_path' => $config['auth_path'],
+                    'token_path' => $config['token_path'],
                 )
             ),
+            'host' => $config['host'],
             'security_salt' => $config['salt'],
             'security_timeout' => $config['timeout'],
             'path' => $config['path'],
@@ -36,8 +41,16 @@ class OpauthGoogle extends \MapasCulturais\AuthProvider{
         $opauth = new \Opauth($opauth_config, false );
 
         $this->opauth = $opauth;
-        
-        
+
+
+//        if($config['logout_url']){
+//            $app->hook('auth.logout:after', function() use($app, $config){
+//                print($config['logout_url']);
+//                echo file_get_contents($config['logout_url']);
+//                die('<br>test');
+//                $app->redirect($app->baseUrl);
+//            });
+//        }
 
         // add actions to auth controller
         $app->hook('GET(auth.index)', function () use($app){
@@ -144,7 +157,7 @@ class OpauthGoogle extends \MapasCulturais\AuthProvider{
 
         // verifica se a resposta é um erro
         if (array_key_exists('error', $response)) {
-            
+
             $app->flash('auth error', 'Opauth returns error auth response');
         } else {
             /**
