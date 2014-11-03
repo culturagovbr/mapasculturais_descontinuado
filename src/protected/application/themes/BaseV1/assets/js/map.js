@@ -292,9 +292,10 @@
                 // activate google service
 
                 var geocoder = null;
-                if(typeof google !== 'undefined')
-                    geocoder =  new google.maps.Geocoder();
-
+                var googleGeocodeUri = 'http://maps.google.com/maps/api/geocode/json?sensor=false';
+                if(typeof google !== 'undefined') {
+                    geocoder = new google.maps.Geocoder();
+                }
 
                 function lat(p){
                     return typeof p.lat === 'function' ? p.lat() : p.lat;
@@ -312,27 +313,28 @@
                 }
 
                 // callback to handle google geolocation result
-                function geocode_callback(results, status) {
+                function geocode_callback(response) {
 
-                    console.log(results);
+                    console.log(response);
                     if(typeof google === 'undefined'){
                         return false;
                     }
-                    if (status == google.maps.GeocoderStatus.OK) {
+                    if (response.status == google.maps.GeocoderStatus.OK) {
                         var nearestResult = null,
                             shortestDistance = null;
 
-                        results.forEach(function(r){
+                        response.results.forEach(function(r){
+                            console.log('result', r);
                             var location = r.geometry.location;
                             var d = distanceFromCenter(location);
-                            console.log(d);
+                            console.log('distance', d);
                             if(!nearestResult || d < shortestDistance) {
-                                nearestResult = location;
+                                nearestResult = r;
                                 shortestDistance = d;
                             }
                         });
-                        console.log(nearestResult);
-                        var foundLocation = new L.latLng(nearestResult.lat(), nearestResult.lng());
+                        console.log('nearest', nearestResult);
+                        var foundLocation = new L.latLng(nearestResult.geometry.location.lat, nearestResult.geometry.location.lng);
                         map.setView(foundLocation, isPrecise ? config.zoomPrecisse : config.zoomApproximate);
                         marker.setLatLng(foundLocation);
                     }
@@ -349,12 +351,36 @@
                     var mapCenter = map.getCenter();
                     //var googleBounds = new google.maps.LatLngBounds(mapBounds.getSouthWest(), mapBounds.getNorthEast());
                     var googleCenter = new google.maps.LatLng(mapCenter.lat, mapCenter.lng);
-                    geocoder.geocode({
-                        'address': strAddress,
-                        'location': googleCenter,
-                        //'type' : 'route'
-                        //'bounds': googleBounds
-                    }, geocode_callback);
+
+                    // get map center's countrycode and locality through reverse geocoding
+                    var countryCode, locality;
+                    $.get('http://maps.googleapis.com/maps/api/geocode/json?sensor=false',{
+                        latlng: mapCenter.lat+','+mapCenter.lng
+                    }).done(function(response){
+                        if (response.status == google.maps.GeocoderStatus.OK) {
+                            response.results[0].address_components.forEach(function (address) {
+                                if(address.types.indexOf('country')!==-1){
+                                    countryCode = address.short_name;
+                                }else if(address.types.indexOf('locality')!==-1){
+                                    locality = address.short_name;
+                                }
+                                console.log(address)
+                            });
+                        }
+                        $.get(googleGeocodeUri, {
+                            'address': strAddress,
+                            'components': 'administrative_area:'+locality+'|country:'+countryCode
+                        }).done(geocode_callback);
+                    });
+
+
+                    //geocoder.geocode({
+                    //    'address': strAddress,
+                    //    'location': googleCenter,
+                    //    //'components': 'administrative_area:são%20paulo|country:BR'
+                    //    //'type' : 'route'
+                    //    //'bounds': googleBounds
+                    //}, geocode_callback);
                 });
 
                 //Mais controles
