@@ -313,8 +313,7 @@
                 }
 
                 // callback to handle google geolocation result
-                function geocode_callback(response) {
-
+                function geocodeCallback(response) {
                     console.log(response);
                     if(typeof google === 'undefined'){
                         return false;
@@ -324,10 +323,8 @@
                             shortestDistance = null;
 
                         response.results.forEach(function(r){
-                            console.log('result', r);
                             var location = r.geometry.location;
                             var d = distanceFromCenter(location);
-                            console.log('distance', d);
                             if(!nearestResult || d < shortestDistance) {
                                 nearestResult = r;
                                 shortestDistance = d;
@@ -337,6 +334,7 @@
                         var foundLocation = new L.latLng(nearestResult.geometry.location.lat, nearestResult.geometry.location.lng);
                         map.setView(foundLocation, isPrecise ? config.zoomPrecisse : config.zoomApproximate);
                         marker.setLatLng(foundLocation);
+                        marker.bindPopup("<b>Hello world!</b><br />I am a popup.");
                     }
                 }
 
@@ -347,14 +345,12 @@
                 });
 
                 $('.js-editable[data-edit="endereco"]').on('changeAddress', function(event, strAddress){
-                    //var mapBounds = map.getBounds();
-                    var mapCenter = map.getCenter();
-                    //var googleBounds = new google.maps.LatLngBounds(mapBounds.getSouthWest(), mapBounds.getNorthEast());
-                    var googleCenter = new google.maps.LatLng(mapCenter.lat, mapCenter.lng);
+                    var mapCenter = map.getCenter(),
+                        countryCode,
+                        locality;
 
-                    // get map center's countrycode and locality through reverse geocoding
-                    var countryCode, locality;
-                    $.get('http://maps.googleapis.com/maps/api/geocode/json?sensor=false',{
+                    // get map center's country code and locality through reverse geocoding
+                    $.get(googleGeocodeUri, {
                         latlng: mapCenter.lat+','+mapCenter.lng
                     }).done(function(response){
                         if (response.status == google.maps.GeocoderStatus.OK) {
@@ -364,23 +360,17 @@
                                 }else if(address.types.indexOf('locality')!==-1){
                                     locality = address.short_name;
                                 }
-                                console.log(address)
                             });
+                            var components = '';
+                            components = locality ?    components + 'administrative_area:' + locality: '';
+                            components = countryCode ? components + '|country:' + countryCode : '';
+                            //finally the geocode request filtered by the administrative area
+                            $.get(googleGeocodeUri, {
+                                'address': strAddress,
+                                'components': components
+                            }).done(geocodeCallback);
                         }
-                        $.get(googleGeocodeUri, {
-                            'address': strAddress,
-                            'components': 'administrative_area:'+locality+'|country:'+countryCode
-                        }).done(geocode_callback);
                     });
-
-
-                    //geocoder.geocode({
-                    //    'address': strAddress,
-                    //    'location': googleCenter,
-                    //    //'components': 'administrative_area:são%20paulo|country:BR'
-                    //    //'type' : 'route'
-                    //    //'bounds': googleBounds
-                    //}, geocode_callback);
                 });
 
                 //Mais controles
