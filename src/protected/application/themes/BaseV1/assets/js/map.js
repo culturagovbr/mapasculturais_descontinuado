@@ -193,8 +193,6 @@
                         $(this).parent().hide();
                 }
 
-
-
                 /* Events */
                 map.on('locationfound', function(e) {
                     var radius = e.accuracy / 2;
@@ -297,14 +295,44 @@
                 if(typeof google !== 'undefined')
                     geocoder =  new google.maps.Geocoder();
 
+
+                function lat(p){
+                    return typeof p.lat === 'function' ? p.lat() : p.lat;
+                }
+                function lng(p){
+                    return typeof p.lng === 'function' ? p.lng() : p.lng;
+                }
+
+                function calculateDistance(p1, p2){
+                    return Math.sqrt(Math.pow(lat(p1) - lat(p2), 2) + Math.pow(lng(p1) - lng(p2), 2));
+                }
+
+                function distanceFromCenter(p){
+                    return calculateDistance(map.getCenter(), p);
+                }
+
                 // callback to handle google geolocation result
                 function geocode_callback(results, status) {
+
+                    console.log(results);
                     if(typeof google === 'undefined'){
                         return false;
                     }
                     if (status == google.maps.GeocoderStatus.OK) {
-                        var location = results[0].geometry.location;
-                        var foundLocation = new L.latLng(location.lat(), location.lng());
+                        var nearestResult = null,
+                            shortestDistance = null;
+
+                        results.forEach(function(r){
+                            var location = r.geometry.location;
+                            var d = distanceFromCenter(location);
+                            console.log(d);
+                            if(!nearestResult || d < shortestDistance) {
+                                nearestResult = location;
+                                shortestDistance = d;
+                            }
+                        });
+                        console.log(nearestResult);
+                        var foundLocation = new L.latLng(nearestResult.lat(), nearestResult.lng());
                         map.setView(foundLocation, isPrecise ? config.zoomPrecisse : config.zoomApproximate);
                         marker.setLatLng(foundLocation);
                     }
@@ -317,7 +345,16 @@
                 });
 
                 $('.js-editable[data-edit="endereco"]').on('changeAddress', function(event, strAddress){
-                    geocoder.geocode({'address': strAddress + ', Brasil'}, geocode_callback);
+                    //var mapBounds = map.getBounds();
+                    var mapCenter = map.getCenter();
+                    //var googleBounds = new google.maps.LatLngBounds(mapBounds.getSouthWest(), mapBounds.getNorthEast());
+                    var googleCenter = new google.maps.LatLng(mapCenter.lat, mapCenter.lng);
+                    geocoder.geocode({
+                        'address': strAddress,
+                        'location': googleCenter,
+                        //'type' : 'route'
+                        //'bounds': googleBounds
+                    }, geocode_callback);
                 });
 
                 //Mais controles
@@ -376,6 +413,11 @@
                     for ( var key in camadasGoogle) {
                         camadasBase[key] = camadasGoogle[key];
                     };
+
+                    camadasBase['MapBox'] = L.tileLayer('http://{s}.tiles.mapbox.com/v3/examples.map-i875mjb7/{z}/{x}/{y}.png', {
+                        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                        maxZoom: config.zoomMax
+                    });
                 }
 
                 /*
