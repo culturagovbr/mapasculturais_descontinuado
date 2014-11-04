@@ -334,7 +334,7 @@
                         var foundLocation = new L.latLng(nearestResult.geometry.location.lat, nearestResult.geometry.location.lng);
                         map.setView(foundLocation, isPrecise ? config.zoomPrecisse : config.zoomApproximate);
                         marker.setLatLng(foundLocation);
-                        marker.bindPopup("<b>Hello world!</b><br />I am a popup.");
+                        marker.bindPopup(nearestResult.formatted_address).openPopup();
                     }
                 }
 
