@@ -20,10 +20,11 @@ use MapasCulturais\App;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="object_type", type="string")
  * @ORM\DiscriminatorMap({
-        "MapasCulturais\Entities\Project"   = "\MapasCulturais\Entities\ProjectAgentRelation",
-        "MapasCulturais\Entities\Event"     = "\MapasCulturais\Entities\EventAgentRelation",
-        "MapasCulturais\Entities\Agent"     = "\MapasCulturais\Entities\AgentAgentRelation",
-        "MapasCulturais\Entities\Space"     = "\MapasCulturais\Entities\SpaceAgentRelation"
+        "MapasCulturais\Entities\Project"       = "\MapasCulturais\Entities\ProjectAgentRelation",
+        "MapasCulturais\Entities\Event"         = "\MapasCulturais\Entities\EventAgentRelation",
+        "MapasCulturais\Entities\Agent"         = "\MapasCulturais\Entities\AgentAgentRelation",
+        "MapasCulturais\Entities\Space"         = "\MapasCulturais\Entities\SpaceAgentRelation",
+        "MapasCulturais\Entities\Registration"  = "\MapasCulturais\Entities\RegistrationAgentRelation"
    })
  */
 abstract class AgentRelation extends \MapasCulturais\Entity
@@ -157,6 +158,11 @@ abstract class AgentRelation extends \MapasCulturais\Entity
 
     function delete($flush = false) {
         $this->checkPermission('remove');
+        // ($originType, $originId, $destinationType, $destinationId, $metadata)
+        $ruid = RequestAgentRelation::generateRequestUid($this->owner->getClassName(), $this->owner->id, $this->agent->getClassName(), $this->agent->id, array('class' => $this->getClassName(), 'relationId' => $this->id));
+        $requests = App::i()->repo('RequestAgentRelation')->findBy(array('requestUid' => $ruid));
+        foreach($requests as $r)
+            $r->delete($flush);
 
         parent::delete($flush);
     }

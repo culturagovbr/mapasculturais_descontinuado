@@ -1,4 +1,16 @@
 @charset "UTF-8";
+.approve, .reject, .maybe, .attachment-list .attachment-list-item .attachment-title:before {
+  font-family: 'ElegantIcons';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  vertical-align: middle; }
+
 /* =Reset default browser CSS. Based on work by Eric Meyer: http://meyerweb.com/eric/tools/css/reset/index.html
 -------------------------------------------------------------- */
 html,
@@ -1042,18 +1054,19 @@ h6 {
   .content-do-header .entity-parent-title:after {
     content: ' »'; }
 
+#entity-owner {
+  clear: both; }
+
 .dono {
   margin: 1.5rem 0;
   padding-top: 1.5rem;
   border-top: 1px solid #eee;
   font-size: 0.875rem; }
-
-.dono .avatar {
-  width: 3rem;
-  height: 3rem; }
-
-.dono .descricao-do-agente {
-  font-style: italic; }
+  .dono .avatar {
+    width: 3rem;
+    height: 3rem; }
+  .dono .descricao-do-agente {
+    font-style: italic; }
 
 .regra {
   margin-bottom: 1.5rem; }
@@ -2296,7 +2309,8 @@ nav.sidebar-left .icone {
   text-decoration: none; }
 
 .botao {
-  height: 1.875rem;
+  height: 2rem;
+  box-sizing: border-box;
   padding: 0 0.5rem;
   font-size: 0.75rem;
   line-height: 1.875rem; }
@@ -2321,16 +2335,16 @@ nav.sidebar-left .icone {
 .botao.download,
 .botao.excluir {
   color: #666;
-  background: #d8d8d8;
-  border: 1px solid #c4c4c4; }
+  background: #e2e2e2;
+  border: 1px solid #ccc; }
 
 .botao.adicionar:hover,
 .botao.editar:hover,
 .botao.download:hover,
 .botao.excluir:hover {
   color: #333;
-  background: #ddd;
-  border: 1px solid #999; }
+  background: #eee;
+  border: 1px solid #666; }
 
 .botao-grande {
   padding: 0.5rem;
@@ -2396,7 +2410,7 @@ nav.sidebar-left .icone {
   display: none;
   padding: .2rem .5rem;
   border-radius: 2px;
-  background: #ddd;
+  background: #e2e2e2;
   border: 1px solid #999;
   box-shadow: rgba(0, 0, 0, 0.25) 0 1px 2px 0;
   -webkit-box-shadow: rgba(0, 0, 0, 0.25) 0 1px 2px 0; }
@@ -2430,93 +2444,103 @@ nav.sidebar-left .icone {
 table.contratos td {
   font-size: 0.75rem; }
 
-/*dropdown*/
 .dropdown {
   position: relative;
   display: inline-block;
   height: 2rem;
   margin: 0;
-  background: #e2e2e2;
+  background-color: #e2e2e2;
   color: #000000;
   border-radius: 2px;
   font-size: 0.75rem;
   line-height: 1.875rem; }
+  .dropdown .placeholder {
+    padding: 0 1.5rem 0 0.5rem;
+    cursor: pointer; }
+    .dropdown .placeholder:after {
+      content: '\33';
+      position: absolute;
+      right: 0;
+      width: 1.5rem;
+      text-align: center;
+      font-family: 'ElegantIcons';
+      speak: none;
+      font-size: 1rem;
+      font-weight: normal;
+      font-variant: normal;
+      text-transform: none;
+      line-height: 1.875rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      vertical-align: middle;
+      cursor: pointer; }
+  .dropdown .submenu-dropdown {
+    z-index: 900;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    min-width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    display: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    background: #e2e2e2;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0 1px 2px 0;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.35) 0 1px 2px 0;
+    -webkit-transition: opacity .5s;
+    transition: opacity .5s;
+    opacity: 0; }
+    .dropdown .submenu-dropdown:before {
+      content: '\42';
+      position: absolute;
+      top: -13px;
+      right: 0;
+      left: 0;
+      padding-right: .25rem;
+      color: #e2e2e2;
+      font-family: 'ElegantIcons';
+      speak: none;
+      font-weight: normal;
+      font-variant: normal;
+      font-size: 24px;
+      text-align: right;
+      text-transform: none;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale; }
+    .dropdown .submenu-dropdown ul {
+      list-style: none;
+      margin: 0; }
+    .dropdown .submenu-dropdown li {
+      padding: 0 0.5rem;
+      margin-bottom: .5rem;
+      cursor: pointer;
+      -webkit-transition: all .2s;
+      transition: all .2s; }
+      .dropdown .submenu-dropdown li:focus, .dropdown .submenu-dropdown li:hover {
+        background: #ccc;
+        color: #fff; }
+  .dropdown:hover .submenu-dropdown {
+    display: block;
+    opacity: 1; }
 
-.dropdown .placeholder {
-  padding: 0 0.5rem;
-  cursor: pointer; }
-
-.dropdown .placeholder:after {
-  content: '\33';
-  float: right;
-  font-family: 'ElegantIcons';
-  speak: none;
-  font-size: 1rem;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1.875rem;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  vertical-align: middle;
-  cursor: pointer; }
-
-.dropdown .submenu-dropdown {
-  z-index: 900;
-  position: absolute;
-  top: 40px;
-  right: 0;
-  min-width: 100%;
+.dropdown-select {
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  display: none;
-  margin: 0;
-  padding: 0.5rem 0;
-  background: #e2e2e2;
-  border-radius: 2px;
-  box-shadow: rgba(0, 0, 0, 0.35) 0 1px 2px 0;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.35) 0 1px 2px 0;
-  -webkit-transition: opacity .5s;
-  transition: opacity .5s;
-  opacity: 0; }
-
-.dropdown .submenu-dropdown:before {
-  content: '\42';
-  position: absolute;
-  top: -13px;
-  right: 0;
-  left: 0;
-  padding-right: .25rem;
-  color: #e2e2e2;
-  font-family: 'ElegantIcons';
-  speak: none;
-  font-weight: normal;
-  font-variant: normal;
-  font-size: 24px;
-  text-align: right;
-  text-transform: none;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; }
-
-.dropdown:hover .submenu-dropdown {
-  display: block;
-  opacity: 1; }
-
-.dropdown .submenu-dropdown ul {
-  list-style: none;
-  margin: 0; }
-
-.dropdown .submenu-dropdown li {
-  padding: 0 0.5rem;
-  margin-bottom: .5rem;
-  cursor: pointer;
-  -webkit-transition: all .2s;
-  transition: all .2s; }
-
-.dropdown .submenu-dropdown li:hover {
-  background: #1c5690;
-  color: #fff; }
+  border: 1px solid #ccc;
+  font-weight: bold;
+  color: #666; }
+  .dropdown-select .placeholder {
+    white-space: nowrap;
+    overflow: hidden; }
+    .dropdown-select .placeholder:after {
+      background-color: #e2e2e2; }
+  .dropdown-select .submenu-dropdown {
+    border: 1px solid #ccc; }
+  .dropdown-select:hover {
+    box-shadow: rgba(0, 0, 0, 0.25) 0 1px 2px 0;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.25) 0 1px 2px 0; }
 
 /* =Edit box
 -------------------------------------------------------------- */
@@ -2607,6 +2631,7 @@ table.contratos td {
 /*Directive Find Entity*/
 .directive-find-entity .result-container {
   max-height: 300px;
+  max-width: 375px;
   padding: 0;
   margin: 0;
   overflow-y: auto; }
@@ -2683,9 +2708,6 @@ h1 .icone {
 .icon_check.selected {
   background: #000000;
   color: #fff !important; }
-
-.icon_check:hover {
-  color: #000000; }
 
 .social_twitter {
   color: #00acee !important; }
@@ -3173,10 +3195,161 @@ h1 .icone {
   margin-bottom: 1.5rem;
   background: #ccc; }
 
-#boas-vindas-painel {
+.highlighted-message {
   border-left: 3px solid #1c5690;
   padding: 0.75rem;
   background: #f8f8f8; }
+
+.registrations-table, .my-registrations, .approved-registrations {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 3rem;
+  table-layout: fixed; }
+  .registrations-table tbody tr, .my-registrations tbody tr, .approved-registrations tbody tr {
+    border-left: 3px solid transparent; }
+    .registrations-table tbody tr:nth-child(even), .my-registrations tbody tr:nth-child(even), .approved-registrations tbody tr:nth-child(even) {
+      background-color: #f6f6f6; }
+    .registrations-table tbody tr:hover, .my-registrations tbody tr:hover, .approved-registrations tbody tr:hover {
+      background-color: #eee; }
+    .registrations-table tbody tr.approved, .my-registrations tbody tr.approved, .approved-registrations tbody tr.approved {
+      border-left: 3px solid #66cc66; }
+    .registrations-table tbody tr.rejected, .my-registrations tbody tr.rejected, .approved-registrations tbody tr.rejected {
+      border-left: 3px solid #cc3333; }
+    .registrations-table tbody tr.maybed, .my-registrations tbody tr.maybed, .approved-registrations tbody tr.maybed {
+      border-left: 3px solid #cc9933; }
+    .registrations-table tbody tr td, .my-registrations tbody tr td, .approved-registrations tbody tr td {
+      word-wrap: break-word; }
+  .registrations-table tbody p, .my-registrations tbody p, .approved-registrations tbody p {
+    margin-bottom: 0.75rem; }
+  .registrations-table tbody a, .my-registrations tbody a, .approved-registrations tbody a {
+    color: #cc0033; }
+  .registrations-table tbody ul, .my-registrations tbody ul, .approved-registrations tbody ul {
+    margin: 0;
+    list-style: none; }
+  .registrations-table .registration-id, .my-registrations .registration-id, .approved-registrations .registration-id {
+    width: 12%; }
+  .registrations-table .registration-attachments, .my-registrations .registration-attachments, .approved-registrations .registration-attachments {
+    width: 36%;
+    text-align: left; }
+  .registrations-table .registration-agents, .my-registrations .registration-agents, .approved-registrations .registration-agents {
+    width: 36%;
+    text-align: left; }
+  .registrations-table .registration-status, .my-registrations .registration-status, .approved-registrations .registration-status {
+    width: 16%; }
+    .registrations-table .registration-status .dropdown, .my-registrations .registration-status .dropdown, .approved-registrations .registration-status .dropdown {
+      width: 100%;
+      text-align: left;
+      background-color: transparent; }
+
+.approve, .reject, .maybe {
+  font-size: 1.25rem;
+  color: #ccc;
+  margin: 0 2px; }
+
+.approve:before {
+  content: "\e052"; }
+.approve:hover {
+  color: #66cc66; }
+.approve.selected {
+  color: #66cc66; }
+
+.reject:before {
+  content: "\e051"; }
+.reject:hover {
+  color: #cc3333; }
+.reject.selected {
+  color: #cc3333; }
+
+.maybe:before {
+  content: "\e064"; }
+.maybe:hover {
+  color: #cc9933; }
+.maybe.selected {
+  color: #cc9933; }
+
+.my-registrations .registration-id, .approved-registrations .registration-id {
+  width: 10%; }
+.my-registrations .registration-agents, .approved-registrations .registration-agents {
+  width: 30%; }
+
+.registration-form {
+  box-sizing: border-box;
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: 1.5rem;
+  margin-bottom: 3rem; }
+  .registration-form > div {
+    float: left;
+    box-sizing: border-box;
+    padding-right: .75rem; }
+    .registration-form > div:nth-child(1) {
+      width: 40%; }
+    .registration-form > div:nth-child(2) {
+      width: 40%; }
+    .registration-form > div:nth-child(3) {
+      width: 20%;
+      padding-right: 0; }
+  .registration-form .dropdown-select {
+    width: 100%; }
+  .registration-form .botao {
+    width: 100%; }
+    .registration-form .botao.principal {
+      text-align: center; }
+    .registration-form .botao.simples {
+      white-space: nowrap;
+      overflow: hidden; }
+
+.registration-edition-options {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 2px; }
+  .registration-edition-options:hover {
+    background-color: #f4f4f4; }
+  .registration-edition-options h4 {
+    margin-bottom: 0.75rem; }
+
+.registration-edition-help {
+  font-style: italic;
+  color: #999; }
+
+.attachment-list {
+  margin: 0;
+  list-style: none; }
+  .attachment-list .attachment-list-item {
+    position: relative;
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee; }
+    .attachment-list .attachment-list-item .attachment-title {
+      display: block; }
+      .attachment-list .attachment-list-item .attachment-title:before {
+        content: "\e016"; }
+    .attachment-list .attachment-list-item .attachment-description {
+      font-size: 0.75rem;
+      color: #999; }
+  .attachment-list .is-editable {
+    padding-right: 4rem;
+    min-height: 1.5rem; }
+    .attachment-list .is-editable .botoes {
+      display: none;
+      position: absolute;
+      top: .75rem;
+      right: .75rem; }
+    .attachment-list .is-editable:hover {
+      background: #eee;
+      border-radius: 2px; }
+      .attachment-list .is-editable:hover .botoes {
+        display: inline-block; }
+  .attachment-list a.icone,
+  .attachment-list a.editar {
+    margin-left: 5px;
+    color: #666;
+    cursor: pointer; }
+    .attachment-list a.icone:hover,
+    .attachment-list a.editar:hover {
+      color: #333; }
+  .attachment-list a.icone {
+    font-size: 1rem; }
 
 .ui-datepicker {
   display: none;

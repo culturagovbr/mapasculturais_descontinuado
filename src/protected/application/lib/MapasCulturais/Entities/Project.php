@@ -118,6 +118,13 @@ class Project extends \MapasCulturais\Entity
     protected $createTimestamp;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="registration_categories", type="json_array", nullable=true)
+     */
+    protected $registrationCategories = array();
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="status", type="smallint", nullable=false)
@@ -134,15 +141,12 @@ class Project extends \MapasCulturais\Entity
      */
     protected $parent;
 
-
     /**
      * @var \MapasCulturais\Entities\Project[] Chield projects
      *
      * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\Project", mappedBy="parent", fetch="LAZY", cascade={"remove"})
      */
     protected $_children;
-    
-
 
     /**
      * @var \MapasCulturais\Entities\Agent
@@ -162,6 +166,13 @@ class Project extends \MapasCulturais\Entity
     protected $_events;
 
     /**
+     * @var \MapasCulturais\Entities\RegistrationFileConfiguration[] RegistrationFileConfiguration
+     *
+     * @ORM\OneToMany(targetEntity="\MapasCulturais\Entities\RegistrationFileConfiguration", mappedBy="owner", fetch="LAZY")
+     */
+    public $registrationFileConfigurations;
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="is_verified", type="boolean", nullable=false)
@@ -172,7 +183,7 @@ class Project extends \MapasCulturais\Entity
     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\ProjectMeta", mappedBy="owner", cascade="remove", orphanRemoval=true)
     */
     protected $__metadata = array();
-    
+
     function getEvents(){
         return $this->fetchByStatus($this->_events, self::STATUS_ENABLED);
     }
@@ -194,15 +205,51 @@ class Project extends \MapasCulturais\Entity
     }
 
     function validateRegistrationDates() {
-        if($this->registrationFrom && $this->registrationTo)
+        if($this->registrationFrom && $this->registrationTo){
             return $this->registrationFrom <= $this->registrationTo;
-        else
+
+        }elseif($this->registrationFrom || $this->registrationTo){
+            return false;
+
+        }else{
             return true;
+        }
     }
 
     function isRegistrationOpen(){
         $cdate = new \DateTime;
         return $cdate >= $this->registrationFrom && $cdate <= $this->registrationTo;
+    }
+
+
+    protected function canUserRegister($user = null){
+        if($user->is('guest'))
+            return false;
+
+        return $this->isRegistrationOpen();
+    }
+
+    function getEnabledRelations(){
+        $result = array();
+        foreach(App::i()->getRegisteredRegistrationAgentRelations() as $def){
+            $metadata_name = $def->metadataName;
+            $metadata_value = $this->$metadata_name;
+
+            if($this->$metadata_name !== 'dontUse'){
+                $obj = new \stdClass;
+                $obj->metadataName = $metadata_name;
+                $obj->required = $metadata_value;
+                $obj->label = $def->label;
+            }
+        }
+    }
+
+    function setRegistrationCategories($value){
+        if(is_string($value)){
+            $this->registrationCategories = explode("\n", $value);
+        }else{
+            $this->registrationCategories = $value;
+        }
     }
 
     function getRegistrationByAgent(Agent $agent){

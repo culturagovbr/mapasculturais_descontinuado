@@ -1,10 +1,12 @@
 (function(angular){
     "use strict";
 
-    var app = angular.module('Entity', ['RelatedAgents', 'ChangeOwner', 'Notifications', 'ngSanitize']);
+    var app = angular.module('Entity', ['RelatedAgents', 'ChangeOwner', 'Project', 'Notifications', 'ngSanitize']);
 
-    app.factory('FindService', ['$rootScope', '$http', function($rootScope, $http){
+    app.factory('FindService', ['$rootScope', '$http', '$q', function($rootScope, $http, $q){
         var baseUrl = MapasCulturais.baseURL + '/api/';
+        var canceller;
+        
         function extend (query){
             return angular.extend(query, {
                 "@select": 'id,name,type,shortDescription,terms',
@@ -14,11 +16,18 @@
         };
 
         function request (url, query, success_cb, error_cb){
+            cancelRequest();
+            
             query = extend(query);
-
+            
+            
+            canceller = $q.defer();
+            
             var p = $http({
                 url: url,
                 method: "GET",
+                timeout: canceller.promise,
+                cache:true,
                 params: query
             });
 
@@ -30,8 +39,18 @@
                 p.error( error_cb );
             }
         };
+        
+        function cancelRequest(){
+            if(canceller){
+                canceller.resolve();
+            }
+        }
 
         return {
+            
+            cancel: function(){
+               cancelRequest();
+            },
 
             find: function(entity, query, success_cb, error_cb){
                 var url = baseUrl + entity + '/find';
@@ -101,7 +120,7 @@
         };
     }]);
 
-    app.controller('EntityController',['$scope', '$timeout', 'RelatedAgents', function($scope, $timeout, RelatedAgents, ChangeOwner){
+    app.controller('EntityController',['$scope', '$timeout', 'RelatedAgents', 'ChangeOwner', 'Project', function($scope, $timeout, RelatedAgents, ChangeOwner, Project){
         $scope.openEditBox = function(editboxId){
 
         };
@@ -143,13 +162,14 @@
                 $scope.find = function(){
                     if(timeouts.find)
                         $timeout.cancel(timeouts.find);
+                    
+                    FindService.cancel();
 
                     var s = $scope.searchText.trim().replace(' ', '*');
 
                     var query = angular.isObject($scope.apiQuery) ? $scope.apiQuery : {};
 
                     query.name = 'ILIKE(*' + s + '*)';
-
                     timeouts.find = $timeout(function(){
                         $scope.spinnerCondition = true;
                         FindService.find($scope.entity, query, function(data, status){
@@ -235,6 +255,7 @@
             },
 
             open: function(editboxId, $event){
+                
                 if(typeof this.openEditboxes[editboxId] === 'undefined')
                     throw new Error('EditBox with id ' + editboxId + ' does not exists');
 
@@ -321,6 +342,31 @@
 
                 if(angular.isFunction($scope.onOpen)){
                     jQuery('#'+attrs.id).on('open', function(){ $scope.onOpen(); });
+                }
+            }
+        };
+    }]);
+
+    app.directive('mcSelect', [function() {
+        return {
+            restrict: 'E',
+            templateUrl: MapasCulturais.templateUrl.MCSelect,
+            transclude: true,
+
+            scope: {
+                data: '=',
+                model: '=',
+                placeholder: '@'
+            },
+            link: function($scope, el, attrs) {
+                $scope.classes = attrs.classes;
+                $scope.selectItem = function(item, $event){
+                    $($event.target).parents('.js-submenu-dropdown').hide();
+                    setTimeout(function(){
+                        $($event.target).parents('.js-submenu-dropdown').css('display','');
+                    },500);
+                    
+                    $scope.model = item;
                 }
             }
         };
