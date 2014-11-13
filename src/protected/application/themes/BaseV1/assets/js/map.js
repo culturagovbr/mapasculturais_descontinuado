@@ -58,7 +58,7 @@
         }
 
         //jQuery(document).ready(function() {
-        
+
             var config = MapasCulturais.mapsDefaults;
 
             var mapSelector = initializerOptions.mapSelector;
@@ -124,7 +124,7 @@
                     attribution: 'Dados e Imagens &copy; <a href="http://www.openstreetmap.org/copyright">Contrib. OpenStreetMap</a>, ',
                     maxZoom: config.zoomMax
                 });
-                
+
                 var map = new L.Map(id, options).addLayer(openStreetMap);
                 $(this).data('leaflet-map', map);
                 var timeout;
@@ -157,13 +157,25 @@
                     iconSize: new L.Point(circle._radius * 2, circle._radius * 2)
                 });
 
-                marker.on('move', function(e) {
+                marker.on('dragend', function(e) {
+                    var latlng = e.latlng ? e.latlng : e.target.getLatLng();
+
+                    console.log(latlng);
                     //var position = e.latlng;
-                    circle.setLatLng(e.latlng);
+                    circle.setLatLng(latlng);
                     //se for só visualização, não tem editable, não seta valor
                     if (isEditable)
-                        $dataTarget.editable('setValue', [e.latlng.lng, e.latlng.lat]);
+                        $dataTarget.editable('setValue', [latlng.lng, latlng.lat]);
 
+                    $.get(googleGeocodeUri, {
+                        latlng: latlng.lat+','+latlng.lng
+                    }).done(function(response){
+                        console.log(response);
+                        marker.bindPopup(
+                            response.results[0].formatted_address +
+                            ' <a stype="cursor:pointer" onclick="'+'$(\'[data-edit=\\\'endereco\\\']\').editable(\'setValue\',\''+response.results[0].formatted_address+'\')'+'">usar</a>'
+                        ).openPopup();
+                    });
                 });
 
 
@@ -213,15 +225,13 @@
                 });
 
 
-                marker.on('drag', function(e) {
-                    circle.setLatLng(e.target.getLatLng());
-                });
-
                 map.on('click', function(e) {
 
                     //se for só visualização, não edição
-                    if (isEditable && MapasCulturais.request.controller !== 'event')
+                    if (isEditable && MapasCulturais.request.controller !== 'event'){
                         marker.setLatLng(e.latlng);
+                        marker.fire('dragend', e);
+                    }
                 });
 
                 var $dataPrecisionRadios = $('input[name="' + id + '-precisionOption"]');
@@ -334,7 +344,7 @@
                         var foundLocation = new L.latLng(nearestResult.geometry.location.lat, nearestResult.geometry.location.lng);
                         map.setView(foundLocation, isPrecise ? config.zoomPrecisse : config.zoomApproximate);
                         marker.setLatLng(foundLocation);
-                        marker.bindPopup(nearestResult.formatted_address).openPopup();
+//                        marker.bindPopup(nearestResult.formatted_address).openPopup();
                     }
                 }
 
