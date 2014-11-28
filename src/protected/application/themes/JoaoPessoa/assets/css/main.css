@@ -4188,4 +4188,7 @@ button.mfp-arrow-left {
 #brand-logo img {
   width: 77px; }
 
+#main-header #busca {
+  z-index: 1666; }
+
 /*# sourceMappingURL=main.css.map */
