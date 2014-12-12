@@ -1,8 +1,8 @@
 MapasCulturais = MapasCulturais || {};
 
 $(function(){
-//    $.fn.select2.defaults.separator = '; ';
-//    $.fn.editabletypes.select2.defaults.viewseparator = '; ';
+    $.fn.select2.defaults.separator = '; ';
+    $.fn.editabletypes.select2.defaults.viewseparator = '; ';
     MapasCulturais.TemplateManager.init();
     MapasCulturais.Modal.initKeyboard('.js-dialog');
     MapasCulturais.Modal.initDialogs('.js-dialog');
@@ -695,16 +695,24 @@ MapasCulturais.Search = {
                 type:'select2',
                 name: $selector.data('field-name') ? $selector.data('field-name') : null,
                 select2:{
-//                    multiple: $selector.data('multiple'),
-//                    tokenSeparators: [";",";"],
-//                    separator:'; ',
-//                    viewseparator: '; ',
+                    multiple: $selector.data('multiple'),
+                    tokenSeparators: ["; ","; "],
+                    separator:'; ',
+                    viewseparator: '; ',
                     width: $selector.data('search-box-width'),
                     placeholder: $selector.data('search-box-placeholder'),
                     minimumInputLength: 0,
                     allowClear: $selector.data('allow-clear'),
                     initSelection: function(e,cb){
-                        cb({id: $selector.data('value'), name: $selector.data('editable').$element.html()});
+                        var data = [];
+                        var texts = $selector.data('editable').$element.html().split('; ');
+                        var i = -1;
+                        $(e.val().split("; ")).each(function () {
+                            i++;
+                            data.push({id: this, name: texts[i]});
+                        });
+                        cb(data);
+//                        cb({id: $selector.data('value'), name: $selector.data('editable').$element.html()});
                     },
                     ajax: {
                         url: MapasCulturais.baseURL + 'api/' + $selector.data('entity-controller') + '/find',
@@ -893,8 +901,9 @@ MapasCulturais.Search = {
                 $selector.data('value-name', entity.name);
             },
             selection: function(entity, $selector){
+                entity.text = entity.name;
                 $selector.data('entity', entity);
-                return entity.name;
+                return entity.text;
             },
 
             noMatches: function(term, $selector){
