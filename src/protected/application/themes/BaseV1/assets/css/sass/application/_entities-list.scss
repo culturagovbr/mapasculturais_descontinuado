@@ -159,6 +159,12 @@
         }
     }
 }
+@media print { 
+    #lista {
+        margin-top: 0 !important;
+    }
+}
+
 
 //== Entity Calendar of Events
 //

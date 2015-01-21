@@ -242,7 +242,7 @@
         border: 1px solid $brand-accent;
         padding: $padding-base;
         border-radius: $border-radius-base;
-    }
+    } 
     @media screen and (max-width: $screen-sm-max) and (min-height: 501px) {
         padding-left: 40px; // to fit nav.home-nav
     }
@@ -262,8 +262,12 @@
     }
     @media print {
         color: #000;
+        min-height: auto;
         h2,h3,h1,h4,h5,h6 {
             color: #000;
+        }
+        .box .btn-large, .box:nth-child(2) {
+            display: none;
         }
     }
 }
@@ -280,6 +284,9 @@
         width: 100%;
         max-width: 272px;
         margin: auto;
+        @media print {
+            display: none;
+        }
     }
     .view-more {
         position: relative;
@@ -288,6 +295,12 @@
         font-size: 4rem;
         text-align: center;
         line-height: 1;
+        @media print {
+            display: none;
+        }
+    }
+    @media print {
+        min-height: auto;
     }
 }
 //** Intro search
@@ -378,6 +391,12 @@
     .abas li.active {
         border-bottom-color: $brand-event;
     }
+    @media print {
+        .box .btn-large {
+            display: none;
+        }
+    }
+
 }
 //** Agents section
 #home-agents {
