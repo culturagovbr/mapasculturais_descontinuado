@@ -159,7 +159,7 @@ class Project extends \MapasCulturais\Entity
     /**
      * @var \MapasCulturais\Entities\Agent
      *
-     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="LAZY")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="agent_id", referencedColumnName="id")
      * })
@@ -188,7 +188,10 @@ class Project extends \MapasCulturais\Entity
     protected $isVerified = false;
 
     /**
-    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\ProjectMeta", mappedBy="owner", cascade="remove", orphanRemoval=true)
+    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\ProjectMeta", fetch="LAZY", mappedBy="owner", cascade="remove", orphanRemoval=true)
+    * @ORM\JoinColumns({
+    *   @ORM\JoinColumn(name="object_id", referencedColumnName="id")
+    * })
     */
     protected $__metadata = array();
 

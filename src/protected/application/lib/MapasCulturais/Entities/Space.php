@@ -82,14 +82,14 @@ class Space extends \MapasCulturais\Entity
      */
     protected $name;
 
-    
+
     /**
      * @var boolean
      *
      * @ORM\Column(name="public", type="boolean", nullable=false)
      */
     protected $public = false;
-    
+
     /**
      * @var string
      *
@@ -124,7 +124,7 @@ class Space extends \MapasCulturais\Entity
      * @ORM\Column(name="type", type="smallint", nullable=false)
      */
     protected $_type;
-    
+
     /**
      * @var \MapasCulturais\Entities\EventOccurrence[] Event Occurrences
      *
@@ -154,7 +154,7 @@ class Space extends \MapasCulturais\Entity
     /**
      * @var \MapasCulturais\Entities\Agent
      *
-     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="LAZY")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="agent_id", referencedColumnName="id")
      * })
@@ -174,10 +174,13 @@ class Space extends \MapasCulturais\Entity
      * @ORM\Column(name="is_verified", type="boolean", nullable=false)
      */
     protected $isVerified = false;
-    
-    
+
+
     /**
-    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\SpaceMeta", mappedBy="owner", cascade="remove", orphanRemoval=true)
+    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\SpaceMeta", fetch="LAZY", mappedBy="owner", cascade="remove", orphanRemoval=true)
+    * @ORM\JoinColumns({
+    *   @ORM\JoinColumn(name="object_id", referencedColumnName="id")
+    * })
     */
     protected $__metadata = array();
 

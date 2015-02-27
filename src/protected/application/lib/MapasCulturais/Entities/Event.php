@@ -104,14 +104,17 @@ class Event extends \MapasCulturais\Entity
     protected $status = self::STATUS_ENABLED;
 
     /**
-    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\EventOccurrence", mappedBy="event", cascade="remove", orphanRemoval=true)
+    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\EventOccurrence", fetch="LAZY", mappedBy="event", cascade="remove", orphanRemoval=true)
+    * @ORM\JoinColumns({
+    *   @ORM\JoinColumn(name="event_id", referencedColumnName="id")
+    * })
     */
     protected $occurrences = array();
 
     /**
      * @var \MapasCulturais\Entities\Agent
      *
-     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="LAZY")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="agent_id", referencedColumnName="id")
      * })
@@ -121,7 +124,7 @@ class Event extends \MapasCulturais\Entity
     /**
      * @var \MapasCulturais\Entities\Project
      *
-     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Project", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Project", fetch="LAZY")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      * })
@@ -139,9 +142,11 @@ class Event extends \MapasCulturais\Entity
 
 
     /**
-     * @var \MapasCulturais\Entities\ProjectMeta[] Entity Metadata
-     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\EventMeta", mappedBy="owner", cascade="remove", orphanRemoval=true)
-     */
+    * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\EventMeta", fetch="LAZY", mappedBy="owner", cascade="remove", orphanRemoval=true)
+    * @ORM\JoinColumns({
+    *   @ORM\JoinColumn(name="object_id", referencedColumnName="id")
+    * })
+    */
     protected $__metadata = array();
 
     protected function canUserCreate($user){

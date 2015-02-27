@@ -45,6 +45,14 @@ trait ControllerAPI{
     }
 
     protected function apiResponse($data){
+        if(isset(App::i()->config['app.queryLogger']->distinctQueries)){
+            $queries = [];
+            foreach(App::i()->config['app.queryLogger']->distinctQueries as $sql => $num)
+                $queries[] = $num . ': ' . trim(str_replace(["\n","\t"],' ', $sql));
+
+            $data[] = $queries;
+        }
+
         if(is_array($data))
             $this->apiArrayResponse($data);
         else
@@ -389,7 +397,8 @@ trait ControllerAPI{
 
             $query = $app->em->createQuery($final_dql);
 
-            if($app->user->is('superAdmin') && isset($_GET['@debug'])){
+            if(isset($_GET['@debug'])){
+
                 if(isset($_GET['@type']) && $_GET['@type'] == 'html') {
                     echo '<pre style="color:red">';
                 }

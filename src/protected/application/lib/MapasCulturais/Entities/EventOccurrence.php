@@ -137,7 +137,7 @@ class EventOccurrence extends \MapasCulturais\Entity
     /**
      * @var \MapasCulturais\Entities\Event
      *
-     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Event", cascade="persist")
+     * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Event", fetch="LAZY", cascade="persist")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="event_id", referencedColumnName="id")
      * })
@@ -387,8 +387,7 @@ class EventOccurrence extends \MapasCulturais\Entity
             'until' =>  $this->until,
             'spaceId' =>  $this->spaceId,
 
-            'space' => $this->space ? array('id' => $this->space->id, 'name' => $this->space->name, 'singleUrl' => $this->space->singleUrl, 'shortDescription' => $this->space->shortDescription, 'avatar' => $this->space->avatar, 'location'=>$this->space->location) : null,
-            'event' => $this->event ? array('id' => $this->event->id, 'name' => $this->event->name, 'shortDescription' => $this->event->shortDescription, 'avatar' => $this->space->avatar) : null,
+            'space' => $this->space ? $this->space->simplify('id,name,singleUrl,shortDescription,avatar,location,metadata') : null,
             'editUrl' => $this->editUrl,
             'deleteUrl' => $this->deleteUrl,
             'status' => $this->status
@@ -438,7 +437,7 @@ class EventOccurrence extends \MapasCulturais\Entity
             throw new \MapasCulturais\Exceptions\WorkflowRequest(array($request));
         }
     }
-    
+
     function delete($flush = false) {
         $this->checkPermission('remove');
         // ($originType, $originId, $destinationType, $destinationId, $metadata)
