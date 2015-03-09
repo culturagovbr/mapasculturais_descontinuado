@@ -8,18 +8,19 @@ class Fake extends \MapasCulturais\AuthProvider{
         $app = App::i();
 
         // add actions to auth controller
-        $app->hook('GET(auth.index)', function () use($app){
+        $app->hook('GET(auth.index)', function (\MapasCulturais\Controller $controller) use($app){
             $users = $app->repo('User')->findBy(array(), array('id' => 'ASC'));
-            $this->render('fake-authentication', array('users' => $users, 'form_action' => $app->createUrl('auth', 'fakeLogin')));
+
+            $controller->render('fake-authentication', array('users' => $users, 'form_action' => $app->createUrl('auth', 'fakeLogin')));
         });
 
-        $app->hook('GET(auth.fakeLogin)', function () use($app){
+        $app->hook('GET(auth.fakeLogin)', function (\MapasCulturais\Controller $controller) use($app){
             $app->auth->processResponse();
 
             if($app->auth->isUserAuthenticated()){
                 $app->redirect ($app->auth->getRedirectPath());
             }else{
-                $app->redirect ($this->createUrl(''));
+                $app->redirect ($controller->createUrl(''));
             }
         });
     }

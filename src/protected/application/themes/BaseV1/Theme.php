@@ -68,11 +68,11 @@ class Theme extends MapasCulturais\Theme {
 
         /* === NOTIFICATIONS  === */
         // para todos os requests
-        $app->hook('workflow(<<*>>).create', function() use($app) {
+        $app->hook('workflow(<<*>>).create', function($__request) use($app) {
 
-            if ($this->notifications) {
+            if ($__request->notifications) {
                 $app->disableAccessControl();
-                foreach ($this->notifications as $n) {
+                foreach ($__request->notifications as $n) {
                     $n->delete();
                 }
                 $app->enableAccessControl();
@@ -81,8 +81,8 @@ class Theme extends MapasCulturais\Theme {
             $requester = $app->user;
             $profile = $requester->profile;
 
-            $origin = $this->origin;
-            $destination = $this->destination;
+            $origin = $__request->origin;
+            $destination = $__request->destination;
 
             $origin_type = strtolower($origin->entityType);
             $origin_url = $origin->singleUrl;
@@ -95,7 +95,7 @@ class Theme extends MapasCulturais\Theme {
             $destination_link = "<a href=\"{$destination_url}\">{$destination_name}</a>";
             $origin_link = "<a href=\"{$origin_url}\">{$origin_name}</a>";
 
-            switch ($this->getClassName()) {
+            switch ($__request->getClassName()) {
                 case "MapasCulturais\Entities\RequestAgentRelation":
                     if($origin->getClassName() === 'MapasCulturais\Entities\Registration'){
                         $message = "{$profile_link} quer relacionar o agente {$destination_link} à inscrição {$origin->number} no projeto <a href=\"{$origin->project->singleUrl}\">{$origin->project->name}</a>.";
@@ -115,7 +115,7 @@ class Theme extends MapasCulturais\Theme {
                     $message_to_requester = "Sua requisição para fazer do {$origin_type} {$origin_link} um {$origin_type} filho de {$destination_link} foi enviada.";
                     break;
                 case "MapasCulturais\Entities\RequestEventOccurrence":
-                    $message = "{$profile_link} quer adicionar o evento {$origin_link} que ocorre <em>{$this->rule->description}</em> no espaço {$destination_link}.";
+                    $message = "{$profile_link} quer adicionar o evento {$origin_link} que ocorre <em>{$__request->rule->description}</em> no espaço {$destination_link}.";
                     $message_to_requester = "Sua requisição para criar a ocorrência do evento {$origin_link} no espaço {$destination_link} foi enviada.";
                     break;
                 case "MapasCulturais\Entities\RequestEventProject":
@@ -131,7 +131,7 @@ class Theme extends MapasCulturais\Theme {
             $notification = new Notification;
             $notification->user = $requester;
             $notification->message = $message_to_requester;
-            $notification->request = $this;
+            $notification->request = $__request;
             $notification->save(true);
 
             $notified_user_ids = array($requester->id);
@@ -147,7 +147,7 @@ class Theme extends MapasCulturais\Theme {
                 $notification = new Notification;
                 $notification->user = $user;
                 $notification->message = $message;
-                $notification->request = $this;
+                $notification->request = $__request;
                 $notification->save(true);
             }
 
@@ -155,17 +155,17 @@ class Theme extends MapasCulturais\Theme {
                 $notification = new Notification;
                 $notification->user = $origin->ownerUser;
                 $notification->message = $message;
-                $notification->request = $this;
+                $notification->request = $__request;
                 $notification->save(true);
             }
         });
 
-        $app->hook('workflow(<<*>>).approve:before', function() use($app) {
+        $app->hook('workflow(<<*>>).approve:before', function($__request) use($app) {
             $requester = $app->user;
             $profile = $requester->profile;
 
-            $origin = $this->origin;
-            $destination = $this->destination;
+            $origin = $__request->origin;
+            $destination = $__request->destination;
 
             $origin_type = strtolower($origin->entityType);
             $origin_url = $origin->singleUrl;
@@ -178,7 +178,7 @@ class Theme extends MapasCulturais\Theme {
             $destination_link = "<a href=\"{$destination_url}\">{$destination_name}</a>";
             $origin_link = "<a href=\"{$origin_url}\">{$origin_name}</a>";
 
-            switch ($this->getClassName()) {
+            switch ($__request->getClassName()) {
                 case "MapasCulturais\Entities\RequestAgentRelation":
                     if($origin->getClassName() === 'MapasCulturais\Entities\Registration'){
                         $message = "{$profile_link} aceitou o relacionamento do agente {$destination_link} à inscrição <a href=\"{$origin->singleUrl}\" >{$origin->number}</a> no projeto <a href=\"{$origin->project->singleUrl}\">{$origin->project->name}</a>.";
@@ -193,7 +193,7 @@ class Theme extends MapasCulturais\Theme {
                     $message = "{$profile_link} aceitou que o {$origin_type} {$origin_link} seja um {$origin_type} filho de {$destination_link}.";
                     break;
                 case "MapasCulturais\Entities\RequestEventOccurrence":
-                    $message = "{$profile_link} aceitou adicionar o evento {$origin_link} que ocorre <em>{$this->rule->description}</em> no espaço {$destination_link}.";
+                    $message = "{$profile_link} aceitou adicionar o evento {$origin_link} que ocorre <em>{$__request->rule->description}</em> no espaço {$destination_link}.";
                     break;
                 case "MapasCulturais\Entities\RequestEventProject":
                     $message = "{$profile_link} aceitou relacionar o evento {$origin_link} ao projeto {$destination_link}.";
@@ -206,11 +206,11 @@ class Theme extends MapasCulturais\Theme {
             $users = array();
 
             // notifica quem fez a requisição
-            $users[] = $this->requesterUser;
+            $users[] = $__request->requesterUser;
 
-            if ($this->getClassName() === "MapasCulturais\Entities\RequestChangeOwnership" && $this->type === Entities\RequestChangeOwnership::TYPE_REQUEST) {
+            if ($__request->getClassName() === "MapasCulturais\Entities\RequestChangeOwnership" && $__request->type === Entities\RequestChangeOwnership::TYPE_REQUEST) {
                 // se não foi o dono da entidade de destino que fez a requisição, notifica o dono
-                if (!$destination->ownerUser->equals($this->requesterUser))
+                if (!$destination->ownerUser->equals($__request->requesterUser))
                     $users[] = $destination->ownerUser;
 
                 // se não é o dono da entidade de origem que está aprovando, notifica o dono
@@ -218,7 +218,7 @@ class Theme extends MapasCulturais\Theme {
                     $users[] = $origin->ownerUser;
             }else {
                 // se não foi o dono da entidade de origem que fez a requisição, notifica o dono
-                if (!$origin->ownerUser->equals($this->requesterUser))
+                if (!$origin->ownerUser->equals($__request->requesterUser))
                     $users[] = $origin->ownerUser;
 
                 // se não é o dono da entidade de destino que está aprovando, notifica o dono
@@ -243,12 +243,12 @@ class Theme extends MapasCulturais\Theme {
         });
 
 
-        $app->hook('workflow(<<*>>).reject:before', function() use($app) {
+        $app->hook('workflow(<<*>>).reject:before', function($__request) use($app) {
             $requester = $app->user;
             $profile = $requester->profile;
 
-            $origin = $this->origin;
-            $destination = $this->destination;
+            $origin = $__request->origin;
+            $destination = $__request->destination;
 
             $origin_type = strtolower($origin->entityType);
             $origin_url = $origin->singleUrl;
@@ -261,7 +261,7 @@ class Theme extends MapasCulturais\Theme {
             $destination_link = "<a href=\"{$destination_url}\">{$destination_name}</a>";
             $origin_link = "<a href=\"{$origin_url}\">{$origin_name}</a>";
 
-            switch ($this->getClassName()) {
+            switch ($__request->getClassName()) {
                 case "MapasCulturais\Entities\RequestAgentRelation":
                     if($origin->canUser('@control')){
                         if($origin->getClassName() === 'MapasCulturais\Entities\Registration'){
@@ -278,12 +278,12 @@ class Theme extends MapasCulturais\Theme {
                     }
                     break;
                 case "MapasCulturais\Entities\RequestChangeOwnership":
-                    if ($this->type === Entities\RequestChangeOwnership::TYPE_REQUEST) {
-                        $message = $this->requesterUser->equals($requester) ?
+                    if ($__request->type === Entities\RequestChangeOwnership::TYPE_REQUEST) {
+                        $message = $__request->requesterUser->equals($requester) ?
                                 "{$profile_link} cancelou o pedido de propriedade do {$origin_type} {$origin_link} para o agente {$destination_link}." :
                                 "{$profile_link} rejeitou a mudança de propriedade do {$origin_type} {$origin_link} para o agente {$destination_link}.";
                     } else {
-                        $message = $this->requesterUser->equals($requester) ?
+                        $message = $__request->requesterUser->equals($requester) ?
                                 "{$profile_link} cancelou o pedido de propriedade do {$origin_type} {$origin_link} para o agente {$destination_link}." :
                                 "{$profile_link} rejeitou a mudança de propriedade do {$origin_type} {$origin_link} para o agente {$destination_link}.";
                     }
@@ -295,8 +295,8 @@ class Theme extends MapasCulturais\Theme {
                     break;
                 case "MapasCulturais\Entities\RequestEventOccurrence":
                     $message = $origin->canUser('@control') ?
-                            "{$profile_link} cancelou o pedido de autorização do evento {$origin_link} que ocorre <em>{$this->rule->description}</em> no espaço {$destination_link}." :
-                            "{$profile_link} rejeitou o evento {$origin_link} que ocorre <em>{$this->rule->description}</em> no espaço {$destination_link}.";
+                            "{$profile_link} cancelou o pedido de autorização do evento {$origin_link} que ocorre <em>{$__request->rule->description}</em> no espaço {$destination_link}." :
+                            "{$profile_link} rejeitou o evento {$origin_link} que ocorre <em>{$__request->rule->description}</em> no espaço {$destination_link}.";
                     break;
                 case "MapasCulturais\Entities\RequestEventProject":
                     $message = $origin->canUser('@control') ?
@@ -312,14 +312,14 @@ class Theme extends MapasCulturais\Theme {
 
             $users = array();
 
-            if (!$app->user->equals($this->requesterUser)) {
+            if (!$app->user->equals($__request->requesterUser)) {
                 // notifica quem fez a requisição
-                $users[] = $this->requesterUser;
+                $users[] = $__request->requesterUser;
             }
 
-            if ($this->getClassName() === "MapasCulturais\Entities\RequestChangeOwnership" && $this->type === Entities\RequestChangeOwnership::TYPE_REQUEST) {
+            if ($__request->getClassName() === "MapasCulturais\Entities\RequestChangeOwnership" && $__request->type === Entities\RequestChangeOwnership::TYPE_REQUEST) {
                 // se não foi o dono da entidade de destino que fez a requisição, notifica o dono
-                if (!$destination->ownerUser->equals($this->requesterUser))
+                if (!$destination->ownerUser->equals($__request->requesterUser))
                     $users[] = $destination->ownerUser;
 
                 // se não é o dono da entidade de origem que está rejeitando, notifica o dono
@@ -327,7 +327,7 @@ class Theme extends MapasCulturais\Theme {
                     $users[] = $origin->ownerUser;
             }else {
                 // se não foi o dono da entidade de origem que fez a requisição, notifica o dono
-                if (!$origin->ownerUser->equals($this->requesterUser))
+                if (!$origin->ownerUser->equals($__request->requesterUser))
                     $users[] = $origin->ownerUser;
 
                 // se não é o dono da entidade de destino que está rejeitando, notifica o dono
@@ -354,8 +354,8 @@ class Theme extends MapasCulturais\Theme {
 
         /* ---------------------- */
 
-        $app->hook('mapasculturais.body:before', function() {
-            if($this->controller && ($this->controller->action == 'single' || $this->controller->action == 'edit' )): ?>
+        $app->hook('mapasculturais.body:before', function($obj) {
+            if($obj->controller && ($obj->controller->action == 'single' || $obj->controller->action == 'edit' )): ?>
                 <!--facebook compartilhar-->
                     <div id="fb-root"></div>
                     <script>(function(d, s, id) {
@@ -370,25 +370,25 @@ class Theme extends MapasCulturais\Theme {
             endif;
         });
 
-        $app->hook('view.render(<<*>>):before', function() use($app) {
-            $this->assetManager->publishAsset('css/main.css.map', 'css/main.css.map');
+        $app->hook('view.render(<<*>>):before', function($theme) use($app) {
+            $theme->assetManager->publishAsset('css/main.css.map', 'css/main.css.map');
 
-            $this->jsObject['assets'] = array();
-            $this->jsObject['templateUrl'] = array();
-            $this->jsObject['spinnerUrl'] = $this->asset('img/spinner.gif', false);
+            $theme->jsObject['assets'] = array();
+            $theme->jsObject['templateUrl'] = array();
+            $theme->jsObject['spinnerUrl'] = $theme->asset('img/spinner.gif', false);
 
-            $this->jsObject['assets']['fundo'] = $this->asset('img/fundo.png', false);
-            $this->jsObject['assets']['instituto-tim'] = $this->asset('img/instituto-tim-white.png', false);
-            $this->jsObject['assets']['verifiedIcon'] = $this->asset('img/verified-icon.png', false);
-            $this->jsObject['assets']['avatarAgent'] = $this->asset('img/avatar--agent.png', false);
-            $this->jsObject['assets']['avatarSpace'] = $this->asset('img/avatar--space.png', false);
-            $this->jsObject['assets']['avatarEvent'] = $this->asset('img/avatar--event.png', false);
-            $this->jsObject['assets']['avatarProject'] = $this->asset('img/avatar--project.png', false);
+            $theme->jsObject['assets']['fundo'] = $theme->asset('img/fundo.png', false);
+            $theme->jsObject['assets']['instituto-tim'] = $theme->asset('img/instituto-tim-white.png', false);
+            $theme->jsObject['assets']['verifiedIcon'] = $theme->asset('img/verified-icon.png', false);
+            $theme->jsObject['assets']['avatarAgent'] = $theme->asset('img/avatar--agent.png', false);
+            $theme->jsObject['assets']['avatarSpace'] = $theme->asset('img/avatar--space.png', false);
+            $theme->jsObject['assets']['avatarEvent'] = $theme->asset('img/avatar--event.png', false);
+            $theme->jsObject['assets']['avatarProject'] = $theme->asset('img/avatar--project.png', false);
 
-            $this->jsObject['isEditable'] = $this->isEditable();
-            $this->jsObject['isSearch'] = $this->isSearch();
+            $theme->jsObject['isEditable'] = $theme->isEditable();
+            $theme->jsObject['isSearch'] = $theme->isSearch();
 
-            $this->jsObject['mapsDefaults'] = array(
+            $theme->jsObject['mapsDefaults'] = array(
                 'zoomMax' => $app->config['maps.zoom.max'],
                 'zoomMin' => $app->config['maps.zoom.min'],
                 'zoomDefault' => $app->config['maps.zoom.default'],
@@ -399,13 +399,13 @@ class Theme extends MapasCulturais\Theme {
                 'longitude' => $app->config['maps.center'][1]
             );
 
-            $this->jsObject['mapMaxClusterRadius'] = $app->config['maps.maxClusterRadius'];
-            $this->jsObject['mapSpiderfyDistanceMultiplier'] = $app->config['maps.spiderfyDistanceMultiplier'];
-            $this->jsObject['mapMaxClusterElements'] = $app->config['maps.maxClusterElements'];
+            $theme->jsObject['mapMaxClusterRadius'] = $app->config['maps.maxClusterRadius'];
+            $theme->jsObject['mapSpiderfyDistanceMultiplier'] = $app->config['maps.spiderfyDistanceMultiplier'];
+            $theme->jsObject['mapMaxClusterElements'] = $app->config['maps.maxClusterElements'];
 
-            $this->jsObject['mapGeometryFieldQuery'] = $app->config['maps.geometryFieldQuery'];
+            $theme->jsObject['mapGeometryFieldQuery'] = $app->config['maps.geometryFieldQuery'];
 
-            $this->jsObject['labels'] = array(
+            $theme->jsObject['labels'] = array(
                 'agent' => \MapasCulturais\Entities\Agent::getPropertiesLabels(),
                 'project' => \MapasCulturais\Entities\Project::getPropertiesLabels(),
                 'event' => \MapasCulturais\Entities\Event::getPropertiesLabels(),
@@ -413,28 +413,28 @@ class Theme extends MapasCulturais\Theme {
                 'registration' => \MapasCulturais\Entities\Registration::getPropertiesLabels(),
             );
 
-            $this->jsObject['routes'] = $app->config['routes'];
+            $theme->jsObject['routes'] = $app->config['routes'];
 
-            $this->addDocumentMetas();
-            $this->includeVendorAssets();
-            $this->includeCommonAssets();
-            $this->_populateJsObject();
+            $theme->addDocumentMetas();
+            $theme->includeVendorAssets();
+            $theme->includeCommonAssets();
+            $theme->_populateJsObject();
         });
 
-        $app->hook('view.render(<<agent|space|project|event>>/<<single|edit|create>>):before', function() {
-            $this->jsObject['assets']['verifiedSeal'] = $this->asset('img/verified-seal.png', false);
-            $this->jsObject['assets']['unverifiedSeal'] = $this->asset('img/unverified-seal.png', false);
-            $this->assetManager->publishAsset('img/verified-seal-small.png', 'img/verified-seal-small.png');
+        $app->hook('view.render(<<agent|space|project|event>>/<<single|edit|create>>):before', function($theme) {
+            $theme->jsObject['assets']['verifiedSeal'] = $theme->asset('img/verified-seal.png', false);
+            $theme->jsObject['assets']['unverifiedSeal'] = $theme->asset('img/unverified-seal.png', false);
+            $theme->assetManager->publishAsset('img/verified-seal-small.png', 'img/verified-seal-small.png');
         });
 
-        $app->hook('entity(<<agent|space>>).<<insert|update>>:before', function() use ($app) {
+        $app->hook('entity(<<agent|space>>).<<insert|update>>:before', function($entity) use ($app) {
 
             $rsm = new \Doctrine\ORM\Query\ResultSetMapping();
             $rsm->addScalarResult('type', 'type');
             $rsm->addScalarResult('name', 'name');
 
-            $x = $this->location->longitude;
-            $y = $this->location->latitude;
+            $x = $entity->location->longitude;
+            $y = $entity->location->latitude;
 
             $strNativeQuery = "SELECT type, name FROM geo_division WHERE ST_Contains(geom, ST_Transform(ST_GeomFromText('POINT($x $y)',4326),4326))";
 
@@ -444,39 +444,39 @@ class Theme extends MapasCulturais\Theme {
 
             foreach ($app->getRegisteredGeoDivisions() as $d) {
                 $metakey = $d->metakey;
-                $this->$metakey = '';
+                $entity->$metakey = '';
             }
 
             foreach ($divisions as $div) {
                 $metakey = 'geo' . ucfirst($div['type']);
-                $this->$metakey = $div['name'];
+                $entity->$metakey = $div['name'];
             }
         });
 
         // sempre que insere uma imagem cria o avatarSmall
-        $app->hook('entity(<<agent|space|event|project>>).file(avatar).insert:after', function() {
-            $this->transform('avatarSmall');
-            $this->transform('avatarBig');
+        $app->hook('entity(<<agent|space|event|project>>).file(avatar).insert:after', function(\MapasCulturais\Entities\File $file) {
+            $file->transform('avatarSmall');
+            $file->transform('avatarBig');
         });
 
-        $app->hook('entity(<<agent|space|event|project>>).file(header).insert:after', function() {
-            $this->transform('header');
+        $app->hook('entity(<<agent|space|event|project>>).file(header).insert:after', function(\MapasCulturais\Entities\File $file) {
+            $file->transform('header');
         });
 
-        $app->hook('entity(<<agent|space|event|project>>).file(gallery).insert:after', function() {
-            $this->transform('galleryThumb');
-            $this->transform('galleryFull');
+        $app->hook('entity(<<agent|space|event|project>>).file(gallery).insert:after', function(\MapasCulturais\Entities\File $file) {
+            $file->transform('galleryThumb');
+            $file->transform('galleryFull');
         });
 
-        $app->hook('entity(event).save:before', function() {
-            $this->type = 1;
+        $app->hook('entity(event).save:before', function(\MapasCulturais\Entities\Event $event) {
+            $event->type = 1;
         });
 
 
-        $app->hook('repo(<<*>>).getIdsByKeywordDQL.join', function(&$joins, $keyword) {
+        $app->hook('repo(<<*>>).getIdsByKeywordDQL.join', function($obj, &$joins, $keyword) {
             $taxonomy = App::i()->getRegisteredTaxonomyBySlug('tag');
 
-            $class = $this->getClassName();
+            $class = $obj->getClassName();
 
             $joins .= "LEFT JOIN
                 MapasCulturais\Entities\TermRelation
@@ -491,11 +491,11 @@ class Theme extends MapasCulturais\Theme {
                             t.taxonomy = '{$taxonomy->id}'";
         });
 
-        $app->hook('repo(<<*>>).getIdsByKeywordDQL.where', function(&$where, $keyword) {
+        $app->hook('repo(<<*>>).getIdsByKeywordDQL.where', function($obj, &$where, $keyword) {
             $where .= " OR unaccent(lower(t.term)) LIKE unaccent(lower(:keyword)) ";
         });
 
-        $app->hook('repo(Event).getIdsByKeywordDQL.join', function(&$joins, $keyword) {
+        $app->hook('repo(Event).getIdsByKeywordDQL.join', function($obj, &$joins, $keyword) {
             $joins .= " LEFT JOIN e.project p
                 LEFT JOIN MapasCulturais\Entities\EventMeta m
                     WITH
@@ -504,7 +504,7 @@ class Theme extends MapasCulturais\Theme {
                 ";
         });
 
-        $app->hook('repo(Event).getIdsByKeywordDQL.where', function(&$where, $keyword) use($app) {
+        $app->hook('repo(Event).getIdsByKeywordDQL.where', function($obj, &$where, $keyword) use($app) {
             $projects = $app->repo('Project')->findByKeyword($keyword);
             $project_ids = [];
             foreach($projects as $project){
@@ -828,7 +828,7 @@ class Theme extends MapasCulturais\Theme {
         );
     }
 
-    protected function _populateJsObject() {
+    function _populateJsObject() {
 
         $app = App::i();
         $this->jsObject['userId'] = $app->user->is('guest') ? null : $app->user->id;

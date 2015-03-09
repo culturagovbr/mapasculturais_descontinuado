@@ -5,17 +5,17 @@ use MapasCulturais\App;
 $app = App::i();
 
 //mapas.local/agent/agendaSingle/id:56565/?from=
-$app->hook('GET(<<agent|space|project>>.agendaSingle)', function() use ($app) {
-    $entity = $this->requestedEntity;
+$app->hook('GET(<<agent|space|project>>.agendaSingle)', function($controller) use ($app) {
+    $entity = $controller->requestedEntity;
 
     if(!$entity){
         $app->pass();
-    }elseif(!isset($this->getData['from']) || !isset($this->getData['to'])){
+    }elseif(!isset($controller->getData['from']) || !isset($controller->getData['to'])){
         $app->stop();
     }
 
-    $date_from = DateTime::createFromFormat('Y-m-d', $this->getData['from']);
-    $date_to =   DateTime::createFromFormat('Y-m-d', $this->getData['to']);
+    $date_from = DateTime::createFromFormat('Y-m-d', $controller->getData['from']);
+    $date_to =   DateTime::createFromFormat('Y-m-d', $controller->getData['to']);
 
     if(!$date_from || !$date_to){
         $app->stop();

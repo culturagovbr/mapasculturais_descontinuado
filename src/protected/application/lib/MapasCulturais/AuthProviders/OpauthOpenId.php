@@ -44,8 +44,8 @@ class OpauthOpenId extends \MapasCulturais\AuthProvider{
 
 
         // add actions to auth controller
-        $app->hook('GET(auth.index)', function () use($app){
-            $app->redirect($this->createUrl('openid'));
+        $app->hook('GET(auth.index)', function (\MapasCulturais\Controller $controller) use($app){
+            $app->redirect($controller->createUrl('openid'));
         });
 
 
@@ -54,17 +54,17 @@ class OpauthOpenId extends \MapasCulturais\AuthProvider{
             $opauth->run();
         });
 
-        $app->hook('GET(auth.response)', function () use($app){
+        $app->hook('GET(auth.response)', function (\MapasCulturais\Controller $controller) use($app){
             $app->auth->processResponse();
 
             if($app->auth->isUserAuthenticated()){
                 $app->redirect ($app->auth->getRedirectPath());
             }else{
                 if($app->config['app.mode'] === 'production'){
-                    $app->redirect ($this->createUrl('error'));
+                    $app->redirect ($controller->createUrl('error'));
                 }else{
                     echo '<pre>';
-                    var_dump($this->data, $_POST, $_GET, $_REQUEST, $_SESSION);
+                    var_dump($controller->data, $_POST, $_GET, $_REQUEST, $_SESSION);
                     die;
                 }
             }
@@ -186,7 +186,7 @@ class OpauthOpenId extends \MapasCulturais\AuthProvider{
             if(!$user){
                 $response = $this->_getResponse();
                 $user = $this->_createUser($response);
-                
+
                 $profile = $user->profile;
                 $this->_setRedirectPath($profile->editUrl);
 

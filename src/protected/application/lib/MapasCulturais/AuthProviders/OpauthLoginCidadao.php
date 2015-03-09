@@ -34,19 +34,19 @@ class OpauthLoginCidadao extends \MapasCulturais\AuthProvider{
 
 
         // add actions to auth controller
-        $app->hook('GET(auth.index)', function () use($app){
-            $app->redirect($this->createUrl('logincidadao'));
+        $app->hook('GET(auth.index)', function (\MapasCulturais\Controller $controller) use($app){
+            $app->redirect($controller->createUrl('logincidadao'));
         });
         $app->hook('<<GET|POST>>(auth.logincidadao)', function () use($opauth, $config){
 //            $_POST['openid_url'] = $config['login_url'];
             $opauth->run();
         });
-        $app->hook('GET(auth.response)', function () use($app){
+        $app->hook('GET(auth.response)', function (\MapasCulturais\Controller $controller) use($app){
             $app->auth->processResponse();
             if($app->auth->isUserAuthenticated()){
                 $app->redirect ($app->auth->getRedirectPath());
             }else{
-                $app->redirect ($this->createUrl(''));
+                $app->redirect ($controller->createUrl(''));
             }
         });
     }
@@ -145,7 +145,7 @@ class OpauthLoginCidadao extends \MapasCulturais\AuthProvider{
             $response = $this->_getResponse();
             $auth_uid = $response['auth']['uid'];
             $auth_provider = $app->getRegisteredAuthProviderId('logincidadao');
-            
+
             $user = $app->repo('User')->getByAuth($auth_provider, $auth_uid);
             return $user;
         }else{
@@ -164,7 +164,7 @@ class OpauthLoginCidadao extends \MapasCulturais\AuthProvider{
             if(!$user){
                 $response = $this->_getResponse();
                 $user = $this->_createUser($response);
-                
+
                 $profile = $user->profile;
                 $this->_setRedirectPath($profile->editUrl);
             }
@@ -200,7 +200,7 @@ class OpauthLoginCidadao extends \MapasCulturais\AuthProvider{
         }else{
             $agent->name = 'Sem Nome';
         }
-        
+
         $agent->emailPrivado = $user->email;
 
         $app->em->persist($agent);
@@ -212,7 +212,7 @@ class OpauthLoginCidadao extends \MapasCulturais\AuthProvider{
         $app->enableAccessControl();
 
         $this->_setRedirectPath($agent->editUrl);
-        
+
         return $user;
     }
 }

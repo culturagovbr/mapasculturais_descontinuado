@@ -475,11 +475,11 @@ abstract class Theme extends \Slim\View {
     }
 
     function bodyBegin(){
-        App::i()->applyHook('mapasculturais.body:before');
+        App::i()->applyHookBoundTo($this, 'mapasculturais.body:before');
     }
 
     function bodyEnd(){
-        App::i()->applyHook('mapasculturais.body:after');
+        App::i()->applyHookBoundTo($this, 'mapasculturais.body:after');
     }
 
     function bodyProperties(){

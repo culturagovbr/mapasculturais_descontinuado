@@ -938,17 +938,20 @@ class App extends \Slim\Slim{
      * @param  mixed    $hookArgs   (Optional) Argument for hooked functions
      */
     function applyHookBoundTo($target_object, $name, $hookArg = null) {
-        if (is_null($hookArg))
-            $hookArg = array();
-        else if (!is_array($hookArg))
-            $hookArg = array($hookArg);
+        if(is_array($hookArg)){
+            $hookArg = array_merge([$target_object], $hookArg);
 
+        }else if (is_null($hookArg)){
+            $hookArg = [$target_object];
+
+        }else if (!is_array($hookArg)){
+            $hookArg = [$target_object, $hookArg];
+        }
         if ($this->config['app.log.hook'])
             $this->log->debug('APPLY HOOK BOUND TO >> ' . $name);
 
         $callables = $this->_getHookCallables($name);
         foreach ($callables as $callable) {
-            $callable = \Closure::bind($callable, $target_object);
             call_user_func_array($callable, $hookArg);
         }
     }

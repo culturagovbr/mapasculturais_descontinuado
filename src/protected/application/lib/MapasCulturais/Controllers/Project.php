@@ -26,8 +26,8 @@ class Project extends EntityController {
         if(key_exists('parentId', $this->urlData) && is_numeric($this->urlData['parentId'])){
             $parent = $this->repository->find($this->urlData['parentId']);
             if($parent)
-                App::i()->hook('entity(project).new', function() use ($parent){
-                    $this->parent = $parent;
+                App::i()->hook('entity(project).new', function(\MapasCulturais\Entities\Project $entity) use ($parent){
+                    $entity->parent = $parent;
                 });
         }
         parent::GET_create();

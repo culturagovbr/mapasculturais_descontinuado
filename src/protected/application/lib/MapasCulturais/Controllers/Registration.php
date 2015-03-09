@@ -19,7 +19,7 @@ class Registration extends EntityController {
 
     function __construct() {
         $app = App::i();
-        $app->hook('POST(registration.upload):before', function() use($app) {
+        $app->hook('POST(registration.upload):before', function($controller) use($app) {
             $mime_types = array(
                 'application/pdf',
                 'audio/.+',
@@ -67,7 +67,7 @@ class Registration extends EntityController {
                 'application/vnd\.oasis\.opendocument\.text-web',
 
             );
-            $registration = $this->requestedEntity;
+            $registration = $controller->requestedEntity;
             foreach($registration->project->registrationFileConfigurations as $rfc){
 
                 $fileGroup = new Definitions\FileGroup($rfc->fileGroupName, $mime_types, 'The uploaded file is not a valid document.', true);
@@ -75,21 +75,21 @@ class Registration extends EntityController {
             }
         });
 
-        $app->hook('entity(Registration).file(rfc_<<*>>).insert:before', function() use ($app){
+        $app->hook('entity(Registration).file(rfc_<<*>>).insert:before', function($entity) use ($app){
             // find registration file configuration
             $rfc = null;
-            foreach($this->owner->project->registrationFileConfigurations as $r){
-                if($r->fileGroupName === $this->group){
+            foreach($entity->owner->project->registrationFileConfigurations as $r){
+                if($r->fileGroupName === $entity->group){
                     $rfc = $r;
                 }
             }
-            $finfo = pathinfo($this->name);
+            $finfo = pathinfo($entity->name);
             $hash = uniqid();
 
-            $this->name = $this->owner->number . ' - ' . $hash . ' - ' . preg_replace ('/[^\. \-\_\p{L}\p{N}]/u', '', $rfc->title) . '.' . $finfo['extension'];
-            $tmpFile = $this->tmpFile;
-            $tmpFile['name'] = $this->name;
-            $this->tmpFile = $tmpFile;
+            $entity->name = $entity->owner->number . ' - ' . $hash . ' - ' . preg_replace ('/[^\. \-\_\p{L}\p{N}]/u', '', $rfc->title) . '.' . $finfo['extension'];
+            $tmpFile = $entity->tmpFile;
+            $tmpFile['name'] = $entity->name;
+            $entity->tmpFile = $tmpFile;
         });
 
         parent::__construct();

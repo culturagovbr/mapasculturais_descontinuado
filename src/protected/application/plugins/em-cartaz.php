@@ -6,37 +6,37 @@ $app = MapasCulturais\App::i();
 $defaultFrom = new DateTime("first day of next month");
 $defaultTo = new DateTime("last day of next month");
 
-$app->hook('GET(panel.em-cartaz)', function() use ($app, $defaultFrom, $defaultTo) {
-    $this->requireAuthentication();
+$app->hook('GET(panel.em-cartaz)', function($controller) use ($app, $defaultFrom, $defaultTo) {
+    $controller->requireAuthentication();
     if(!$app->user->is('admin') && !$app->user->is('staff')){
         //throw new MapasCulturais\Exceptions\PermissionDenied;
         $app->pass();
     }
-    $this->render('em-cartaz', array(
+    $controller->render('em-cartaz', array(
         'content'=>'',
-        'from' => isset($this->getData['from']) ? new DateTime($this->getData['from']) : $defaultFrom,
-        'to' => isset($this->getData['to']) ? new DateTime($this->getData['to']) : $defaultTo,
+        'from' => isset($controller->getData['from']) ? new DateTime($controller->getData['from']) : $defaultFrom,
+        'to' => isset($controller->getData['to']) ? new DateTime($controller->getData['to']) : $defaultTo,
     ));
 });
 
-$app->hook('panel.menu:after', function() use ($app){
+$app->hook('panel.menu:after', function($obj) use ($app){
     if(!$app->user->is('admin') && !$app->user->is('staff'))
         return;
 
-    $a_class = $this->template == 'panel/em-cartaz' ? 'active' : '';
+    $a_class = $obj->template == 'panel/em-cartaz' ? 'active' : '';
 
     $url = $app->createUrl('panel', 'em-cartaz');
     echo "<li><a class='$a_class' href='$url'><span class='icon icon-em-cartaz'></span> Em Cartaz</a></li>";
 });
 
 
-$app->hook('GET(panel.em-cartaz-<<download|preview>>)', function() use ($app, $defaultFrom, $defaultTo) {
+$app->hook('GET(panel.em-cartaz-<<download|preview>>)', function($controller) use ($app, $defaultFrom, $defaultTo) {
     if(!$app->user->is('admin') && !$app->user->is('staff')){
         //throw new MapasCulturais\Exceptions\PermissionDenied;
         $app->pass();
     }
-    $from = isset($this->getData['from']) ? new DateTime($this->getData['from']) : $defaultFrom;
-    $to = isset($this->getData['to']) ? new DateTime($this->getData['to']) : $defaultTo;
+    $from = isset($controller->getData['from']) ? new DateTime($controller->getData['from']) : $defaultFrom;
+    $to = isset($controller->getData['to']) ? new DateTime($controller->getData['to']) : $defaultTo;
 
 
     $phpWord = new \PhpOffice\PhpWord\PhpWord();
@@ -166,7 +166,7 @@ $app->hook('GET(panel.em-cartaz-<<download|preview>>)', function() use ($app, $d
                 continue;
             }
 
-            if($this->action === 'em-cartaz-preview'){
+            if($controller->action === 'em-cartaz-preview'){
                 $addEventBlockHtml($event);
             }else{
                 $addEventBlockDoc($event);
@@ -176,13 +176,13 @@ $app->hook('GET(panel.em-cartaz-<<download|preview>>)', function() use ($app, $d
         foreach($projects as $project){
             $textRunObj = $section->createTextRun();
 
-            if($this->action === 'em-cartaz-preview'){
+            if($controller->action === 'em-cartaz-preview'){
                 $textRunObj->addText('PROJETO '.$project['project']->name, $eventTitle);
             }else{
                 $section->addText('PROJETO '.$project['project']->name, $eventTitle);
             }
             foreach($project['events'] as $event){
-                if($this->action === 'em-cartaz-preview'){
+                if($controller->action === 'em-cartaz-preview'){
 
                     $addEventBlockHtml($event);
                 }else{
@@ -192,12 +192,12 @@ $app->hook('GET(panel.em-cartaz-<<download|preview>>)', function() use ($app, $d
         }
     }
 
-    if($this->action === 'em-cartaz-preview'){
+    if($controller->action === 'em-cartaz-preview'){
         //$content = '<a href="'.$app->createUrl('panel', 'em-cartaz-download').'">Salvar Documento Em Formato Microsoft Word</a>';
 
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
 
-        $this->render('em-cartaz', array(
+        $controller->render('em-cartaz', array(
             'content'=>$objWriter->getWriterPart('Body')->write(),
             'from' => $from,
             'to' => $to

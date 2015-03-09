@@ -33,8 +33,8 @@ class Event extends EntityController {
     function POST_index(){
         $app = App::i();
 
-        $app->hook('entity(event).insert:before', function() use($app){
-            $this->owner = $app->user->profile;
+        $app->hook('entity(event).insert:before', function(\MapasCulturais\Entities\Event $entity) use($app){
+            $entity->owner = $app->user->profile;
         });
         parent::POST_index();
     }
@@ -44,8 +44,8 @@ class Event extends EntityController {
         if(key_exists('projectId', $this->urlData) && is_numeric($this->urlData['projectId'])){
             $project = $this->repository->find($this->urlData['projectId']);
             if($project)
-                App::i()->hook('entity(event).new', function() use ($project){
-                    $this->project = $project;
+                App::i()->hook('entity(event).new', function(\MapasCulturais\Entities\Event $entity) use ($project){
+                    $entity->project = $project;
                 });
         }
         parent::GET_create();

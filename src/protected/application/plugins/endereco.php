@@ -25,9 +25,9 @@ function updateAddressData($sourceSpace, $destinySpace) {
     $app->log->debug('--- SPACE LOCATION '.$destinySpace->location);
 }
 
-$app->hook('entity(space).save:before', function($args) use ($app) {
+$app->hook('entity(space).save:before', function($entity) use ($app) {
 
-    $changedMetadata = $this->getChangedMetadata();
+    $changedMetadata = $entity->getChangedMetadata();
     if( $changedMetadata && key_exists('endereco', $changedMetadata)){
         $oldEndereco = $changedMetadata['endereco']['oldValue'];
         $newEndereco = $changedMetadata['endereco']['newValue'];
@@ -35,23 +35,23 @@ $app->hook('entity(space).save:before', function($args) use ($app) {
 
     //$oldLocation = get_class($args) === 'Doctrine\ORM\Event\PreUpdateEventArgs' ? $args->getOldValue('location') : null;
 
-    //$app->log->debug('this: '.$this->id.', parentWithAdd: '.getParentWithAddress($this)->id);
+    //$app->log->debug('this: '.$entity->id.', parentWithAdd: '.getParentWithAddress($entity)->id);
     //$app->log->debug('-- OLD LOCATION: '.$oldLocation);
 
-    if(( $this->parent &&
-            (!$this->endereco ||
-            $this->endereco == $this->parent->endereco ||
-            (isset($oldEndereco) && $this->endereco == $oldEndereco) ||
-            !$this->location)
+    if(( $entity->parent &&
+            (!$entity->endereco ||
+            $entity->endereco == $entity->parent->endereco ||
+            (isset($oldEndereco) && $entity->endereco == $oldEndereco) ||
+            !$entity->location)
     )){
         $app->log->debug('UPDATING SPACE:');
-        updateAddressData(getParentWithAddress($this), $this);
+        updateAddressData(getParentWithAddress($entity), $entity);
     }
 
-   foreach($this->children as $child){
-        if( !$child->endereco || $child->endereco == $this->endereco || (isset($oldEndereco) && $child->endereco == $oldEndereco) ){
+   foreach($entity->children as $child){
+        if( !$child->endereco || $child->endereco == $entity->endereco || (isset($oldEndereco) && $child->endereco == $oldEndereco) ){
             $app->log->debug('UPDATING CHILDREN:');
-            updateAddressData($this, $child);
+            updateAddressData($entity, $child);
         }
     }
 

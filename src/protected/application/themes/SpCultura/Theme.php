@@ -38,8 +38,8 @@ class Theme extends BaseV1\Theme{
     function _init() {
         parent::_init();
         $app = App::i();
-        $app->hook('view.render(<<*>>):before', function() use($app) {
-            $this->jsObject['assets']['logo-prefeitura'] = $this->asset('img/logo-prefeitura.png', false);
+        $app->hook('view.render(<<*>>):before', function($theme) use($app) {
+            $theme->jsObject['assets']['logo-prefeitura'] = $theme->asset('img/logo-prefeitura.png', false);
         });
     }
 
