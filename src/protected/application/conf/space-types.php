@@ -149,7 +149,7 @@ return array(
             'range' => array(50,59),
             'items' => array(
                 50 => array( 'name' => 'Arquivo Público' ),
-                51 => array( 'name' => 'Arquivo Privado' ),
+                51 => array( 'name' => 'Arquivo Pr1ivado' ),
             )
         ),
 
@@ -217,14 +217,18 @@ return array(
                 121 => array( 'name' => 'Sala de dança' ),
                 122 => array( 'name' => 'Gafieira' ),
                 123 => array( 'name' => 'Espaço para apresentação de dança' ),
-                124 => array( 'name' => 'Rádio Comunitária' )
+                124 => array( 'name' => 'Rádio Comunitária' ),
+
+                199 => array( 'name' => 'Outros Equipamentos Culturais' ) // adicionado na importação dos dados do Ceará para receber as endidades do tipo "equipamento"
             )
         ),
-        
-        'Bens culturais de natureza material' => array(
+
+        'Outros' => array(
             'range' => array(200, 299),
             'items' => array(
-                200 => array( 'name' => 'Bens culturais de natureza material' )
+                200 => array( 'name' => 'Bens culturais de natureza material' ),
+                201 => array( 'name' => 'Bens culturais de natureza imaterial' ), // adicionado na importação dos dados do Ceará para receber as endidades do tipo "patrimonio-imaterial"
+                299 => array( 'name' => 'Outros' ) // adicionado na importação dos dados do Ceará para receber as endidades do tipo "post"
             )
         ),
 
