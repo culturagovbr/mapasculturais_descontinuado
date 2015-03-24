@@ -121,6 +121,10 @@ return array(
     },
 
     'alter table registration add column registration_categories' => function() use($conn){
+        if($conn->fetchAll("SELECT column_name FROM information_schema.columns WHERE table_name = 'project' AND column_name = 'registration_categories'")){
+            return true;
+        }
+
         echo "adicionando coluna registration_categories\n";
         $conn->executeQuery('ALTER TABLE project ADD COLUMN registration_categories text;');
     },
@@ -142,7 +146,7 @@ return array(
 
     'create or replace function random_id_generator' => function() use($conn){
         $conn->executeQuery('
-            CREATE FUNCTION random_id_generator(table_name character varying, initial_range bigint) RETURNS bigint
+            CREATE OR REPLACE FUNCTION random_id_generator(table_name character varying, initial_range bigint) RETURNS bigint
                 LANGUAGE plpgsql
                 AS $$DECLARE
               rand_int INTEGER;
