@@ -1,9 +1,8 @@
 <?php
 
 use MapasCulturais\Entities\Agent;
-use MapasCulturais\Entities\AgentFile;
 use MapasCulturais\Entities\Space;
-use MapasCulturais\Entities\SpaceFile;
+use MapasCulturais\Entities\File;
 
 $app = MapasCulturais\App::i();
 $em = $app->em;
@@ -11,6 +10,88 @@ $conn = $em->getConnection();
 
 return array(
     'import ceara data' => function() use( $conn, $app ) {
+    /*
+        [0] => AtividadePatrm
+        [1] => BairroPesq
+        [2] => DtPesq
+        [3] => ID
+        [4] => ID_F2
+        [5] => ID_F3
+        [6] => ID_F4
+        [7] => ID_F5
+        [8] => InteresseTomb
+        [9] => LigMantened
+        [10] => NumFicha
+        [11] => Pesquisador
+        [12] => Status
+        [13] => _edit_last
+        [14] => _edit_lock
+        [15] => _mpv_inmap
+        [16] => _mpv_location
+        [17] => _mpv_pin
+        [18] => _oembed_076b752f5a584953888cde02433bd096
+        [19] => _oembed_11dff52bf7cf51715fafd677bac8ea0a
+        [20] => _oembed_16b77d2476b690910e4fec0c34f00c86
+        [21] => _oembed_1a4dd169ad087afea449a5d174a05bb6
+        [22] => _oembed_1d18fc598e4b6d25d2eb482edc87463f
+        [23] => _oembed_1efc6184527734252c79ccc9dffa0c3a
+        [24] => _oembed_1fb19d84a25914f2602efa1736c992a2
+        [25] => _oembed_278c51f6e2ad4ce2a196d5e6c8313cf0
+        [26] => _oembed_2ebbf948946a4e41ca09d67e81e433e0
+        [27] => _oembed_361a49ddb4013bb48a807ccda1dbf06b
+        [28] => _oembed_43b941dc9456d30878ecc48e9fc3adaa
+        [29] => _oembed_5148cee377bc7af6f30427d6c8529e73
+        [30] => _oembed_5fac6d3869591451256f8bafffbd1f3a
+        [31] => _oembed_6afb031b2d0e0240e85be7d407672bb9
+        [32] => _oembed_6d19aa4497f998dc7b8bd097063b6e9d
+        [33] => _oembed_7d674e27613a2bbbccf52591918d8525
+        [34] => _oembed_d2f88d551cf395bab3e1d79d38cbda90
+        [35] => _oembed_d4bfeb34323ebd0433cdf6974d3754b7
+        [36] => _oembed_d8c6b9f2e973f6e5b897da007c923a01
+        [37] => _oembed_e8932f1df2f052666eaecb8adc96ce77
+        [38] => _oembed_eca9c28aa68fcbee403d1053ad17ae55
+        [39] => _oembed_f47d4da8202fc247db5f11843d716407
+        [40] => _oembed_f64ace249129ed09b3ef4215ab2e30a4
+        [41] => _oembed_fe98b7d883173718415f457189aff314
+        [42] => _thumbnail_id
+        [43] => _wp_old_slug
+        [44] => apelido
+        [45] => bairro
+        [46] => bairro_de_origem
+        [47] => cep
+        [48] => complemento
+        [49] => data_criacao
+        [50] => data_tombamento
+        [51] => dirigente
+        [52] => dirigente_2
+        [53] => dirigente_3
+        [54] => dirigente_4
+        [55] => dirigente_5
+        [56] => e-mail
+        [57] => endereco
+        [58] => files
+        [59] => frenda
+        [60] => horario_visita
+        [61] => local_de_origem
+        [62] => num_componentes
+        [63] => numero
+        [64] => origem_etnica
+        [65] => pesquisador
+        [66] => post_content
+        [67] => post_title
+        [68] => post_type
+        [69] => publico_amount
+        [70] => sinopse
+        [71] => site
+        [72] => telefone
+        [73] => telefone_2
+        [74] => telefone_3
+        [75] => tipo_de_tombamento
+        [76] => tombado
+        [77] => visitada
+        [78] => youtube_link
+     */
+    
         $data = json_decode(file_get_contents('/tmp/ceara-data.json'));
 
         $admin_user = $app->repo('User')->find(1);
@@ -24,32 +105,29 @@ return array(
         ];
 
         $endereco = function($ed){
-            if($ed->endereco){
+            $result = '';
+            if(@$ed->endereco){
                 $result = $ed->endereco;
             }
 
-            if($ed->numero && $ed->endereco){
+            if(@$ed->numero && @$ed->endereco){
                 $result .= ' ' . $ed->numero;
             }
 
-            if($ed->bairro){
-                $result .= $ed->endereco ? ', ' . $ed->bairro : $ed->bairro;
+            if(@$ed->bairro){
+                $result .= $result ? ', ' . $ed->bairro : $ed->bairro;
             }
 
-            if($ed->cep){
+            if(@$ed->cep){
                 $result .= $ed->cep ? ', CEP: ' . $ed->cep : ' CEP: ' . $ed->cep;
             }
+            
+            return $result;
         };
 
         $props = [];
 
         foreach ($data as $ed) {
-            foreach($ed as $prop => $v)
-                if(!in_array($prop, $props))
-                    $props[] = $prop;
-
-
-            continue;
             echo "=====> importando {$ed->post_type} de id {$ed->ID} ({$ed->post_title}) \n";
 
             if ($ed->post_type == 'instituicao') {
@@ -61,11 +139,11 @@ return array(
                 $entity->type = $space_types[$ed->post_type];
                 $entity->owner = $admin_profile;
 
-                if($ed->publico_amount){
+                if(@$ed->publico_amount){
                     $entity->capacidade = $ed->publico_amount;
                 }
 
-                if($ed->horario_visita){
+                if(@$ed->horario_visita){
                     $entity->horario = $ed->horario_visita;
                 }
             }
@@ -74,38 +152,90 @@ return array(
             $entity->name = $ed->post_title;
             $entity->longDescription = $ed->post_content;
 
-            if($ed->sinopse){
+            if(@$ed->sinopse){
                 $entity->shortDescription = $ed->sinopse;
             }
 
             $entity->endereco = $endereco($ed);
 
-            if($ed->telefone){
+            if(@$ed->telefone){
                 $entity->telefonePublico = $ed->telefone;
             }
 
-            if($ed->site){
-                if(!preg_match('#^http', $ed->site)){
+            if(@$ed->site){
+                if(!preg_match('#^http#', $ed->site)){
                     $ed->site = 'http://' . $ed->site;
                 }
 
                 $entity->site = $ed->site;
             }
 
+            if(@$ed->telefone2){
+                $entity->telefone1 = $ed->telefone2;
+            }
 
+            if(@$ed->telefone3){
+                $entity->telefone2 = $ed->telefone3;
+            }
+            
+            if(@$ed->{'e-mail'}){
+                $entity->emailPublico = $ed->{'e-mail'};
+            }
 
             //@TODO: data de criação
 
-            try{
-                if (isset($ed->_mpv_location) && is_object($ed->_mpv_location)) {
-                    $entity->location = new MapasCulturais\Types\GeoPoint($ed->_mpv_location->lon, $ed->_mpv_location->lat);
+            if (isset($ed->_mpv_location) && is_object($ed->_mpv_location)) {
+                $entity->location = new MapasCulturais\Types\GeoPoint($ed->_mpv_location->lon, $ed->_mpv_location->lat);
+            }
+            
+            $entity->save();
+            
+            $tmp_path = '/tmp/uploads/';
+            
+            if(@$ed->files && is_array($ed->files)){
+                foreach($ed->files as $i => $f){
+                    $tmp_file = $tmp_path . $f->path;
+                    $file_info = pathinfo($tmp_file);
+                    
+                    if(!file_exists($tmp_file)){
+                        continue;
+                    }
+                    
+                    if($i == 0){
+                        $avatar_basename = 'avatar-' . $file_info['basename'];
+                        $avatar_tmp = $file_info['dirname'] . '/' . $avatar_basename;
+                        echo " ---- > file " . $avatar_basename . "\n";
+                        
+                        copy($tmp_file, $avatar_tmp);
+                        
+                        $file = new File([
+                            'name' => $avatar_basename,
+                            'type' => $f->type,
+                            'tmp_name' => $avatar_tmp,
+                            'error' => 0,
+                            'size' => filesize($tmp_file)
+                        ]);
+
+                        $file->owner = $entity;
+                        $file->group = 'avatar';
+                        $file->save();
+                    }
+                    
+                    echo " ---- > file " . $file_info['basename'] . "\n";
+                    $file = new File([
+                        'name' => $file_info['basename'],
+                        'type' => $f->type,
+                        'tmp_name' => $tmp_file,
+                        'error' => 0,
+                        'size' => filesize($tmp_file)
+                    ]);
+                    
+                    $file->owner = $entity;
+                    $file->group = 'gallery';
+                    $file->save();
                 }
-            }catch(Exception $e){
-                print_r($ed);
             }
         }
-        sort($props);
-        print_r($props);
 
         return false;
     }
