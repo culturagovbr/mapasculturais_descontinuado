@@ -3,6 +3,7 @@
 use MapasCulturais\Entities\Agent;
 use MapasCulturais\Entities\Space;
 use MapasCulturais\Entities\File;
+use MapasCulturais\Entities\MetaList;
 
 $app = MapasCulturais\App::i();
 $em = $app->em;
@@ -10,125 +11,151 @@ $conn = $em->getConnection();
 
 return array(
     'import ceara data' => function() use( $conn, $app ) {
-    /*
-        [0] => AtividadePatrm
-        [1] => BairroPesq
-        [2] => DtPesq
-        [3] => ID
-        [4] => ID_F2
-        [5] => ID_F3
-        [6] => ID_F4
-        [7] => ID_F5
-        [8] => InteresseTomb
-        [9] => LigMantened
-        [10] => NumFicha
-        [11] => Pesquisador
-        [12] => Status
-        [13] => _edit_last
-        [14] => _edit_lock
-        [15] => _mpv_inmap
-        [16] => _mpv_location
-        [17] => _mpv_pin
-        [18] => _oembed_076b752f5a584953888cde02433bd096
-        [19] => _oembed_11dff52bf7cf51715fafd677bac8ea0a
-        [20] => _oembed_16b77d2476b690910e4fec0c34f00c86
-        [21] => _oembed_1a4dd169ad087afea449a5d174a05bb6
-        [22] => _oembed_1d18fc598e4b6d25d2eb482edc87463f
-        [23] => _oembed_1efc6184527734252c79ccc9dffa0c3a
-        [24] => _oembed_1fb19d84a25914f2602efa1736c992a2
-        [25] => _oembed_278c51f6e2ad4ce2a196d5e6c8313cf0
-        [26] => _oembed_2ebbf948946a4e41ca09d67e81e433e0
-        [27] => _oembed_361a49ddb4013bb48a807ccda1dbf06b
-        [28] => _oembed_43b941dc9456d30878ecc48e9fc3adaa
-        [29] => _oembed_5148cee377bc7af6f30427d6c8529e73
-        [30] => _oembed_5fac6d3869591451256f8bafffbd1f3a
-        [31] => _oembed_6afb031b2d0e0240e85be7d407672bb9
-        [32] => _oembed_6d19aa4497f998dc7b8bd097063b6e9d
-        [33] => _oembed_7d674e27613a2bbbccf52591918d8525
-        [34] => _oembed_d2f88d551cf395bab3e1d79d38cbda90
-        [35] => _oembed_d4bfeb34323ebd0433cdf6974d3754b7
-        [36] => _oembed_d8c6b9f2e973f6e5b897da007c923a01
-        [37] => _oembed_e8932f1df2f052666eaecb8adc96ce77
-        [38] => _oembed_eca9c28aa68fcbee403d1053ad17ae55
-        [39] => _oembed_f47d4da8202fc247db5f11843d716407
-        [40] => _oembed_f64ace249129ed09b3ef4215ab2e30a4
-        [41] => _oembed_fe98b7d883173718415f457189aff314
-        [42] => _thumbnail_id
-        [43] => _wp_old_slug
-        [44] => apelido
-        [45] => bairro
-        [46] => bairro_de_origem
-        [47] => cep
-        [48] => complemento
-        [49] => data_criacao
-        [50] => data_tombamento
-        [51] => dirigente
-        [52] => dirigente_2
-        [53] => dirigente_3
-        [54] => dirigente_4
-        [55] => dirigente_5
-        [56] => e-mail
-        [57] => endereco
-        [58] => files
-        [59] => frenda
-        [60] => horario_visita
-        [61] => local_de_origem
-        [62] => num_componentes
-        [63] => numero
-        [64] => origem_etnica
-        [65] => pesquisador
-        [66] => post_content
-        [67] => post_title
-        [68] => post_type
-        [69] => publico_amount
-        [70] => sinopse
-        [71] => site
-        [72] => telefone
-        [73] => telefone_2
-        [74] => telefone_3
-        [75] => tipo_de_tombamento
-        [76] => tombado
-        [77] => visitada
-        [78] => youtube_link
-     */
-    
+        /*
+          [0] => AtividadePatrm
+          [1] => BairroPesq
+          [2] => DtPesq
+          [3] => ID
+          [4] => ID_F2
+          [5] => ID_F3
+          [6] => ID_F4
+          [7] => ID_F5
+          [8] => InteresseTomb
+          [9] => LigMantened
+          [10] => NumFicha
+          [11] => Pesquisador
+          [12] => Status
+          [13] => _edit_last
+          [14] => _edit_lock
+          [15] => _mpv_inmap
+          [16] => _mpv_location
+          [17] => _mpv_pin
+          [18] => _oembed_076b752f5a584953888cde02433bd096
+          [19] => _oembed_11dff52bf7cf51715fafd677bac8ea0a
+          [20] => _oembed_16b77d2476b690910e4fec0c34f00c86
+          [21] => _oembed_1a4dd169ad087afea449a5d174a05bb6
+          [22] => _oembed_1d18fc598e4b6d25d2eb482edc87463f
+          [23] => _oembed_1efc6184527734252c79ccc9dffa0c3a
+          [24] => _oembed_1fb19d84a25914f2602efa1736c992a2
+          [25] => _oembed_278c51f6e2ad4ce2a196d5e6c8313cf0
+          [26] => _oembed_2ebbf948946a4e41ca09d67e81e433e0
+          [27] => _oembed_361a49ddb4013bb48a807ccda1dbf06b
+          [28] => _oembed_43b941dc9456d30878ecc48e9fc3adaa
+          [29] => _oembed_5148cee377bc7af6f30427d6c8529e73
+          [30] => _oembed_5fac6d3869591451256f8bafffbd1f3a
+          [31] => _oembed_6afb031b2d0e0240e85be7d407672bb9
+          [32] => _oembed_6d19aa4497f998dc7b8bd097063b6e9d
+          [33] => _oembed_7d674e27613a2bbbccf52591918d8525
+          [34] => _oembed_d2f88d551cf395bab3e1d79d38cbda90
+          [35] => _oembed_d4bfeb34323ebd0433cdf6974d3754b7
+          [36] => _oembed_d8c6b9f2e973f6e5b897da007c923a01
+          [37] => _oembed_e8932f1df2f052666eaecb8adc96ce77
+          [38] => _oembed_eca9c28aa68fcbee403d1053ad17ae55
+          [39] => _oembed_f47d4da8202fc247db5f11843d716407
+          [40] => _oembed_f64ace249129ed09b3ef4215ab2e30a4
+          [41] => _oembed_fe98b7d883173718415f457189aff314
+          [42] => _thumbnail_id
+          [43] => _wp_old_slug
+          [44] => apelido
+          [45] => bairro
+          [46] => bairro_de_origem
+          [47] => cep
+          [48] => complemento
+          [49] => data_criacao
+          [50] => data_tombamento
+          [51] => dirigente
+          [52] => dirigente_2
+          [53] => dirigente_3
+          [54] => dirigente_4
+          [55] => dirigente_5
+          [56] => e-mail
+          [57] => endereco
+          [58] => files
+          [59] => frenda
+          [60] => horario_visita
+          [61] => local_de_origem
+          [62] => num_componentes
+          [63] => numero
+          [64] => origem_etnica
+          [65] => pesquisador
+          [66] => post_content
+          [67] => post_title
+          [68] => post_type
+          [69] => publico_amount
+          [70] => sinopse
+          [71] => site
+          [72] => telefone
+          [73] => telefone_2
+          [74] => telefone_3
+          [75] => tipo_de_tombamento
+          [76] => tombado
+          [77] => visitada
+          [78] => youtube_link
+         */
+
         $data = json_decode(file_get_contents('/tmp/ceara-data.json'));
 
         $admin_user = $app->repo('User')->find(1);
         $admin_profile = $app->repo('Agent')->find(1);
 
         $space_types = [
-            'post' => $app->getRegisteredEntityTypeById ('MapasCulturais\Entities\Space', 299),
-            'patrimonio-material' => $app->getRegisteredEntityTypeById ('MapasCulturais\Entities\Space', 200),
-            'patrimonio-imaterial' => $app->getRegisteredEntityTypeById ('MapasCulturais\Entities\Space', 201),
-            'equipamento' => $app->getRegisteredEntityTypeById ('MapasCulturais\Entities\Space', 199),
+            'post' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 299),
+            'patrimonio-material' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 200),
+            'patrimonio-imaterial' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 201),
+            'equipamento' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 199),
         ];
 
-        $endereco = function($ed){
+        $endereco = function($ed) {
             $result = '';
-            if(@$ed->endereco){
+            if (@$ed->endereco) {
                 $result = $ed->endereco;
             }
 
-            if(@$ed->numero && @$ed->endereco){
+            if (@$ed->numero && @$ed->endereco) {
                 $result .= ' ' . $ed->numero;
             }
 
-            if(@$ed->bairro){
+            if (@$ed->complemento && $result) {
+                $result .= ' ' . $ed->complemento;
+            }
+
+            if (@$ed->bairro) {
                 $result .= $result ? ', ' . $ed->bairro : $ed->bairro;
             }
 
-            if(@$ed->cep){
+            if (@$ed->cep) {
                 $result .= $ed->cep ? ', CEP: ' . $ed->cep : ' CEP: ' . $ed->cep;
             }
-            
+
             return $result;
         };
 
-        $props = [];
 
-        foreach ($data as $ed) {
-            echo "=====> importando {$ed->post_type} de id {$ed->ID} ({$ed->post_title}) \n";
+        $youtube_id_from_url = function($url) {
+            $pattern = '%^# Match any youtube URL
+                    (?:https?://)?  # Optional scheme. Either http or https
+                    (?:www\.)?      # Optional www subdomain
+                    (?:             # Group host alternatives
+                      youtu\.be/    # Either youtu.be,
+                    | youtube\.com  # or youtube.com
+                      (?:           # Group path alternatives
+                        /embed/     # Either /embed/
+                      | /v/         # or /v/
+                      | /watch\?v=  # or /watch\?v=
+                      )             # End path alternatives.
+                    )               # End host alternatives.
+                    ([\w-]{10,12})  # Allow 10-12 for 11 char youtube id.
+                    $%x'
+            ;
+            $result = preg_match($pattern, $url, $matches);
+            if (false !== $result) {
+                return $matches[1];
+            }
+            return false;
+        };
+
+        foreach ($data as $i => $ed) {
+            echo "=====> ({$i}) importando {$ed->post_type} de id {$ed->ID} ({$ed->post_title}) \n";
 
             if ($ed->post_type == 'instituicao') {
                 $entity = new Agent;
@@ -139,11 +166,11 @@ return array(
                 $entity->type = $space_types[$ed->post_type];
                 $entity->owner = $admin_profile;
 
-                if(@$ed->publico_amount){
+                if (@$ed->publico_amount) {
                     $entity->capacidade = $ed->publico_amount;
                 }
 
-                if(@$ed->horario_visita){
+                if (@$ed->horario_visita) {
                     $entity->horario = $ed->horario_visita;
                 }
             }
@@ -152,33 +179,33 @@ return array(
             $entity->name = $ed->post_title;
             $entity->longDescription = $ed->post_content;
 
-            if(@$ed->sinopse){
+            if (@$ed->sinopse) {
                 $entity->shortDescription = $ed->sinopse;
             }
 
             $entity->endereco = $endereco($ed);
 
-            if(@$ed->telefone){
+            if (@$ed->telefone) {
                 $entity->telefonePublico = $ed->telefone;
             }
 
-            if(@$ed->site){
-                if(!preg_match('#^http#', $ed->site)){
+            if (@$ed->site) {
+                if (!preg_match('#^http#', $ed->site)) {
                     $ed->site = 'http://' . $ed->site;
                 }
 
                 $entity->site = $ed->site;
             }
 
-            if(@$ed->telefone2){
+            if (@$ed->telefone2) {
                 $entity->telefone1 = $ed->telefone2;
             }
 
-            if(@$ed->telefone3){
+            if (@$ed->telefone3) {
                 $entity->telefone2 = $ed->telefone3;
             }
-            
-            if(@$ed->{'e-mail'}){
+
+            if (@$ed->{'e-mail'}) {
                 $entity->emailPublico = $ed->{'e-mail'};
             }
 
@@ -187,27 +214,135 @@ return array(
             if (isset($ed->_mpv_location) && is_object($ed->_mpv_location)) {
                 $entity->location = new MapasCulturais\Types\GeoPoint($ed->_mpv_location->lon, $ed->_mpv_location->lat);
             }
-            
+
+            if (@$ed->terms) {
+                $tags = ['NÃO REVISADO'];
+                $areas = [];
+
+                foreach ($ed->terms as $taxo => $terms) {
+                    if ($taxo == 'post_tag') {
+                        $prefixo = '';
+                    } else {
+                        $prefixo = $taxo . ': ';
+                    }
+
+
+                    foreach ($terms as $term) {
+                        $term = trim($term);
+                        $lterm = strtolower($term);
+                        if (!$term) {
+                            continue;
+                        }
+
+                        if($taxo == 'pratica-cultural'){
+                            if($lterm == 'arte e cultura digital'){
+                                $areas[] = 'Arte Digital';
+                                $areas[] = 'Cultura Digital';
+                                continue;
+
+                            }elseif($lterm == 'audiovisual'){
+                                $areas[] = 'Audiovisual';
+                                continue;
+
+                            }elseif($lterm == 'circo'){
+                                $areas[] = 'Circo';
+                                continue;
+
+                            }elseif($lterm == 'cultura popular'){
+                                $areas[] = 'Cultura Popular';
+                                continue;
+
+                            }elseif($lterm == 'cultura popular tradicional'){
+                                $areas[] = 'Cultura Popular';
+                                $tags[] = $lterm;
+                                continue;
+
+                            }elseif($lterm == 'dança'){
+                                $areas[] = 'Dança';
+                                continue;
+
+                            }elseif($lterm == 'literatura'){
+                                $areas[] = 'Literatura';
+                                continue;
+
+                            }elseif($lterm == 'música'){
+                                $areas[] = 'Música';
+                                continue;
+
+                            }elseif($lterm == 'música'){
+                                $areas[] = 'Música';
+                                continue;
+
+                            }elseif($lterm == 'artes cênicas'){
+                                $areas[] = 'Teatro';
+                                continue;
+
+                            }elseif($lterm == 'artes cênicas'){
+                                $areas[] = 'Teatro';
+                                continue;
+
+                            }elseif($lterm == 'artes visuais'){
+                                $areas[] = 'Artes Visuais';
+                                continue;
+
+                            }elseif($lterm == 'artesanato'){
+                                $areas[] = 'Artesanato';
+                                continue;
+
+                            }elseif($lterm == 'cultura afro-brasileira'){
+                                $areas[] = 'Cultura Negra';
+                                $tags[] = 'Cultura Afro-Brasileira';
+                                continue;
+
+                            }elseif($lterm == 'design'){
+                                $areas[] = 'Design';
+                                continue;
+
+                            }elseif($lterm == 'esporte'){
+                                $areas[] = 'Esporte';
+                                continue;
+
+                            }elseif($lterm == 'fotografia'){
+                                $areas[] = 'Fotografia';
+                                continue;
+
+                            }elseif($lterm == 'gastronomia'){
+                                $areas[] = 'Gastronomia';
+                                continue;
+
+                            }
+                        }
+
+                        $_term = $prefixo . $term;
+                        $tags[] = $_term;
+
+                    }
+                }
+
+                $entity->terms['tag'] = array_unique($tags);
+                $entity->terms['area'] = array_unique($areas);
+            }
+
             $entity->save();
-            
+
             $tmp_path = '/tmp/uploads/';
-            
-            if(@$ed->files && is_array($ed->files)){
-                foreach($ed->files as $i => $f){
+
+            if (@$ed->files && is_array($ed->files)) {
+                foreach ($ed->files as $i => $f) {
                     $tmp_file = $tmp_path . $f->path;
                     $file_info = pathinfo($tmp_file);
-                    
-                    if(!file_exists($tmp_file)){
+
+                    if (!file_exists($tmp_file)) {
                         continue;
                     }
-                    
-                    if($i == 0){
+
+                    if ($i == 0) {
                         $avatar_basename = 'avatar-' . $file_info['basename'];
                         $avatar_tmp = $file_info['dirname'] . '/' . $avatar_basename;
                         echo " ---- > file " . $avatar_basename . "\n";
-                        
+
                         copy($tmp_file, $avatar_tmp);
-                        
+
                         $file = new File([
                             'name' => $avatar_basename,
                             'type' => $f->type,
@@ -220,7 +355,7 @@ return array(
                         $file->group = 'avatar';
                         $file->save();
                     }
-                    
+
                     echo " ---- > file " . $file_info['basename'] . "\n";
                     $file = new File([
                         'name' => $file_info['basename'],
@@ -229,14 +364,34 @@ return array(
                         'error' => 0,
                         'size' => filesize($tmp_file)
                     ]);
-                    
+
                     $file->owner = $entity;
                     $file->group = 'gallery';
                     $file->save();
+                }
+            }
+
+            if (@$ed->youtube_link) {
+                $vidID = $youtube_id_from_url($ed->youtube_link);
+
+                $url = "http://gdata.youtube.com/feeds/api/videos/" . $vidID;
+                $doc = new DOMDocument;
+                if ($doc->load($url)) {
+                    $title = $doc->getElementsByTagName("title")->item(0)->nodeValue;
+
+                    echo " => adicionando vídeo '$title' ($ed->youtube_link)\n";
+
+                    $metalist = new MetaList;
+
+                    $metalist->owner = $entity;
+                    $metalist->group = 'videos';
+                    $metalist->title = $title;
+                    $metalist->value = $ed->youtube_link;
+                    $metalist->save();
                 }
             }
         }
 
         return false;
     }
-);
+    );
