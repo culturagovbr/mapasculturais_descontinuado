@@ -11,6 +11,7 @@ $conn = $em->getConnection();
 
 return array(
     'import ceara data' => function() use( $conn, $app ) {
+        return true; // já executou
         /*
           [0] => AtividadePatrm
           [1] => BairroPesq
@@ -394,4 +395,4 @@ return array(
 
         return false;
     }
-    );
+);
