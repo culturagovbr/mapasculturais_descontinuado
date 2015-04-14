@@ -18,3 +18,18 @@
 #home-developers {
     background: $brand-devs;
 }
+
+#brand-logo {
+    a {
+        img {
+            @media screen and (min-width: $screen-tablet) {
+                margin-top: 12px;
+            }
+        }
+    }
+}
+#about-nav {
+    @media screen and (min-width: $screen-tablet) {
+        padding: 1.5rem;
+    }
+}
