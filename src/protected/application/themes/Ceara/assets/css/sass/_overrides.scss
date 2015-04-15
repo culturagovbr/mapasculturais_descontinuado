@@ -18,7 +18,16 @@
 #home-developers {
     background: $brand-devs;
 }
-
+//
+// Header
+//
+#main-header {
+    #header-nav-row {
+        @media screen and (min-width: $screen-sm-min) {
+            background: url(/assets/img/bg-top.png) no-repeat left bottom #FFFFFF;
+        }
+    }
+}
 #brand-logo {
     a {
         img {
