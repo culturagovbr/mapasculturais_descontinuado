@@ -139,6 +139,14 @@ return array(
             'type' => 'text'
         ),
 
+        'cep' => array(
+            'private' => function(){
+                return !$this->publicLocation;
+            },
+            'label' => 'CEP',
+            'type' => 'text'
+        ),
+
         'site' => array(
             'label' => 'Site',
             'validations' => array(

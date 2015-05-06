@@ -394,5 +394,126 @@ return array(
         }
 
         return false;
+    },
+            
+    'importando o banco de dados do sinf' => function() use ($conn){
+        $data = json_decode(file_get_contents('/tmp/sinf.json'));
+        
+        $emails = [];
+        
+        $secretarias = [];
+        
+        $nu = 0;
+        
+        foreach($data as $u){
+            $nu++;
+            echo "criando usuário $nu ($u->email)\n";
+            
+            $user = new MapasCulturais\Entities\User;
+            
+            $user->email = $u->email ? $u->email : 'REVISAR';
+            $user->authProvider = 1;
+            $user->authUid = '';
+            
+            $user->save();
+            
+            $profile = null;
+            
+            foreach($u->agents as $e){
+                echo "--> criando AGENTE $e->name\n";
+                
+                $entity = new MapasCulturais\Entities\Agent($user);
+                
+                if(!isset($secretarias[$e->geoMunicipio])){
+                    $secretarias[$e->geoMunicipio] = $entity;
+                }
+                
+                $entity->type = (int) $e->type;
+                $entity->name = $e->name;
+                $entity->emailPrivado = $u->email;
+                $entity->nomeCompleto = isset($e->nomeCompleto) ? $e->nomeCompleto : $e->name;
+                $entity->documento = $e->documento;
+                
+                $l = (array) $e->location;
+                if($l['latitude'] && $l['longitude']) $entity->location = $l;
+                
+                $entity->endereco = $e->endereco;
+                $entity->geoBairro = $e->geoBairro;
+                $entity->geoMunicipio = $e->geoMunicipio;
+                if(isset($e->cep)) $entity->cep = $e->cep;
+                
+                if(isset($e->telefonePublico)) $entity->telefonePublico = $e->telefonePublico;
+                if(isset($e->telefone1)) $entity->telefone1 = $e->telefone1;
+                if(isset($e->telefone2)) $entity->telefone2 = $e->telefone2;
+                
+                if(isset($e->dataDeNascimento)) $entity->dataDeNascimento = $e->dataDeNascimento;
+                if(isset($e->site)) $entity->site = $e->site;
+                if(isset($e->genero)) $entity->genero = $e->genero;
+                
+                $entity->save();
+                
+                if(!$profile){
+                    $profile = $entity;
+                    $user->profile = $profile;
+                    $user->save();
+                }
+            }
+            
+/*
+(
+    [_space] => 1
+    [type] => Biblioteca
+    [name] => BIBLIOTECA JORGE AMADO
+    [email] => sec.culturaturismo@hotmail.com
+    [site] => 
+    [endereco] => Rua Migueira Braga, 760, Centro, Miraíma, Ceará
+    [cep] => 62530-000
+    [telefonePublico] => (88) 3630-1312
+    [telefone1] => (88) 9210-9882
+    [telefone2] => 
+    [geoBairro] => Centro
+    [geoMunicipio] => Miraíma
+    [id] => 5122
+    [location] => stdClass Object
+        (
+            [latitude] => -3.569051
+            [longitude] => -39.966623
+        )
+
+)
+*/           
+            foreach($u->spaces as $e){
+                echo "--> criando ESPAÇO $e->name\n";
+                
+                $entity = new MapasCulturais\Entities\Space;
+                $entity->type = 199;
+                $entity->name = $e->name;
+                $entity->emailPrivado = $u->email;
+                
+                $l = (array) $e->location;
+                if($l['latitude'] && $l['longitude']) $entity->location = $l;
+                
+                $entity->endereco = $e->endereco;
+                $entity->geoBairro = $e->geoBairro;
+                $entity->geoMunicipio = $e->geoMunicipio;
+                if(isset($e->cep)) $entity->cep = $e->cep;
+                
+                if(isset($e->telefonePublico)) $entity->telefonePublico = $e->telefonePublico;
+                if(isset($e->telefone1)) $entity->telefone1 = $e->telefone1;
+                if(isset($e->telefone2)) $entity->telefone2 = $e->telefone2;
+                
+                if(isset($e->site)) $entity->site = $e->site;
+                
+                if($profile){
+                    $entity->owner = $profile;
+                }else{
+                    $entity->owner = $secretarias[$e->geoMunicipio];
+                }
+                
+                $entity->save();
+            }
+        }
+        
+        MapasCulturais\App::i()->em->flush();
     }
 );
