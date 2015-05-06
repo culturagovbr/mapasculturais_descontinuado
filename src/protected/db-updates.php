@@ -4,7 +4,7 @@ namespace MapasCulturais;
 $app = App::i();
 $em = $app->em;
 $conn = $em->getConnection();
-
+return [];
 
 return array(
     'alter table user add column profile_id' => function() use ($app, $conn){
