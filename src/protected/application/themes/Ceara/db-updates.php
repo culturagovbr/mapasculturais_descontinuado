@@ -105,6 +105,23 @@ return array(
             'patrimonio-imaterial' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 201),
             'equipamento' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 199),
         ];
+        
+        $__areas = [
+"Artes Cênicas"                 => "Teatro",
+"Artes Gráficas"                => ["Design", "Artes Visuais"],
+"Audiovisual"                   => "Audiovisual",
+"Gastronomia"                   => "Gastronomia",
+"Artes Visuais"                 => "Artes Visuais",
+"Mídia - Imprensa/Rádio/TV"     => ["Rádio", "Televisão"],
+"Artesanato"                    => "Artesanato",
+"Literatura"                    => "Literatura",
+"Música"                        => "Música",
+"Patrimônio Histórico Cultural" => ["Patrimônio Material", "Patrimônio Imaterial"],
+"À classificar"                 => "Outros",
+"Produção e Gestão Cultural"    => ["Produção Cultural", "Gestão Cultural"],
+"Prof. da Cultura Tradicional"  => "Cultura Popular",
+"Turismo Cultural"              => "Turismo"
+        ];
 
         $endereco = function($ed) {
             $result = '';
@@ -396,7 +413,7 @@ return array(
         return false;
     },
             
-    'importando o banco de dados do sinf' => function() use ($conn){
+    'importando o banco de dados do sinf2' => function() use ($conn){
         $data = json_decode(file_get_contents('/tmp/sinf.json'));
         
         $emails = [];
@@ -415,11 +432,14 @@ return array(
             $user->authProvider = 1;
             $user->authUid = '';
             
-            $user->save();
+//            $user->save();
             
             $profile = null;
             
             foreach($u->agents as $e){
+                
+                print_r($e);
+                continue;
                 echo "--> criando AGENTE $e->name\n";
                 
                 $entity = new MapasCulturais\Entities\Agent($user);
@@ -450,6 +470,13 @@ return array(
                 if(isset($e->site)) $entity->site = $e->site;
                 if(isset($e->genero)) $entity->genero = $e->genero;
                 
+                
+                if((int) $e->type === 1){
+                    $entity->publicLocation = false;
+                }else{
+                    $entity->publicLocation = true;
+                }
+                
                 $entity->save();
                 
                 if(!$profile){
@@ -458,6 +485,8 @@ return array(
                     $user->save();
                 }
             }
+            
+            continue;
             
 /*
 (
@@ -481,12 +510,27 @@ return array(
         )
 
 )
-*/           
+ * 
+ * TIPOS:
+    [0] => Biblioteca
+    [1] => Centro Cultural
+    [2] => Cinema
+    [3] => Teatro
+    [4] => Museu
+
+*/         
+            $space_types = [
+                'Biblioteca' => 21, // biblioteca privada
+                'Centro Cultural' => 41, // centro cultural privado
+                'Cinema' => 14, // sala de cinema
+                'Teatro' => 31, // teatro privado
+                'Museu' => 61 // museu privado
+            ];
             foreach($u->spaces as $e){
                 echo "--> criando ESPAÇO $e->name\n";
                 
                 $entity = new MapasCulturais\Entities\Space;
-                $entity->type = 199;
+                $entity->type = isset($space_types[$e->type]) ? $space_types[$e->type] : 199;
                 $entity->name = $e->name;
                 $entity->emailPrivado = $u->email;
                 
@@ -513,7 +557,7 @@ return array(
                 $entity->save();
             }
         }
-        
+        die;
         MapasCulturais\App::i()->em->flush();
     }
 );
