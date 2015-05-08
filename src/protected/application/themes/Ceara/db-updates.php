@@ -105,7 +105,7 @@ return array(
             'patrimonio-imaterial' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 201),
             'equipamento' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 199),
         ];
-        
+
         $__areas = [
 "Artes Cênicas"                 => "Teatro",
 "Artes Gráficas"                => ["Design", "Artes Visuais"],
@@ -412,94 +412,92 @@ return array(
 
         return false;
     },
-            
-    'importando o banco de dados do sinf2' => function() use ($conn){
+
+    'importando o banco de dados do sinf' => function() use ($conn){
         $data = json_decode(file_get_contents('/tmp/sinf.json'));
-        
+
         $emails = [];
-        
+
         $secretarias = [];
-        
+
         $nu = 0;
-        
+
         foreach($data as $u){
             $nu++;
             echo "criando usuário $nu ($u->email)\n";
-            
+
             $user = new MapasCulturais\Entities\User;
-            
+
             $user->email = $u->email ? $u->email : 'REVISAR';
             $user->authProvider = 1;
             $user->authUid = '';
-            
-//            $user->save();
-            
+
+            $user->save();
+
             $profile = null;
-            
+
             foreach($u->agents as $e){
-                
-                print_r($e);
-                continue;
+
                 echo "--> criando AGENTE $e->name\n";
-                
+
                 $entity = new MapasCulturais\Entities\Agent($user);
-                
+
                 if(!isset($secretarias[$e->geoMunicipio])){
                     $secretarias[$e->geoMunicipio] = $entity;
                 }
-                
+
                 $entity->type = (int) $e->type;
                 $entity->name = $e->name;
                 $entity->emailPrivado = $u->email;
                 $entity->nomeCompleto = isset($e->nomeCompleto) ? $e->nomeCompleto : $e->name;
                 $entity->documento = $e->documento;
-                
+
                 $l = (array) $e->location;
                 if($l['latitude'] && $l['longitude']) $entity->location = $l;
-                
+
                 $entity->endereco = $e->endereco;
                 $entity->geoBairro = $e->geoBairro;
                 $entity->geoMunicipio = $e->geoMunicipio;
                 if(isset($e->cep)) $entity->cep = $e->cep;
-                
+
                 if(isset($e->telefonePublico)) $entity->telefonePublico = $e->telefonePublico;
                 if(isset($e->telefone1)) $entity->telefone1 = $e->telefone1;
                 if(isset($e->telefone2)) $entity->telefone2 = $e->telefone2;
-                
+
                 if(isset($e->dataDeNascimento)) $entity->dataDeNascimento = $e->dataDeNascimento;
                 if(isset($e->site)) $entity->site = $e->site;
                 if(isset($e->genero)) $entity->genero = $e->genero;
-                
-                
+
+
                 if((int) $e->type === 1){
                     $entity->publicLocation = false;
                 }else{
                     $entity->publicLocation = true;
                 }
-                
+
                 $entity->save();
-                
+
                 if(!$profile){
                     $profile = $entity;
                     $user->profile = $profile;
                     $user->save();
                 }
             }
-            
+
             continue;
-            
+
 /*
 (
     [_space] => 1
     [type] => Biblioteca
     [name] => BIBLIOTECA JORGE AMADO
     [email] => sec.culturaturismo@hotmail.com
-    [site] => 
+    [site] =>
     [endereco] => Rua Migueira Braga, 760, Centro, Miraíma, Ceará
     [cep] => 62530-000
     [telefonePublico] => (88) 3630-1312
     [telefone1] => (88) 9210-9882
-    [telefone2] => 
+    [telefone2] =>
     [geoBairro] => Centro
     [geoMunicipio] => Miraíma
     [id] => 5122
@@ -510,7 +508,7 @@ return array(
         )
 
 )
- * 
+ *
  * TIPOS:
     [0] => Biblioteca
     [1] => Centro Cultural
@@ -518,7 +516,7 @@ return array(
     [3] => Teatro
     [4] => Museu
 
-*/         
+*/
             $space_types = [
                 'Biblioteca' => 21, // biblioteca privada
                 'Centro Cultural' => 41, // centro cultural privado
@@ -528,32 +526,32 @@ return array(
             ];
             foreach($u->spaces as $e){
                 echo "--> criando ESPAÇO $e->name\n";
-                
+
                 $entity = new MapasCulturais\Entities\Space;
                 $entity->type = isset($space_types[$e->type]) ? $space_types[$e->type] : 199;
                 $entity->name = $e->name;
                 $entity->emailPrivado = $u->email;
-                
+
                 $l = (array) $e->location;
                 if($l['latitude'] && $l['longitude']) $entity->location = $l;
-                
+
                 $entity->endereco = $e->endereco;
                 $entity->geoBairro = $e->geoBairro;
                 $entity->geoMunicipio = $e->geoMunicipio;
                 if(isset($e->cep)) $entity->cep = $e->cep;
-                
+
                 if(isset($e->telefonePublico)) $entity->telefonePublico = $e->telefonePublico;
                 if(isset($e->telefone1)) $entity->telefone1 = $e->telefone1;
                 if(isset($e->telefone2)) $entity->telefone2 = $e->telefone2;
-                
+
                 if(isset($e->site)) $entity->site = $e->site;
-                
+
                 if($profile){
                     $entity->owner = $profile;
                 }else{
                     $entity->owner = $secretarias[$e->geoMunicipio];
                 }
-                
+
                 $entity->save();
             }
         }
