@@ -557,7 +557,6 @@ return array(
                 $entity->save();
             }
         }
-        die;
         MapasCulturais\App::i()->em->flush();
     }
 );
