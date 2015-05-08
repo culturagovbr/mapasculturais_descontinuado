@@ -106,23 +106,6 @@ return array(
             'equipamento' => $app->getRegisteredEntityTypeById('MapasCulturais\Entities\Space', 199),
         ];
 
-        $__areas = [
-"Artes Cênicas"                 => "Teatro",
-"Artes Gráficas"                => ["Design", "Artes Visuais"],
-"Audiovisual"                   => "Audiovisual",
-"Gastronomia"                   => "Gastronomia",
-"Artes Visuais"                 => "Artes Visuais",
-"Mídia - Imprensa/Rádio/TV"     => ["Rádio", "Televisão"],
-"Artesanato"                    => "Artesanato",
-"Literatura"                    => "Literatura",
-"Música"                        => "Música",
-"Patrimônio Histórico Cultural" => ["Patrimônio Material", "Patrimônio Imaterial"],
-"À classificar"                 => "Outros",
-"Produção e Gestão Cultural"    => ["Produção Cultural", "Gestão Cultural"],
-"Prof. da Cultura Tradicional"  => "Cultura Popular",
-"Turismo Cultural"              => "Turismo"
-        ];
-
         $endereco = function($ed) {
             $result = '';
             if (@$ed->endereco) {
@@ -422,6 +405,23 @@ return array(
 
         $nu = 0;
 
+        $__areas = [
+"Artes Cênicas"                 => ["Teatro"],
+"Artes Gráficas"                => ["Design", "Artes Visuais"],
+"Audiovisual"                   => ["Audiovisual"],
+"Gastronomia"                   => ["Gastronomia"],
+"Artes Visuais"                 => ["Artes Visuais"],
+"Mídia - Imprensa/Rádio/TV"     => ["Rádio", "Televisão"],
+"Artesanato"                    => ["Artesanato"],
+"Literatura"                    => ["Literatura"],
+"Música"                        => ["Música"],
+"Patrimônio Histórico Cultural" => ["Patrimônio Material", "Patrimônio Imaterial"],
+"À classificar"                 => ["Outros"],
+"Produção e Gestão Cultural"    => ["Produção Cultural", "Gestão Cultural"],
+"Prof. da Cultura Tradicional"  => ["Cultura Popular"],
+"Turismo Cultural"              => ["Turismo"]
+        ];
+
         foreach($data as $u){
             $nu++;
             echo "criando usuário $nu ($u->email)\n";
@@ -441,6 +441,20 @@ return array(
                 echo "--> criando AGENTE $e->name\n";
 
                 $entity = new MapasCulturais\Entities\Agent($user);
+
+                $areas = [];
+
+                if($e->grupos){
+                    foreach($e->grupos as $grupo){
+                        $areas = array_merge($areas, $__areas[$grupo]);
+                    }
+
+                    $entity->terms['area'] = array_unique($areas);
+                }
+
+                if($e->areas){
+                    $entity->terms['tag'] = $e->areas;
+                }
 
                 if(!isset($secretarias[$e->geoMunicipio])){
                     $secretarias[$e->geoMunicipio] = $entity;
