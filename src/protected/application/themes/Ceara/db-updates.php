@@ -452,8 +452,8 @@ return array(
                     $entity->terms['area'] = array_unique($areas);
                 }
 
-                if($e->areas){
-                    $entity->terms['tag'] = $e->areas;
+                if(isset($e->areas) && $e->areas){
+                    $entity->terms['tag'] = array_unique($e->areas);
                 }
 
                 if(!isset($secretarias[$e->geoMunicipio])){
