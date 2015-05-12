@@ -1,6 +1,7 @@
 <?php
-
 namespace Ceara;
+
+use MapasCulturais\App;
 
 class AuthProvider extends \MapasCulturais\AuthProviders\OpauthOpenId{
 
