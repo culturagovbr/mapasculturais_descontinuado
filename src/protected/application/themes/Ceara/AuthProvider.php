@@ -13,7 +13,7 @@ class AuthProvider extends \MapasCulturais\AuthProviders\OpauthOpenId{
         
         if($user = $app->repo('User')->findOneBy(['email' => $email])){
             $user->authUid = $response['auth']['uid'];
-            $user = new \MapasCulturais\Entities\User;
+            
             $name = '';
             
             if(isset($response['auth']['info']['name'])){
