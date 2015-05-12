@@ -397,6 +397,7 @@ return array(
     },
 
     'importando o banco de dados do sinf' => function() use ($conn){
+        return true;
         $data = json_decode(file_get_contents('/tmp/sinf.json'));
 
         $emails = [];
@@ -570,5 +571,30 @@ return array(
             }
         }
         MapasCulturais\App::i()->em->flush();
+    },
+            
+    'fix sinf users' => function() use ($conn){
+        $rs = $conn->fetchAll("select count(ID) as num, email from usr GROUP BY email ORDER BY num DESC");
+        
+        foreach($rs as $r){
+            if($r['num'] > 1){
+                $ids = [];
+                $first_id = null;
+                $users = $conn->fetchAll("SELECT * FROM usr WHERE email = '{$r['email']}'");
+                
+                foreach ($users as $user){
+                    if(!$first_id){
+                        $first_id = $user['id'];
+                    }else{
+                        $ids[] = $user['id'];
+                        echo "MOVENDO AGENTES DO USUÁRIO {$user['id']}\n";
+                        $conn->executeQuery("UPDATE agent SET user_id = $first_id");
+                    }
+                }
+                $ids = implode(',', $ids);
+                echo " ----> DELETANDO USUÁRIOS DE IDS $ids\n\n";
+                $conn->executeQuery("DELETE FROM usr WHERE id IN($ids)");
+            }
+        }
     }
 );
