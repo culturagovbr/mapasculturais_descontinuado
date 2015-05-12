@@ -588,7 +588,7 @@ return array(
                     }else{
                         $ids[] = $user['id'];
                         echo "MOVENDO AGENTES DO USUÁRIO {$user['id']}\n";
-                        $conn->executeQuery("UPDATE agent SET user_id = $first_id");
+                        $conn->executeQuery("UPDATE agent SET user_id = $first_id WHERE user_id = {$user['id']}");
                     }
                 }
                 $ids = implode(',', $ids);
