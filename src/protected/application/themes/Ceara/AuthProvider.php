@@ -20,20 +20,22 @@ class AuthProvider extends \MapasCulturais\AuthProviders\OpauthOpenId{
                 
                 $user = $app->repo('User')->findOneBy(['email' => $email]);
                 
-                $profile = $user->profile;
-            
-                if(('1' !== (string) $profile->type) && strtolower(trim($profile->name)) != strtolower(trim($name)) && strtolower(trim($profile->nomeCompleto)) != strtolower(trim($name))){
-                    // cria um agente do tipo user profile para o usuário criado acima
-                    $agent = new Entities\Agent($user);
+                if($user){
+                    $profile = $user->profile;
 
-                    $agent->name = $name;
-                    $agent->type = 1;
+                    if(('1' !== (string) $profile->type) && strtolower(trim($profile->name)) != strtolower(trim($name)) && strtolower(trim($profile->nomeCompleto)) != strtolower(trim($name))){
+                        // cria um agente do tipo user profile para o usuário criado acima
+                        $agent = new Entities\Agent($user);
 
-                    $agent->save(true);
+                        $agent->name = $name;
+                        $agent->type = 1;
 
-                    $user->profile = $agent;
-                    
-                    $user->save(true);
+                        $agent->save(true);
+
+                        $user->profile = $agent;
+
+                        $user->save(true);
+                    }
                 }
             }
 
