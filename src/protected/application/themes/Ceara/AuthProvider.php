@@ -35,11 +35,13 @@ class AuthProvider extends \MapasCulturais\AuthProviders\OpauthOpenId{
                 $app->em->flush();
 
                 $user->profile = $agent;
-                $user->save(true);
             }
-            return $user;
+            $user->save(true);
+            
         }else{
-            return parent::_createUser($response);
+            $user = parent::_createUser($response);
         }
+        
+        return $user;
     }
 }
