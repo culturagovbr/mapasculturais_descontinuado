@@ -9,6 +9,12 @@ $this->addEntityToJs($entity);
 
 $this->addProjectToJs($entity);
 
+if(!$entity->isNew() && $entity->canUser('@control')){
+    if($app->user->is('admin') || $app->user->is('staff')){ //@TODO: remover este if quando o layout estiver pronto
+        $this->addProjectEventsToJs($entity);
+    }
+}
+
 if($this->isEditable()){
     $this->addEntityTypesToJs($entity);
     $this->addTaxonoyTermsToJs('tag');
@@ -37,6 +43,7 @@ $child_entity_request = isset($child_entity_request) ? $child_entity_request : n
                 </div>
             <?php endif; ?>
         </div>
+        <?php $this->part('entity-status', array('entity' => $entity)); ?>
         <!--.header-image-->
         <div class="header-content">
             <div class="avatar <?php if($entity->avatar): ?>com-imagem<?php endif; ?>">
@@ -78,11 +85,58 @@ $child_entity_request = isset($child_entity_request) ? $child_entity_request : n
         <?php elseif($entity->canUser('@control')): ?>
             <li ng-if="data.projectRegistrationsEnabled"><a href="#inscritos">Inscritos</a></li>
         <?php endif; ?>
+
+        <?php if($app->user->is('admin') || $app->user->is('staff')): // @TODO: remover este if quando o layout estiver pronto ?>
+        <?php if(!$entity->isNew()): ?>
+            <li ng-if="data.entity.userHasControl" ><a href="#eventos">Status dos eventos</a></li>
+        <?php endif; ?>
+        <?php endif; ?>
     </ul>
+    <?php if($app->user->is('admin') || $app->user->is('staff')): // @TODO: remover este if quando o layout estiver pronto ?>
+    <?php if(!$entity->isNew()): ?>
+    <div id="eventos" ng-if="data.entity.userHasControl" ng-controller="ProjectEventsController">
+
+        <input type="text" ng-model="data.eventFilter" ng-change="filterEvents()" placeholder="filtrar eventos" style="width:300px;"><br>
+        <span class="btn btn-small btn-default" ng-click="selectAll()">marcar eventos listados</span>
+        <span class="btn btn-small btn-default" ng-click="deselectAll()">desmarcar eventos listados</span>
+        <div class="alignright" >
+            <span class="btn btn-small btn-warning" ng-click="unpublishSelectedEvents()">tornar os eventos selecionados rascunhos</span>
+            <span class="btn btn-small btn-primary" ng-click="publishSelectedEvents()">publicar os eventos selecionados</span>
+        </div>
+
+
+        <table style="width:100%; margin-top:5px;">
+            <caption>{{numSelectedEvents}} {{numSelectedEvents == 1 ? 'evento selecionado' : 'eventos selecionados' }}</caption>
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>Autor</th>
+                    <th>Evento</th>
+                    <th>Ocorrências</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="event in events" ng-show="!event.hidden" ng-class="{'selected': event.selected, 'evt-publish': event.status == 1, 'evt-draft': event.status == 0}">
+                    <td><input type='checkbox' ng-model="event.selected" ng-checked="event.selected"></td>
+                    <td><a href='{{event.owner.singleUrl}}'>{{event.owner.name}}</a></td>
+                    <td><a href='{{event.singleUrl}}'>{{event.name}}</a></td>
+                    <td>
+                        <ul>
+                            <li ng-repeat='occ in event.occurrences'>
+                                <a href="{{occ.space.singleUrl}}">{{occ.space.name}}</a> - {{occ.rule.description}} <span ng-if='occ.rule.price'>({{occ.rule.price}})</span>
+                            </li>
+                        </ul>
+                    </td>
+                    <td>{{event.status === 0 ? 'rascunho' : 'publicado'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <?php endif; ?>
+    <?php endif; ?>
 
     <div id="sobre" class="aba-content">
-
-
         <?php if($this->isEditable() || $entity->registrationFrom || $entity->registrationTo): ?>
             <div class="highlighted-message clearfix">
                 <?php if($this->isEditable() || $entity->registrationFrom): ?>

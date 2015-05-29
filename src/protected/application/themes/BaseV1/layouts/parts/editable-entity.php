@@ -73,7 +73,7 @@ if($this->isEditable()){
 
             <?php if($entity->usesDraft()): ?>
                 <?php if($entity->isNew() || $entity->status <= 0):  ?>
-                    <a class="btn btn-primary js-submit-button hltip" data-status="<?php echo $status_draft ?>" hltitle="Salvar este <?php echo strtolower($entity->getEntityType()) ?> como rascunho.">Salvar</a>
+                    <a class="btn btn-default js-submit-button hltip" data-status="<?php echo $status_draft ?>"  hltitle="Salvar este <?php echo strtolower($entity->getEntityType()) ?> como rascunho.">Salvar rascunho</a>
                     <a class="btn btn-primary js-submit-button hltip" data-status="<?php echo $status_enabled ?>" hltitle="Salvar e publicar este <?php echo strtolower($entity->getEntityType()) ?>.">Publicar</a>
                 <?php else: ?>
                     <a class="btn btn-primary js-submit-button" data-status="<?php echo $status_enabled ?>">Salvar</a>
