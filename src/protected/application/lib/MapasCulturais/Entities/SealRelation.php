@@ -110,7 +110,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
      * @ORM\Column(name="renovation_request", type="boolean", nullable=false)
      */
     protected $renovation_request;
-    
+
     function setSeal(Seal $seal){
         if($this->isNew()){
             $this->seal = $seal;
@@ -118,7 +118,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
             $period = new \DateInterval("P" . ((string)$seal->validPeriod) . "M");
             $dateFin = $this->createTimestamp->add($period);
             $this->validateDate = $dateFin;
-            
+
         } else {
             throw new \Exception();
         }
@@ -147,7 +147,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
         return $this->owner->canUser('removeSealRelation', $user) || $can;
     }
-    
+
     protected function canUserPrint($user) {
         return $this->owner->canUser('@control', $user) || $this->seal->canUser('@control', $user);
     }
@@ -161,31 +161,32 @@ abstract class SealRelation extends \MapasCulturais\Entity
                 $this->owner_relation = $this->owner->owner;
             }
             parent::save($flush);
-            
+
         } catch (\MapasCulturais\Exceptions\PermissionDenied $e) {
             if (!App::i()->isWorkflowEnabled())
                 throw $e;
 
             $app = App::i();
             $app->disableAccessControl();
-            $this->status = self::STATUS_PENDING;
-            
-            
-            
-            
-            
-            
-            
-            parent::save($flush);
-            $app->enableAccessControl();
+            if ($this->seal->need_permission !== 's'){
+                $this->status = self::STATUS_PENDING;
 
-            $request = new RequestSealRelation;
-            $request->setSealRelation($this);
-            $request->save(true);
+                parent::save($flush);
+                $app->enableAccessControl();
 
-            throw new \MapasCulturais\Exceptions\WorkflowRequest([$request]);
+                $request = new RequestSealRelation;
+                $request->setSealRelation($this);
+                $request->save(true);
+
+                throw new \MapasCulturais\Exceptions\WorkflowRequest([$request]);
+            } else {
+                parent::save($flush);
+                $app->enableAccessControl();
+            }
         }
     }
+
+
 
     function delete($flush = false) {
         $this->checkPermission('remove');
@@ -198,3 +199,6 @@ abstract class SealRelation extends \MapasCulturais\Entity
         parent::delete($flush);
     }
 }
+
+
+
