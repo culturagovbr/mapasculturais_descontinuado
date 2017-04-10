@@ -41,7 +41,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
     /**
      * A entidade que recebe o selo
-     * 
+     *
      * @var integer
      *
      * @ORM\Column(name="object_id", type="integer", nullable=false)
@@ -75,7 +75,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
     /**
      * O agente que está aplicando o selo (que não necessariamente é o dono do selo, pode ser um agente com permissão
      * ou o dono de um projeto que aplica o selo quando a inscrição é selecionada)
-     * 
+     *
      * @var \MapasCulturais\Entities\Agent
      *
      * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
@@ -87,7 +87,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
     /**
      * Gerada automaticamente no metodo save() com o profile do usuario logado.
-     * 
+     *
      * @var \MapasCulturais\Entities\Agent
      *
      * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
@@ -135,7 +135,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
     protected function canUserCreate($user){
         $app = App::i();
 
-        $can = !$app->isWorkflowEnabled() || $this->seal->canUser('@control', $user);
+        $can = !$app->isWorkflowEnabled() || ($this->seal->canUser('@control', $user) && $this->seal->need_permission !== 'Sim');
 
         return $this->owner->canUser('createSealRelation', $user) && $can;
     }

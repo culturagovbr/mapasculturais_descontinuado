@@ -13,6 +13,11 @@ use MapasCulturais\App;
  */
 class RequestSealRelation extends Request{
 
+    protected function canUserApprove($user){
+        $seal = $this->getSealRelation()->seal;
+        return parent::canUserApprove($user) && ($seal->getOwnerUser() === $user || $seal->need_permission !== 'Sim');
+    }
+
     function setSealRelation(SealRelation $relation){
         $this->destination = $relation->owner;
         $this->origin = $relation->seal;
