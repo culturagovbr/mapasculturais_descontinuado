@@ -152,10 +152,10 @@
             });
 
             //to fix address field not getting focus on touch screens
-            $('#endereco').on('click dblclick', function(){
+            $('#endereco').on('click dblclick', function(e){
                 var $self = $(this);
                 $self.focus();
-                $self.stopPropagation();
+                e.stopPropagation();
                 //loose focus on click outslide
                 $('body').one('click', function(event){
                     if($self.parent().find(event.target).length == 0){
@@ -196,7 +196,7 @@
                             text : $scope.data.global.locationFilters.address.text,
                             center : {
                                 lat: results.lat,
-                                lng: results.lng
+                                lng: results.lon
                             },
                             radius : $scope.defaultLocationRadius
                         }
