@@ -1,9 +1,9 @@
 <?php $this->applyTemplateHook('avatar','before'); ?>
 <div class="avatar <?php if($entity->avatar): ?>com-imagem<?php endif; ?>">
     <?php if($avatar = $entity->avatar): ?>
-        <img src="<?php echo $avatar->transform('avatarBig')->url; ?>" alt="" class="js-avatar-img" />
+        <img src="<?php echo $avatar->transform('avatarBig')->url; ?>" alt="" class="js-avatar-img" style="<?php if(isset($style)): echo $style; endif; ?>" />
     <?php else: ?>
-        <img class="js-avatar-img" src="<?php $this->asset($default_image); ?>" />
+        <img class="js-avatar-img" src="<?php $this->asset($default_image); ?>" style="<?php if(isset($style)): echo $style; endif; ?>" />
     <?php endif; ?>
     <?php if($this->isEditable()): ?>
         <a class="btn btn-default edit js-open-editbox" data-target="#editbox-change-avatar" href="#"><?php \MapasCulturais\i::_e("Editar");?></a>

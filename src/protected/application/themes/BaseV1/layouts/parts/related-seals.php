@@ -31,7 +31,8 @@ $this->addRelatedSealsToJs($entity);
                 <div class="avatar-seal ng-scope" ng-repeat="relation in relations" ng-class="{pending: relation.status < 0 || (relation.toExpire == 1 || relation.toExpire == 0) }">
                     <?php $idRelation =  '{{relation.id}}';?>
                     <a ng-href="<?php echo $app->createUrl('seal','sealrelation',[$idRelation]);?>" class="ng-binding">
-                        <img ng-src="{{avatarUrl(relation.seal.avatar.avatarMedium.url)}}">
+                        <img ng-if="relation.toExpire == 2" ng-src="{{avatarUrl(relation.seal.avatar.avatarMedium.url)}}">
+                        <img ng-if="relation.toExpire == 0" ng-src="{{avatarUrl(relation.seal.avatar.avatarMedium.url)}}" style="opacity:0.2;">
                     </a>
                     <div class="botoes" ng-if="isEditable && canRelateSeal"><a class="delete hltip js-remove-item"  data-href="" data-target="" data-confirm-message="" title="<?php \MapasCulturais\i::esc_attr_e("Excluir selo");?>" ng-click="deleteRelation(relation,relation.seal.id)"></a></div>
                     <div class="descricao-do-selo">

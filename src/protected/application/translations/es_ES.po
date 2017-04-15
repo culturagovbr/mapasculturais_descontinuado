@@ -7952,7 +7952,7 @@ msgid "Expirou em:"
 msgstr "Venció el: "
 
 #: application/themes/BaseV1/views/seal/sealrelation.php:57
-msgid "Válido em:"
+msgid "Válido até:"
 msgstr "Válido en:"
 
 #: application/themes/BaseV1/views/site/permission-denied.php:1

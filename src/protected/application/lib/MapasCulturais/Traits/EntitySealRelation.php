@@ -69,7 +69,7 @@ trait EntitySealRelation {
         $diff = 0;
         foreach ($this->getSealRelations($include_pending_relations) as $sealRelation) {
             $result[$sealRelation->id] = $return_relations ? $sealRelation : $sealRelation->seal;
-            if(isset($result[$sealRelation->id]->validateDate) && $result[$sealRelation->id]->validateDate) {
+            if($result[$sealRelation->id]->validateDate && $result[$sealRelation->id]->seal->validPeriod > 0) {
                 $diff = ($result[$sealRelation->id]->validateDate->format("U") - $now->format("U"))/86400;
                 $result[$sealRelation->id]->validateDate = $result[$sealRelation->id]->validateDate->format("d/m/Y");
                 if($diff <= 0) { // Expired
