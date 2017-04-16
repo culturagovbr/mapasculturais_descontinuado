@@ -12,10 +12,10 @@ if (!($app->user->is('superAdmin') || $app->user->is('admin'))) {
 		<a class="btn btn-default add" href="<?php echo $app->createUrl('subsite', 'create') ?>"><?php echo $this->dict('entities: add new subsite');?></a>
 	</header>
     <ul class="abas clearfix clear">
-        <li class="active"><a href="#ativos"><?php \MapasCulturais\i::_e('Ativos') ?></a></li>
-        <li><a href="#rascunhos"><?php \MapasCulturais\i::_e('Rascunhos') ?></a></li>
-        <li><a href="#lixeira"><?php \MapasCulturais\i::_e('Lixeira') ?></a></li>
-		<li><a href="#arquivo"><?php \MapasCulturais\i::_e('Arquivo') ?></a></li>
+        <li class="active"><a href="#ativos"><?php \MapasCulturais\i::_e('Ativos') ?> (<?php echo count($user->enabledSubsite); ?>)</a></li>
+        <li><a href="#rascunhos"><?php \MapasCulturais\i::_e('Rascunhos') ?> (<?php echo count($user->draftSubsite); ?>)</a></li>
+        <li><a href="#lixeira"><?php \MapasCulturais\i::_e('Lixeira') ?> (<?php echo count($user->trashedSubsite); ?>)</a></li>
+		<li><a href="#arquivo"><?php \MapasCulturais\i::_e('Arquivo') ?> (<?php echo count($user->archivedSubsite); ?>)</a></li>
     </ul>
     <div id="ativos">
         <?php foreach($app->user->enabledSubsite as $entity): ?>

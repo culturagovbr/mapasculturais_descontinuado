@@ -501,27 +501,27 @@ class User extends \MapasCulturais\Entity implements \MapasCulturais\UserInterfa
     }
 
     function getEnabledSubsite(){
-        return $this->getSubsite(Subsite::STATUS_ENABLED);
+        return $this->_getEntitiesByStatus(__NAMESPACE__ . '\Subsite');
     }
     function getDraftSubsite(){
         $this->checkPermission('modify');
 
-        return $this->getSubsite(Subsite::STATUS_DRAFT);
+        return $this->_getEntitiesByStatus(__NAMESPACE__ . '\Subsite', Subsite::STATUS_DRAFT, '=');
     }
     function getTrashedSubsite(){
         $this->checkPermission('modify');
 
-        return $this->getSubsite(Subsite::STATUS_TRASH);
+        return $this->_getEntitiesByStatus(__NAMESPACE__ . '\Subsite', Subsite::STATUS_TRASH, '=');
     }
     function getDisabledSubsite(){
         $this->checkPermission('modify');
 
-        return $this->getSubsite(Subsite::STATUS_DISABLED);
+        return $this->_getEntitiesByStatus(__NAMESPACE__ . '\Subsite', Subsite::STATUS_DISABLED, '=');
     }
     function getArchivedSubsite(){
         $this->checkPermission('modify');
 
-        return $this->getSubsite(Subsite::STATUS_ARCHIVED);
+        return $this->_getEntitiesByStatus(__NAMESPACE__ . '\Subsite', Subsite::STATUS_ARCHIVED, '=');
     }
 
     public function getSeals(){
