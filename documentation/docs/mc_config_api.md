@@ -451,3 +451,91 @@ $.getJSON(
    }
 }
 ```
+# API de Escrita
+Para conseguir criar, atualizar ou apagar entidades via API, primeiramente é necessário cadastrar o seu App indo no painel de usuário do Mapas Culturais e acessando "Meus Apps". Após criar um novo App, copie as duas chaves que são fornecidas (Pública e Prvada).
+A API de escrita do Mapas utiliza o padrão de JSON Web Tokens - [JWT](https://jwt.io) para identificar de maneira segura dois sistemas que queiram se comunicar.
+O JWT contém a sua chave pública, identificada como "pk" e um timestamp "tm" que é um timestamp Unix em microsegundos do momento que a requisição foi enviada.
+
+Toda requisição feita deve conter duas informações no seu _header_, o valor do jwt no _header_ "authorization" e um _header_ "MapasSDK-REQUEST" com valor "true", por exemplo:
+
+```javascript
+"authorization": eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwayI6IjEyMzQ1Njc4OTAiLCJ0bSI6IkpvaG4gRG9lIn0.CyeWFH-Hl_ui-Uk2SpvI3bxoVFwwMl7G0y3TuqI57xU,
+"MapasSDK-REQUEST": true
+```
+
+Os métodos da API são, lembrando que os tipos de entidade são Agent, Space, Project, Event, Subsite, Seal:
+
+## createEntity
+Caminho: "\<nome-da-entidade>/index"
+
+Tipo da requisição: POST
+
+Esse método é utilizado para criar um novo registro para uma Entidade, os dados da entidade a ser criada devem ser enviados no body da requisição.
+## patchEntity
+Caminho: "\<nome-da-entidade>/single/\<id>"
+
+Tipo da requisição: PATCH
+
+Esse método deve ser usado para alterações parciais de dados de um registro de uma certa Entidade.
+## updateEntity
+Caminho: "\<nome-da-entidade>/single/\<id>"
+
+Tipo da requisição: PUT
+
+Esse método é usado para alteração de dados de um único registro. **Atenção**: Todos os dados da entidade devem estar na requisição, inclusive aqueles que não serão alterados.
+## deleteEntity
+Caminho: "\<nome-da-entidade>/single/\<id>"
+
+Tipo da requisição: DELETE
+
+Apaga o registro informado.
+
+**Exemplos**:
+
+* criando um agente
+
+```PHP
+$data = [
+    'type' => '2',
+    'name' => 'Fulano ' . date('Y/m/d H:i:s'),
+    'shortDescription' => 'Oi',
+    'terms' => [
+        'area' => [
+            'Arqueologia'
+        ]
+    ],
+    'location' => [
+        '-46.685684400000014',
+        '-23.5404024'
+    ],
+    'endereco' => 'Rua Capital Federal'
+];
+
+$curl->setHeader('authorization', $jwt);
+$curl->setHeader('MapasSDK-REQUEST', true);
+
+$curl->post('http://mapas.cultura.gov.br/agent/index', $data);
+$curl->close();
+```
+
+* alterando um agente
+```PHP
+$data = [
+    shortDescription => 'Description'
+];
+
+$curl->setHeader('authorization', $jwt);
+$curl->setHeader('MapasSDK-REQUEST', true);
+
+$curl->patch('http://mapas.cultura.gov.br/agent/single/35', $data);
+$curl->close();
+```
+
+* apagando um espaço
+```PHP
+$curl->setHeader('authorization', $jwt);
+$curl->setHeader('MapasSDK-REQUEST', true);
+
+$curl->delete('http://mapas.cultura.gov.br/space/single/8');
+$curl->close();
+```
