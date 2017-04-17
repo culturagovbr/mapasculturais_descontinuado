@@ -15,7 +15,7 @@ class RequestSealRelation extends Request{
 
     protected function canUserApprove($user){
         $seal = $this->getSealRelation()->seal;
-        return parent::canUserApprove($user) && ($seal->getOwnerUser() === $user || $seal->need_permission !== 'Sim');
+        return parent::canUserApprove($user) && ($seal->getOwnerUser() === $user || $seal->need_permission !== 's');
     }
 
     function setSealRelation(SealRelation $relation){
