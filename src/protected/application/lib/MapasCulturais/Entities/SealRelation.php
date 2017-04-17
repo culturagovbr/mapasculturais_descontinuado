@@ -135,7 +135,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
     protected function canUserCreate($user){
         $app = App::i();
 
-        $can = !$app->isWorkflowEnabled() || ($this->seal->canUser('@control', $user) && $this->seal->need_permission !== 'Sim');
+        $can = !$app->isWorkflowEnabled() || ($this->seal->canUser('@control', $user) && $this->seal->need_permission !== 's');
 
         return $this->owner->canUser('createSealRelation', $user) && $can;
     }
@@ -168,21 +168,17 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
             $app = App::i();
             $app->disableAccessControl();
-            if ($this->seal->need_permission !== 's'){
-                $this->status = self::STATUS_PENDING;
 
-                parent::save($flush);
-                $app->enableAccessControl();
+            $this->status = self::STATUS_PENDING;
+            parent::save($flush);
 
-                $request = new RequestSealRelation;
-                $request->setSealRelation($this);
-                $request->save(true);
+            $app->enableAccessControl();
 
-                throw new \MapasCulturais\Exceptions\WorkflowRequest([$request]);
-            } else {
-                parent::save($flush);
-                $app->enableAccessControl();
-            }
+            $request = new RequestSealRelation;
+            $request->sealRelation = $this;
+            $request->save(true);
+
+            throw new \MapasCulturais\Exceptions\WorkflowRequest([$request]);
         }
     }
 
