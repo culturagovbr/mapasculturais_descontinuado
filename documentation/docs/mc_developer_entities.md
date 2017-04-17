@@ -243,3 +243,19 @@ Selos possuem:
 * Período de Validade
 * Imagem de Capa
 * Imagem de Avatar
+
+Desabilitando entidades:
+-------------------------
+Para desabilitar entidades é necessário alterar a configuração do Mapas Culturais incluindo, no arquivo **config.php**, a informação referente a quais entidades serão desabilitadas, por exemplo:
+
+```PHP
+'app.enabled.agents'   => true,
+'app.enabled.spaces'   => true,
+'app.enabled.projects' => false,
+'app.enabled.events'   => false,
+'app.enabled.subsite'  => true,
+'app.enabled.seals'    => true,
+'app.enabled.apps'     => true,
+```
+
+No exemplo acima, as entidades Eventos e Projetos serão desabilitadas, também é possível desabilitar entidades por tema, bastando apenas indicar quais entidades serão desabilitadas no arquivo de configuração do tema.
