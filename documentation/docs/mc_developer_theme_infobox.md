@@ -17,7 +17,7 @@ Por padrão, apenas alguns campos são retornados:
 * Áreas de atuação e tags (terms)
 * URL e nome do projeto relacionado (quando é um evento)
 
-Se você quiser exibir alguma outra informação, é preciso informar qual campo deseja que também seja retornado na busca. Para isso usamos uma função disponível na classe do tema. 
+Se você quiser exibir alguma outra informação, é preciso informar qual campo deseja que também seja retornado na busca. Para isso usamos uma função disponível na classe do tema.
 
 Por exemplo para adicionar o campo município, faça:
 
@@ -40,14 +40,14 @@ class Theme extends BaseV1\Theme{
 
     function _init() {
         $app = App::i();
-        
+
         parent::_init();
 
         // ... outras coisas que você pode fazer aqui...
-        
+
         $this->addSearchQueryFields('En_Municipio');
-        
-        
+
+
     }
 
 }
@@ -90,22 +90,22 @@ class Theme extends BaseV1\Theme{
 
     function _init() {
         $app = App::i();
-        
+
         parent::_init();
 
-        
+
         // ... outras coisas que você pode fazer aqui...
-        
+
         $this->addSearchQueryFields('En_Municipio');
-        
+
         $app->hook('template(site.search.space-infobox-new-fields-before):begin', function() {
             echo '<div><span class="label">Município:</span> {{openEntity.space.En_Municipio}}</div>';
         });
-        
+
         $app->hook('template(site.search.list.space.meta):begin', function() {
             echo '<div><span class="label">Município:</span> {{space.En_Municipio}}</div>';
         });
-        
+
     }
 
 }
@@ -116,7 +116,7 @@ Se quiséssemos adicionar também aos resultados de agentes, poderíamos modific
 ```PHP
 
 <?php
-        
+
 $app->hook('template(site.search.<<space|agent>>-infobox-new-fields-before):begin', function() {
     echo '<div><span class="label">Município:</span> {{openEntity.space.En_Municipio}}</div>';
 });
@@ -125,6 +125,20 @@ $app->hook('template(site.search.list.<<space|agent>>.meta):begin', function() {
     echo '<div><span class="label">Município:</span> {{space.En_Municipio}}</div>';
 });
 
+```
+
+### Criando hooks
+
+Para criar um hook é preciso incluir uma chamada ao método _applyHookBoundTo()_ da classe App onde se deseja inserir um hook. A função necessita os seguintes parâmetros:
+
+1. **_$target_object_** (Object) instância do objeto que quer amarrar o hook (geralmente $this)
+2. **_$name_** (string) nome do hook
+3. **_$hookArgs_** (array opcional) array que incluí argumentos que serão usados pelo hook.
+
+Exemplo:
+
+```PHP
+$app->applyHookBoundTo($this, "api.response({$this->hookClassName}).error:before", $hook_data);
 ```
 
 ### Sobreescrevendo os templates
