@@ -87,12 +87,12 @@ $this->includeAngularEntityAssets($entity);
 
 
                     <p>
-                        <span class="label"><?php \MapasCulturais\i::_e("Aprovação para aplicar o Selo") ?></span>
+                        <span class="label"><?php \MapasCulturais\i::_e("Aprovação para aplicar o Selo") ?>: </span>
                         <span
                           class="js-editable"
                           data-edit="need_permission"
                           data-empty-text="<?php \MapasCulturais\i::_e('Não precisa de aprovação para aplicar o Selo') ?>"
-                          data-original-title="<?php \MapasCulturais\i::_e('Aprovação para aplicar o Selo') ?>">: <?php echo $entity->need_permission ?></span>
+                          data-original-title="<?php \MapasCulturais\i::_e('Aprovação para aplicar o Selo') ?>"><?php echo $entity->need_permission ?></span>
                     </p>
 
                     <?php $this->applyTemplateHook('tab-about-service','end'); ?>
