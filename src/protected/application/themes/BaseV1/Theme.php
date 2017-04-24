@@ -1817,7 +1817,7 @@ class Theme extends MapasCulturais\Theme {
     }
 
     function addRelatedAdminAgentsToJs($entity) {
-        $this->jsObject['entity']['agentAdminRelations'] = $entity->getAgentRelations(true);
+        $this->jsObject['entity']['agentAdminRelations'] = $entity->getAgentRelations(true, true);
     }
 
     function addSubsiteAdminsToJs($subsite) {
