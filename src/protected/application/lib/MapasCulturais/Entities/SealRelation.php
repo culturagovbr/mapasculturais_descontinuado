@@ -41,7 +41,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
     /**
      * A entidade que recebe o selo
-     * 
+     *
      * @var integer
      *
      * @ORM\Column(name="object_id", type="integer", nullable=false)
@@ -75,7 +75,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
     /**
      * O agente que está aplicando o selo (que não necessariamente é o dono do selo, pode ser um agente com permissão
      * ou o dono de um projeto que aplica o selo quando a inscrição é selecionada)
-     * 
+     *
      * @var \MapasCulturais\Entities\Agent
      *
      * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
@@ -87,7 +87,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
     /**
      * Gerada automaticamente no metodo save() com o profile do usuario logado.
-     * 
+     *
      * @var \MapasCulturais\Entities\Agent
      *
      * @ORM\ManyToOne(targetEntity="MapasCulturais\Entities\Agent", fetch="EAGER")
@@ -110,7 +110,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
      * @ORM\Column(name="renovation_request", type="boolean", nullable=false)
      */
     protected $renovation_request;
-    
+
     function setSeal(Seal $seal){
         if($this->isNew()){
             $this->seal = $seal;
@@ -118,7 +118,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
             $period = new \DateInterval("P" . ((string)$seal->validPeriod) . "M");
             $dateFin = $this->createTimestamp->add($period);
             $this->validateDate = $dateFin;
-            
+
         } else {
             throw new \Exception();
         }
@@ -135,7 +135,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
     protected function canUserCreate($user){
         $app = App::i();
 
-        $can = !$app->isWorkflowEnabled() || $this->seal->canUser('@control', $user);
+        $can = !$app->isWorkflowEnabled() || ($this->seal->canUser('@control', $user) && $this->seal->need_permission !== 's');
 
         return $this->owner->canUser('createSealRelation', $user) && $can;
     }
@@ -147,7 +147,7 @@ abstract class SealRelation extends \MapasCulturais\Entity
 
         return $this->owner->canUser('removeSealRelation', $user) || $can;
     }
-    
+
     protected function canUserPrint($user) {
         return $this->owner->canUser('@control', $user) || $this->seal->canUser('@control', $user);
     }
@@ -161,31 +161,28 @@ abstract class SealRelation extends \MapasCulturais\Entity
                 $this->owner_relation = $this->owner->owner;
             }
             parent::save($flush);
-            
+
         } catch (\MapasCulturais\Exceptions\PermissionDenied $e) {
             if (!App::i()->isWorkflowEnabled())
                 throw $e;
 
             $app = App::i();
             $app->disableAccessControl();
+
             $this->status = self::STATUS_PENDING;
-            
-            
-            
-            
-            
-            
-            
             parent::save($flush);
+
             $app->enableAccessControl();
 
             $request = new RequestSealRelation;
-            $request->setSealRelation($this);
+            $request->sealRelation = $this;
             $request->save(true);
 
             throw new \MapasCulturais\Exceptions\WorkflowRequest([$request]);
         }
     }
+
+
 
     function delete($flush = false) {
         $this->checkPermission('remove');
@@ -198,3 +195,6 @@ abstract class SealRelation extends \MapasCulturais\Entity
         parent::delete($flush);
     }
 }
+
+
+

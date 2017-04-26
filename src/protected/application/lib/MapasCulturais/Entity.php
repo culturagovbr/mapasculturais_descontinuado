@@ -89,7 +89,10 @@ abstract class Entity implements \JsonSerializable{
         }
 
         if(property_exists($this, 'createTimestamp'))
-                $this->createTimestamp = new \DateTime;
+            $this->createTimestamp = new \DateTime;
+
+        if(isset($this->getRegisteredMetadata()['need_permission']))
+            $this->need_permission = 'Não';
 
         if($this->usesOwnerAgent() && !$app->user->is('guest')){
             $this->setOwner($app->user->profile);
