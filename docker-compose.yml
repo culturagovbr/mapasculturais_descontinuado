@@ -1,12 +1,30 @@
-web:
-  image: hacklab/mapasculturais
-  ports:
-   - "80:80"
-  volumes:
-   - .:/srv/mapas/mapasculturais
-  links:
-   - db:postgis
-db:
-  image: mdillon/postgis
-  environment:
-   - POSTGRES_PASSWORD=postgis
+version: '3'
+services:
+        db:
+            image: mdillon/postgis:9.6-alpine
+            environment:
+                - POSTGRES_PASSWORD=senhaMapas
+                - POSTGRES_USER=mapas
+                - POSTGRES_DB=mapas
+
+        deploy:
+                build: .
+                depends_on:
+                    - db
+
+        nginx:
+            image: nginx:mainline-alpine
+            volumes:
+                - .:/var/www/
+            depends_on:
+                - db
+                - deploy
+                - php
+
+        php:
+            image: php:5-fpm-alpine
+            volumes:
+                - .:/var/www/html
+            depends_on:
+                - db
+                - deploy
