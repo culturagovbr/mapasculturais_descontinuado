@@ -1,0 +1,5 @@
+FROM php:5-fpm-alpine
+
+RUN apk add --update php5 php5-cli php5-json php5-phar libxml2-dev libcurl curl-dev php5-pdo curl postgresql-dev php5-ctype php5-pdo_pgsql php5-curl php5-dom php5-xml
+
+RUN docker-php-ext-install pdo_pgsql curl dom xml
