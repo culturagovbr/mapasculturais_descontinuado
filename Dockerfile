@@ -4,8 +4,9 @@ MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
-RUN apk add --update php5 php5-cli php5-json php5-phar php5-openssl php5-pdo php5-ctype php5-pdo_pgsql php5-curl php5-dom php5-xml sassc nodejs nodejs-npm composer@testing bash
+RUN apk add --update php5 php5-cli php5-json php5-phar php5-openssl php5-pdo php5-ctype php5-pdo_pgsql php5-curl php5-dom php5-xml sassc nodejs nodejs-npm composer@testing bash git postgresql-client
 
+VOLUME ["/var/www/html"]
 COPY . /var/www/html
 
 WORKDIR /var/www/html
@@ -19,5 +20,4 @@ RUN (cd src/protected \
         && composer -n install --prefer-dist \
         && composer -n dump-autoload --optimize)
 
-# WORKDIR /var/www/html/scripts
 # RUN ["./deploy.sh", "dev.mapas.cultura.gov.br"]
