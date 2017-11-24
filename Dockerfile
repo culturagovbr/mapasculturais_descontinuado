@@ -4,7 +4,7 @@ MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
 RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 
-RUN apk add --update php5 php5-cli php5-json php5-phar php5-openssl php5-pdo php5-pdo_pgsql php5-curl php5-dom php5-xml sassc nodejs nodejs-npm composer@testing bash
+RUN apk add --update php5 php5-cli php5-json php5-phar php5-openssl php5-pdo php5-ctype php5-pdo_pgsql php5-curl php5-dom php5-xml sassc nodejs nodejs-npm composer@testing bash
 
 COPY . /var/www/html
 
