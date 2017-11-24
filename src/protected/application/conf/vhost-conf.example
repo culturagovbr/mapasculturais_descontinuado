@@ -1,0 +1,41 @@
+server {
+  set $site_name dev.mapas;
+
+  listen *:80;
+  server_name  localhost;
+  access_log   /tmp/nginx.access.log;
+  error_log    /tmp/nginx.error.log;
+
+  index index.php;
+  root  /var/www/html/src/;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ /files/.*\.php$ {
+      deny all;
+      return 403;
+  }
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico|woff)$ {
+          expires 1w;
+          log_not_found off;
+  }
+
+  location ~ \.php$ {
+    try_files $uri =404;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    fastcgi_pass php:9000;
+    client_max_body_size 0;
+  }
+
+  charset utf-8;
+}
+
+server {
+  listen *:80;
+  server_name dev.mapas;
+  return 301 $scheme://dev.mapas$request_uri;
+}
