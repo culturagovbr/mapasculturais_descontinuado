@@ -3,6 +3,11 @@
 DOMAIN="localhost"
 MODE="production"
 
+until nc -z db 5432; do
+	>&2 echo "Postgres is unavaliable - sleeping"
+	sleep 2
+done
+
 for i in "$@"
 do
 case $i in
@@ -56,6 +61,7 @@ HTTP_HOST=$DOMAIN REQUEST_METHOD='CLI' REMOTE_ADDR='127.0.0.1' REQUEST_URI='/' S
 
 
 cd $DIR
+
 ./db-update.sh $DOMAIN
 ./mc-db-updates.sh
 ./compile-sass.sh $DOMAIN
