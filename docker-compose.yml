@@ -26,6 +26,8 @@ services:
                 - php
             links:
                 - php
+            ports:
+                - "80:80"
 
         php:
             image: php:5-fpm-alpine
