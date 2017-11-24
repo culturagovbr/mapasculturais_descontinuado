@@ -9,8 +9,12 @@ services:
 
         deploy:
                 build: .
+                links:
+                    - db:db
                 depends_on:
                     - db
+                working_dir: /var/www/html/scripts
+                command: ["./deploy.sh", "dev.mapas.cultura.gov.br"]
 
         nginx:
             image: nginx:mainline-alpine
@@ -20,11 +24,15 @@ services:
                 - db
                 - deploy
                 - php
+            links:
+                - php
 
         php:
             image: php:5-fpm-alpine
             volumes:
                 - .:/var/www/html
+            links:
+                - db:db
             depends_on:
                 - db
                 - deploy

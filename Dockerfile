@@ -2,20 +2,22 @@ FROM alpine:3.6
 
 MAINTAINER Fabio Montefuscolo <fabio.montefuscolo@gmail.com>
 
-RUN apk add --update php5 php5-cli php5-json php5-phar sassc nodejs nodejs-npm wget
+RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+
+RUN apk add --update php5 php5-cli php5-json php5-phar php5-openssl php5-pdo php5-pdo_pgsql php5-curl php5-dom php5-xml sassc nodejs nodejs-npm composer@testing bash
 
 COPY . /var/www/html
 
-RUN wget https://getcomposer.org/download/1.5.2/composer.phar -o /var/www/html/scripts/composer.phar
-
-WORKDIR /var/www/html/scripts
+WORKDIR /var/www/html
 
 RUN npm install -g uglify-js uglifycss autoprefixer
 
-WORKDIR /var/www/html/scripts
+RUN ln -s /usr/bin/php5 /usr/bin/php
+RUN ln -s /usr/bin/sassc /usr/bin/sass
 
-RUN ["./deploy.sh", "dev.mapas.cultura.gov.br"]
+RUN (cd src/protected \
+        && composer -n install --prefer-dist \
+        && composer -n dump-autoload --optimize)
 
-# RUN (cd src/protected \
-#         && composer -n install --prefer-dist \
-#         && composer -n dump-autoload --optimize)
+# WORKDIR /var/www/html/scripts
+# RUN ["./deploy.sh", "dev.mapas.cultura.gov.br"]
