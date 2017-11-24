@@ -8,6 +8,9 @@ until nc -z db 5432; do
 	sleep 2
 done
 
+psql -h db -U mapas -f ../db/schema.sql mapas
+psql -h db -U mapas -f ../db/initial-data.sql mapas
+
 for i in "$@"
 do
 case $i in
