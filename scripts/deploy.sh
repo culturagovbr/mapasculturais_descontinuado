@@ -3,6 +3,8 @@
 DOMAIN="localhost"
 MODE="production"
 
+mkdir ../src/files ../src/assets
+
 until nc -z db 5432; do
 	>&2 echo "Postgres is unavaliable - sleeping"
 	sleep 2
