@@ -13,11 +13,13 @@ WORKDIR /var/www/html
 
 RUN npm install -g uglify-js uglifycss autoprefixer
 
+RUN mkdir -p src/files src/assets
+
 RUN ln -s /usr/bin/php5 /usr/bin/php
 RUN ln -s /usr/bin/sassc /usr/bin/sass
 
-RUN (cd src/protected \
-        && composer -n install --prefer-dist \
-        && composer -n dump-autoload --optimize)
+# RUN (cd src/protected \
+#         && composer -n install --prefer-dist \
+#         && composer -n dump-autoload --optimize)
 
 # RUN ["./deploy.sh", "dev.mapas.cultura.gov.br"]
