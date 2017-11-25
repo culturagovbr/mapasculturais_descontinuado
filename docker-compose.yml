@@ -18,19 +18,18 @@ services:
                     - .:/var/www/html
                 environment:
                     - PGPASSWORD=senhaMapas
-                command: ["./deploy.sh", "dev.mapas"]
+                command: ["./deploy.sh", "localhost"]
 
         nginx:
             image: nginx:mainline-alpine
             volumes:
                 - .:/var/www/html
-                - ./src/protected/application/conf/vhost-conf.example:/etc/nginx/conf.d/default.conf
+                - ./documentation/site.conf:/etc/nginx/conf.d/default.conf
             depends_on:
-                - db
                 - deploy
                 - php
             links:
-                - php
+                    - php:php
             ports:
                 - "80:80"
 
@@ -40,8 +39,12 @@ services:
               dockerfile: Dockerfile-php
             volumes:
                 - .:/var/www/html
+                - ./documentation/php-conf.d/log.conf:/usr/local/etc/php-fpm.d/zz-log.conf
+                - ./documentation/php-conf.d/clear-env.conf:/usr/local/etc/php-fpm.d/zz-clear-env.conf
             links:
                 - db:db
             depends_on:
                 - db
                 - deploy
+            environment:
+                - TZ=America/Sao_Paulo
