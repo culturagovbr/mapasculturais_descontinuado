@@ -3,7 +3,6 @@ from ubuntu:14.04
 RUN apt-get update -y && apt-get install -y git curl npm ruby2.0 ruby2.0-dev postgresql postgresql-contrib postgis \
  postgresql-9.3-postgis-2.1 postgresql-9.3-postgis-2.1-scripts \
  php5 php5-gd php5-cli php5-json php5-curl php5-pgsql php-apc php5-fpm imagemagick libmagickcore-dev libmagickwand-dev php5-imagick nginx
-
 RUN curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 RUN sudo apt-get install -y nodejs
 
@@ -13,6 +12,8 @@ RUN mv composer.phar /usr/local/bin/composer.phar
 RUN apt-get install zip -y
 
 RUN npm install -g uglify-js uglifycss autoprefixer
+
+RUN gem2.0 install sass -v 3.4.22
 
 # Inicia usuário mapas
 
@@ -36,7 +37,7 @@ COPY src/protected/application/conf/config.template.php src/protected/applicatio
 USER root
 
 RUN mkdir /var/log/mapasculturais
-RUN chown mapas:www-data /var/log/mapasculturais 
+RUN chown mapas:www-data /var/log/mapasculturais
 
 USER mapas
 
@@ -44,7 +45,7 @@ RUN mkdir -p src/assets && mkdir -p src/files
 
 USER root
 
-ADD config_files/nginx/mapas.conf /etc/nginx/sites-available 
+ADD config_files/nginx/mapas.conf /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/mapas.conf /etc/nginx/sites-enabled/mapas.conf \
 && rm /etc/nginx/sites-available/default
 
@@ -52,44 +53,18 @@ ADD config_files/php5/mapas.conf /etc/php5/fpm/pool.d
 
 USER root
 
-RUN  /etc/init.d/postgresql start \ 
+RUN  /etc/init.d/postgresql start \
 && su - postgres -c "psql -c 'CREATE USER MAPAS;'" \
 && su - postgres -c "createdb --owner mapas mapas" \
 && su - postgres -c "psql -d mapas -c 'CREATE EXTENSION postgis;'" \
 && su - postgres -c "psql -d mapas -c 'CREATE EXTENSION unaccent;'" \
 && su - mapas -c "psql -f mapasculturais/db/schema.sql" \
-&& su - mapas -c "psql -f mapasculturais/db/initial-data.sql" \
+&& su - mapas -c "psql -f mapasculturais/db/initial-data.sql"\
 && su - mapas -c "./mapasculturais/scripts/deploy.sh"
 
+RUN update-rc.d postgresql defaults && update-rc.d nginx defaults && update-rc.d php5-fpm defaults
+
 USER root
-RUN service nginx restart && service php5-fpm restart
+ENTRYPOINT service postgresql restart && service nginx restart && service php5-fpm restart && bash
 
-EXPOSE 80:9000
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# USER root
-# RUN sudo -u postgres psql -c "CREATE USER mapas"
+EXPOSE 80:80
