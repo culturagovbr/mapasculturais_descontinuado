@@ -11,7 +11,9 @@ RUN mv composer.phar /usr/local/bin/composer.phar
 
 RUN apt-get install zip -y
 
-RUN npm install -g uglify-js uglifycss autoprefixer
+RUN npm install -g uglify-js2 uglifycss autoprefixer
+
+RUN ln -s /usr/bin/uglifyjs2 /usr/bin/uglifyjs
 
 RUN gem2.0 install sass -v 3.4.22
 
@@ -65,6 +67,6 @@ RUN  /etc/init.d/postgresql start \
 RUN update-rc.d postgresql defaults && update-rc.d nginx defaults && update-rc.d php5-fpm defaults
 
 USER root
-ENTRYPOINT service postgresql restart && service nginx restart && service php5-fpm restart && bash
+ENTRYPOINT service postgresql restart && service nginx restart && service php5-fpm restart  && bash
 
 EXPOSE 80:80
