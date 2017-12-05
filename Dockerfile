@@ -51,6 +51,8 @@ ADD config_files/nginx/mapas.conf /etc/nginx/sites-available
 RUN ln -s /etc/nginx/sites-available/mapas.conf /etc/nginx/sites-enabled/mapas.conf \
 && rm /etc/nginx/sites-available/default
 
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+
 ADD config_files/php5/mapas.conf /etc/php5/fpm/pool.d
 
 USER root
@@ -66,7 +68,11 @@ RUN  /etc/init.d/postgresql start \
 
 RUN update-rc.d postgresql defaults && update-rc.d nginx defaults && update-rc.d php5-fpm defaults
 
+ADD config_files/entrypoint.sh entrypoint.sh 
+
+RUN chmod +x entrypoint.sh
+
 USER root
-ENTRYPOINT service postgresql restart && service nginx restart && service php5-fpm restart  && bash
+CMD ["/srv/mapas/mapasculturais/entrypoint.sh", "-D"]
 
 EXPOSE 80:80
