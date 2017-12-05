@@ -12,8 +12,7 @@ RUN mv composer.phar /usr/local/bin/composer.phar
 RUN apt-get install zip -y
 
 RUN npm install -g uglify-js2 uglifycss autoprefixer
-
-RUN ln -s /usr/bin/uglifyjs2 /usr/bin/uglifyjs
+RUN update-alternatives --install /usr/bin/uglifyjs uglifyjs /usr/bin/uglifyjs2 10
 
 RUN gem2.0 install sass -v 3.4.22
 
