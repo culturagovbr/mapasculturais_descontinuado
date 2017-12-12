@@ -74,4 +74,4 @@ RUN chmod +x entrypoint.sh
 USER root
 CMD ["/srv/mapas/mapasculturais/entrypoint.sh", "-D"]
 
-EXPOSE 80:80
+EXPOSE 8090:80
