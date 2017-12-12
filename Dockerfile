@@ -27,6 +27,7 @@ RUN useradd -G www-data -d /srv/mapas -s /bin/bash mapas; \
     chown -R mapas:www-data /srv/mapas
 
 USER mapas
+
 WORKDIR /srv/mapas/mapasculturais
 
 RUN (cd src/protected \
@@ -68,10 +69,8 @@ RUN  /etc/init.d/postgresql start \
 RUN update-rc.d postgresql defaults && update-rc.d nginx defaults && update-rc.d php5-fpm defaults
 
 ADD config_files/entrypoint.sh entrypoint.sh 
-
 RUN chmod +x entrypoint.sh
 
-USER root
-CMD ["/srv/mapas/mapasculturais/entrypoint.sh", "-D"]
+ENTRYPOINT ["/srv/mapas/mapasculturais/entrypoint.sh"]
 
 EXPOSE 8090:80
