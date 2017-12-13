@@ -4,8 +4,11 @@ set -e
 
 chown -R mapas:www-data /srv/mapas/mapasculturais/src/protected/application
 
-echo "Starting the mysql daemon"
+echo "Starting the postgresql daemon"
 service postgresql start
+
+echo "Deploying app"
+su - mapas -c "cd /srv/mapas/mapasculturais/scripts/ && ./deploy.sh"
 
 echo "Starting php5-fpm daemon"
 service php5-fpm start

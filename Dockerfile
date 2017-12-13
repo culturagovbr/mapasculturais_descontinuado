@@ -63,8 +63,7 @@ RUN  /etc/init.d/postgresql start \
 && su - postgres -c "psql -d mapas -c 'CREATE EXTENSION postgis;'" \
 && su - postgres -c "psql -d mapas -c 'CREATE EXTENSION unaccent;'" \
 && su - mapas -c "psql -f mapasculturais/db/schema.sql" \
-&& su - mapas -c "psql -f mapasculturais/db/initial-data.sql"\
-&& su - mapas -c "./mapasculturais/scripts/deploy.sh"
+&& su - mapas -c "psql -f mapasculturais/db/initial-data.sql"
 
 RUN update-rc.d postgresql defaults && update-rc.d nginx defaults && update-rc.d php5-fpm defaults
 
