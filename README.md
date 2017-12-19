@@ -1,5 +1,7 @@
 [![Join the chat at https://telegram.me/#MapasCulturais](https://patrolavia.github.io/telegram-badge/chat.png)](https://telegram.me/joinchat/AVzIFAqpz3VFIPehrPpbZQ)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/3027abd57c309d730135/maintainability)](https://codeclimate.com/github/culturagovbr/mapasculturais/maintainability)
+
 # Mapas Culturais
 
 Em julho de 2013, agentes culturais de vários países da América Latina e do Brasil se reuniram para discutir a criação de uma ferramenta de mapeamento de iniciativas culturais e gestão cultural. Desse encontro surgiram as bases para a criação de Mapas Culturais, um software livre que permite o aprimoramento da gestão cultural dos municípios e estados.
