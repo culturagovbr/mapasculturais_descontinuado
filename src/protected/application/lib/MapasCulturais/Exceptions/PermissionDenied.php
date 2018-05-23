@@ -14,10 +14,10 @@ class PermissionDenied extends \Exception{
         $this->user = $user;
         $this->targetObject = $targetObject;
         $this->action = $action;
-        $user_id = is_object($user) ? $user->id : 'guest';
+        $this->user_id = is_object($user) ? $user->id : 'guest';
 
-        $class = str_replace('MapasCulturais\Entities\\', '', get_class($targetObject));
-        $message = "User with id {$user_id} is trying to $action the $class with the id $targetObject->id";
+        $this->class = str_replace('MapasCulturais\Entities\\', '', get_class($targetObject));
+        $message = "User with id {$this->user_id} is trying to $action the $this->class with the id $targetObject->id";
 
         parent::__construct($message);
     }

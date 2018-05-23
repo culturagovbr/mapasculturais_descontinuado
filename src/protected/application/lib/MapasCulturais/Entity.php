@@ -374,9 +374,32 @@ abstract class Entity implements \JsonSerializable{
         return $result;
     }
 
-    public function checkPermission($action){
-        if(!$this->canUser($action))
-            throw new Exceptions\PermissionDenied(App::i()->user, $this, $action);
+    public function checkPermission($action, $api = false){
+        if (!$this->canUser($action)) {
+            if ($api == true) {
+                $app = App::i();
+
+                $app->contentType('application/json');
+
+                $exception = new Exceptions\PermissionDenied(App::i()->user, $this, $action);
+
+                $app->halt(
+                    403,
+                    json_encode([
+                        'error' => true,
+                        'data' => [
+                            'message' => $exception->getMessage(),
+                            'user' => $exception->user_id,
+                            'action' => $exception->action,
+                            'class' => $exception->class,
+                            'targetObject' => $exception->targetObject->id
+                        ]
+                    ])
+                );
+            } else {
+                throw new Exceptions\PermissionDenied(App::i()->user, $this, $action);
+            }
+        }
     }
 
     public static function getPropertiesLabels(){
