@@ -1,0 +1,14 @@
+FROM node:alpine
+
+RUN mkdir -p /apidoc
+RUN mkdir -p /apidoc/html
+WORKDIR /apidoc
+
+RUN npm install -g apidoc
+
+COPY ./src/protected /mapasculturais
+COPY ./documentation/apidoc /apidoc
+
+#CMD ["apidoc -i /mapasculturais -o /apidoc_out -t /apidoc_out/default"]
+ENTRYPOINT ["apidoc"]
+CMD ["c"]

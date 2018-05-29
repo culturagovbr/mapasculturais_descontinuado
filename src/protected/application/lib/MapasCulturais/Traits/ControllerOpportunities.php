@@ -7,6 +7,15 @@ use MapasCulturais\i;
 
 trait ControllerOpportunities {
 
+    /**
+     * @api {GET} /API/<entity>/createOpportunity Criar nova oportunidade
+     * @apiDescription asd
+     * @apiGroup Traits.Opportunities
+     * @apiName ControllerOpportunities
+     * @apiParam {String} evaluationMethod Método de avaliação da oportunidade.
+     * @apiPermission user
+     * @apiVersion 4.0.0
+    */
     function GET_createOpportunity() {
         $app = App::i();
         

@@ -1,0 +1,10 @@
+{
+  "name": "Mapas Culturais",
+  "version": "4.0.0",
+  "description": "API e HOOK documentação",
+  "title": "Custom apiDoc browser title",  
+  "template": {
+  	"withCompare": true,
+  	"withGenerator": true
+  }  
+}
