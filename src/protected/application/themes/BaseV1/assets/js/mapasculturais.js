@@ -12,6 +12,39 @@ $(function(){
 //    $.fn.select2.defaults.separator = '; ';
 //    $.fn.editabletypes.select2.defaults.viewseparator = '; ';
 
+    $("form.create-entity").submit(function (e) {
+        e.preventDefault();
+        var _url = $(this).data('entity');
+        var _entity = $(this).serializeArray();
+        $.ajax({
+            url: _url, type: 'POST',
+            data: _entity,
+            success: function(r) {
+                if (r.id) {
+                    var name = r.name;
+                    var msg = name + " criado com sucesso!";
+                    MapasCulturais.Messages.success(msg);
+                    if (r.editUrl) {
+                        var _message = msg + " Deseja editar " + name + " agora?";
+                        if( confirm(_message) ) {
+                            window.location = r.editUrl;
+                        }
+                    }
+
+                    $('.entity-modal').find('.js-close').click();
+                } else if (r.error && r.data) {
+                    for (var erro in r.data) {
+                        var _msg = r.data[erro];
+                        MapasCulturais.Messages.error(_msg);
+                        alert(_msg);
+                    }
+
+                    return false;
+                }
+            }
+        });
+    });
+
     var labels = MapasCulturais.gettext.mapas;
 
     MapasCulturais.TemplateManager.init();
@@ -432,8 +465,12 @@ MapasCulturais.Modal = {
             var $dialog = $(this);
             /*$dialog.hide();  Moved to style.css */
 
+
+            var _title = $(this).attr('title');
             $dialog.data('dialog-init', 1);
-            $dialog.prepend('<h2>' + $(this).attr('title') + '</h2>');
+            if (_title)
+                $dialog.prepend('<h2>' + $(this).attr('title') + '</h2>');
+
             $dialog.prepend('<a href="#" class="js-close icon icon-close"></a>');
 
             // close button
@@ -473,6 +510,10 @@ MapasCulturais.Modal = {
         //alert('closing');
         $dialog.find('.editable').editable('hide');
         $dialog.hide();
+        if($('#blockdiv').is(':visible')){
+            $('#blockdiv').hide();
+            $('body').css('overflow','visible');
+        }
         return;
     },
 
@@ -496,6 +537,10 @@ MapasCulturais.Modal = {
 
         return;
     }
+};
+
+MapasCulturais.addEntity = function(){
+    $('#blockdiv').show();
 };
 
 

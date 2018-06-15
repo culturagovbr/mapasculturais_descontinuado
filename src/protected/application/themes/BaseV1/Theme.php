@@ -2653,8 +2653,17 @@ class Theme extends MapasCulturais\Theme {
         return $link_attributes;
     }
 
-    public function getEntityURL($url)
-    {
+    // TODO: ver se eh viavel utilizar esta funcao em todo local que hoje usa esse markup
+    public function renderShortDescriptionMarkUp() {
+        $html = '<span class="js-editable" data-edit="shortDescription"';
+        $html .= 'data-original-title="' . \MapasCulturais\i::esc_attr__("Descrição Curta") . '"';
+        $html .= 'data-original-title="' . \MapasCulturais\i::esc_attr__("Insira uma descrição curta") . ' "';
+        $html .= "data-showButtons='bottom' data-tpl='<textarea maxlength=\"400\"></textarea>'></span>";
+
+        return $html;
+    }
+
+    public function getEntityURL($url) {
         if (filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)) {
             return $url;
         } else {
@@ -2662,12 +2671,195 @@ class Theme extends MapasCulturais\Theme {
         }
     }
 
-    private function getSiteScheme()
-    {
+    private function getSiteScheme() {
         $app = \MapasCulturais\App::i();
         $req = $app->request;
 
         return $req->getScheme() . "://";
+    }
+
+    public $entityClassesShortcuts = [
+        'agent' => 'MapasCulturais\Entities\Agent',
+        'space' => 'MapasCulturais\Entities\Space',
+        'project' => 'MapasCulturais\Entities\Project',
+        'event' => 'MapasCulturais\Entities\Event'
+    ];
+
+    public $mapaClasses = ['agent' => 'Agente', 'space' => 'Espaço', 'project' => 'Projeto', 'event' => 'Evento'];
+
+    public function getShortDescription() {
+        $_placeholder =  \MapasCulturais\i::esc_attr__("Insira uma descrição curta");
+        $markup = "<textarea style='width: 100%' name='shortDescription' placeholder='$_placeholder' maxlength='400' required></textarea>";
+
+        return $markup;
+    }
+
+    public function renderModalFor($entity, $showIcon = true) {
+        if ("edit" != $this->controller->action):
+            $href_class = ($showIcon) ? "add" : "";
+            ?>
+            <a class="<?php echo $href_class; ?> js-open-dialog" href="javascript:void(0)" data-dialog="#add-<?php echo $entity; ?>"
+               data-dialog-callback="MapasCulturais.addEntity" data-dialog-block="true" data-form-action='insert'
+               data-dialog-title="<?php \MapasCulturais\i::esc_attr_e('Modal de Entidade'); ?>">
+                <?php $this->modalCreateEntity($entity); ?>
+            </a>
+            <?php
+        endif;
+    }
+
+    private function entityRequiredFields()  {
+        return [
+            'name' => i::__('Nome'),
+            'shortDescription' => i::__('Descrição curta'),
+            'type' => i::__('Tipo'),
+            'terms' => i::__('Área de Atuação')
+        ];
+    }
+
+    private function getEntityAreas($entity, $type = "") {
+        if ($entity instanceof \MapasCulturais\Entity) {
+            $_entities_areas = ["agent", "space"];
+            $app = App::i();
+
+            $title = "";
+            $_attr = "";
+            $options = [];
+
+            if (in_array($type, $_entities_areas)) {
+                $taxonomies = $app->getRegisteredTaxonomy($entity, 'area');
+                if(is_object($taxonomies)) {
+                    $_attr = 'terms[area][]';
+                    $options = array_values($taxonomies->restrictedTerms);
+                    $title = $app->getView()->dict('taxonomies:area: name', false);
+                }
+            } else if ("event" === $type) {
+                $_attr = 'terms[linguagem][]';
+                $taxonomies = $app->getRegisteredTaxonomy($entity, 'linguagem');
+                $options = array_values($taxonomies->restrictedTerms);
+                $title = $app->getView()->dict('taxonomies:linguagem: name', false);
+            } else {
+                return false;
+            }
+
+            foreach ($app->getRegisteredMetadata($entity) as $meta) {
+                if (is_object($meta) && $meta instanceof MapasCulturais\Definitions\Metadata ) {
+                    if ($meta->is_required) {
+                        $_title = $meta->label;
+                        $_key = $meta->key;
+                        $tipo = $meta->type;
+
+                        if ($tipo === "select" && is_array($meta->config)) {
+                            $this->renderEntityDropdown($_title, $_key, $meta->config['options']);
+                        } else if ($tipo === "string" || $tipo === "int") {
+                            $this->renderTitle($_title);
+                            echo "<input type='text' name='$_key' placeholder='Campo obrigatório' required>";
+                        } else if ($tipo === "text") {
+                            $this->renderTitle($_title);
+                            echo "<textarea name='$_key' maxlength='400'></textarea><br>";
+                        } else if ($tipo === "multiselect" && is_array($meta->config)) {
+                            $this->renderTitle($_title);
+                            echo "<br>";
+                            foreach ($meta->config['options'] as $option) {
+                                echo "<label for='$_key'> $option </label>";
+                                echo "<input type='checkbox' name='$_key' value='$option'> <br>";
+                            }
+                        }
+                    }
+                }
+            }
+
+            $this->renderEntityDropdown($title,$_attr,$options);
+        }
+    }
+
+    private function renderEntityDropdown($title, $attr, $options) {
+        if (empty($title) || empty($attr) || (count($options) <= 0))
+            return false;
+
+        $this->renderTitle($title);
+        $dropdown = "<select name='$attr'>";
+        foreach ($options as $option)
+            $dropdown .= "<option value='$option'> $option </option>";
+        $dropdown .= "</select>";
+
+        echo $dropdown;
+    }
+
+    private function getEntityType($entity) {
+         $app = App::i();
+         $_types = $app->getRegisteredEntityTypes($entity);
+
+         if (!is_null($_types) && is_array($_types)) {
+             $html = "<br><select name='type'>";
+             foreach ($_types as $tipo) {
+                 if (is_object($tipo)) {
+                     $html .= "<option value='$tipo->id'> $tipo->name </option>";
+                 }
+             }
+             $html .= "</select>";
+
+             echo $html;
+         }
+    }
+
+    private function modalFooter() {
+        $msg = i::__('Todos os campos são obrigatórios.');
+        echo "<p class='entity-modal-footer'> <span class='required'>*</span> $msg </p>";
+    }
+
+    private function renderTitle($title) {
+        echo "<label> $title </label> <span class='required'>*</span>";
+    }
+
+    private function renderFieldMarkUp($field, $entity) {
+        $__known_types = [ 'name', 'shortDescription', 'type'];
+        if (in_array($field, $__known_types)) {
+            $title = $this->entityRequiredFields()[$field];
+            $this->renderTitle($title);
+
+            switch ($field) {
+                case "name":
+                    $className = mb_strtolower($entity->getEntityTypeLabel());
+                    $placeholder = sprintf(i::__('Informe o %s do seu novo %s'), strtolower($title), $className);
+                    echo "<input type='text' name='$field' placeholder='$placeholder' required>";
+                    break;
+                case "shortDescription":
+                    echo $this->getShortDescription();
+                    break;
+                case "type":
+                    $this->getEntityType($entity);
+                    break;
+            }
+        }
+    }
+
+    public function modalCreateEntity($entity) {
+        $app = App::i();
+        $_entity_class = $this->entityClassesShortcuts[$entity];
+        $_new_entity = new $_entity_class();
+
+        $_required_keys = array_keys($_new_entity->getValidations());
+        $_name = $_new_entity->getEntityTypeLabel();
+        $url = $app->createUrl($entity);
+        ?>
+        <div id="add-<?php echo $entity ?>" class="js-dialog entity-modal" title="<?php echo "Criar $_name - dados básicos"; ?> "> <hr>
+            <form class="create-entity" data-entity="<?php echo $url; ?>">
+                <?php
+                foreach ($_required_keys as $_field_) {
+                    if ($_new_entity->isPropertyRequired($_new_entity, $_field_)) {
+                        $this->renderFieldMarkUp($_field_, $_new_entity);
+                    }
+                }
+                $this->getEntityAreas($_new_entity, $entity);
+                ?>
+                <input type="hidden" name="parent_id" value="<?php echo $app->user->profile->id; ?>">
+
+                <?php $this->modalFooter(); ?>
+
+                <input type="submit" value="Adicionar <?php echo $_name; ?>">
+            </form>
+        </div>
+    <?php
     }
 
 
