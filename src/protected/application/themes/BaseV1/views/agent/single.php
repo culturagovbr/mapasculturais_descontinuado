@@ -32,6 +32,18 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
     <header class="main-content-header">
         <?php $this->part('singles/header-image', ['entity' => $entity]); ?>
 
+        <p>
+            <span class="label">
+                <?php \MapasCulturais\i::_e("Este agente também é um espaço onde ocorrem eventos?");?>
+            </span>
+            <span class="js-editable  <?php echo ($entity->isPropertyRequired($entity,"agentSpaceRelated") && $editEntity? 'required': '');?>"
+                data-edit="agentSpaceRelated"
+                data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Não");?>"
+                data-value="Nao">
+                    <?php echo $entity->agentSpaceRelated; ?>
+            </span>
+        </p>
+
         <?php $this->part('singles/entity-status', ['entity' => $entity]); ?>
 
         <div class="header-content">

@@ -94,6 +94,15 @@ return array(
                 'v::email()' => \MapasCulturais\i::__('O email público não é um email válido.')
             )
         ),
+        
+        'agentSpaceRelated' => array(
+            'label' => \MapasCulturais\i::__('Agente e Espaço relacionados'),
+            'type' => 'select',
+            'options' => array(
+                'Sim'  => \MapasCulturais\i::__('Sim'),
+                'Nao' => \MapasCulturais\i::__('Não'),
+            )
+        ),
 
         'emailPrivado' => array(
             'private' => true,
