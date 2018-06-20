@@ -2243,6 +2243,24 @@ class Theme extends MapasCulturais\Theme {
             $this->jsObject['entityTypes'] = array();
 
         $this->jsObject['entityTypes'][$controller->id] = $types;
+        
+        if($controller->id == 'agent' || $controller->id == 'space'){
+            $entityRelated = ($controller->id == 'agent') ? 'space' : 'agent';
+            
+            $controllerRelated = App::i()->getControllerByEntity("MapasCulturais\Entities\\".ucfirst($entityRelated));
+            $typesRelated = $controllerRelated->types;
+
+            usort($typesRelated, function($a, $b) {
+                if ($a->name > $b->name)
+                    return 1;
+                elseif ($a->name < $b->name)
+                    return -1;
+                else
+                    return 0;
+            });
+            
+            $this->jsObject['entityTypes'][$controllerRelated->id] = $typesRelated;
+        }
     }
 
     function addTaxonoyTermsToJs($taxonomy_slug) {
