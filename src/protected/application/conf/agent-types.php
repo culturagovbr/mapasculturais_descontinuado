@@ -103,6 +103,10 @@ return array(
                 'Nao' => \MapasCulturais\i::__('Não'),
             )
         ),
+        
+        'agentSpaceRelatedId' => array(
+            'label' => \MapasCulturais\i::__('Id relacionado')
+        ),
 
         'emailPrivado' => array(
             'private' => true,

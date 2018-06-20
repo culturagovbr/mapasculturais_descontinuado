@@ -383,11 +383,26 @@ MapasCulturais.Editables = {
             };
             $(this).editable(config);
         });
+        
+        $('.js-editable-type-related').each(function(){
+            var entity = $(this).data('entity');
+            
+            $.each(MapasCulturais.entityTypes[entity], function(i, obj){
+                obj.text = obj.name;
+                obj.value = obj.id;
+            });
+            var config = {
+                name: 'type-related',
+                type: 'select',
+                source: MapasCulturais.entityTypes[entity]
+            };
+            $(this).editable(config);
+        });
     },
 
     getEditableElements : function(){
         if(MapasCulturais.isEditable)
-            return $('.js-editable, .js-editable-taxonomy, .js-editable-type, .js-editable-registrationCategory');
+            return $('.js-editable, .js-editable-taxonomy, .js-editable-type, .js-editable-type-related, .js-editable-registrationCategory');
         else
             return $('.js-xedit');
     },
