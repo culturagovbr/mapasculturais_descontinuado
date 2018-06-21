@@ -2712,19 +2712,6 @@ class Theme extends MapasCulturais\Theme {
         return $markup;
     }
 
-    public function renderModalFor($entity, $showIcon = true) {
-        if ("edit" != $this->controller->action):
-            $href_class = ($showIcon) ? "add" : "";
-            ?>
-            <a class="<?php echo $href_class; ?> js-open-dialog" href="javascript:void(0)" data-dialog="#add-<?php echo $entity; ?>"
-               data-dialog-callback="MapasCulturais.addEntity" data-dialog-block="true" data-form-action='insert'
-               data-dialog-title="<?php \MapasCulturais\i::esc_attr_e('Modal de Entidade'); ?>">
-                <?php $this->modalCreateEntity($entity); ?>
-            </a>
-            <?php
-        endif;
-    }
-
     private function entityRequiredFields()  {
         return [
             'name' => i::__('Nome'),
@@ -2759,12 +2746,28 @@ class Theme extends MapasCulturais\Theme {
                 return false;
             }
 
+            $this->renderEntityRequiredMetadata($entity);
+            $this->renderEntityDropdown($title,$_attr,$options);
+        }
+    }
+
+    private function renderEntityRequiredMetadata($entity) {
+        if ($entity instanceof \MapasCulturais\Entity) {
+            $app = App::i();
+
             foreach ($app->getRegisteredMetadata($entity) as $meta) {
                 if (is_object($meta) && $meta instanceof MapasCulturais\Definitions\Metadata ) {
-                    if ($meta->is_required) {
+                    $show_meta = $meta->is_required;
+                    $class = "entity-required-field";
+
+                    $app->applyHook('mapasculturais.add_entity_modal', [$meta, &$show_meta, &$class]);
+
+                    if ($show_meta) {
                         $_title = $meta->label;
                         $_key = $meta->key;
                         $tipo = $meta->type;
+
+                        echo "<div class='$class'>";
 
                         if ($tipo === "select" && is_array($meta->config)) {
                             $this->renderEntityDropdown($_title, $_key, $meta->config['options']);
@@ -2782,11 +2785,10 @@ class Theme extends MapasCulturais\Theme {
                                 echo "<input type='checkbox' name='$_key' value='$option'> <br>";
                             }
                         }
+                        echo "</div>";
                     }
                 }
             }
-
-            $this->renderEntityDropdown($title,$_attr,$options);
         }
     }
 
@@ -2851,7 +2853,24 @@ class Theme extends MapasCulturais\Theme {
         }
     }
 
-    public function modalCreateEntity($entity) {
+    public function renderModalFor($entity, $showIcon = true, $label = "", $extra_classes = "") {
+        if ("edit" != $this->controller->action) {
+            $href_class = ($showIcon) ? "add " : " ";
+            $href_class .= $extra_classes;
+            $_unidID = uniqid("-");
+            $_modal_id = "add-" . $entity . $_unidID;
+            ?>
+            <a class="<?php echo $href_class; ?> js-open-dialog" href="javascript:void(0)"  data-dialog-block="true"
+               data-dialog="#<?php echo $_modal_id; ?>" data-dialog-callback="MapasCulturais.addEntity" data-form-action='insert'
+               data-dialog-title="<?php \MapasCulturais\i::esc_attr_e('Modal de Entidade'); ?>">
+                <?php echo $label ?>
+                <?php $this->modalCreateEntity($entity, $_modal_id); ?>
+            </a>
+            <?php
+        }
+    }
+
+    public function modalCreateEntity($entity, $_id) {
         $app = App::i();
         $_entity_class = $this->entityClassesShortcuts[$entity];
         $_new_entity = new $_entity_class();
@@ -2859,9 +2878,16 @@ class Theme extends MapasCulturais\Theme {
         $_required_keys = array_keys($_new_entity->getValidations());
         $_name = $_new_entity->getEntityTypeLabel();
         $url = $app->createUrl($entity);
+
+        $_modal_title = "Criar $_name - dados básicos";
+        $app->applyHook('mapasculturais.add_entity_modal.title', [&$_modal_title]);
         ?>
-        <div id="add-<?php echo $entity ?>" class="js-dialog entity-modal" title="<?php echo "Criar $_name - dados básicos"; ?> "> <hr>
-            <form class="create-entity" data-entity="<?php echo $url; ?>">
+
+        <div id="<?php echo $_id; ?>" class="js-dialog entity-modal" title="<?php echo $_modal_title; ?>"> <hr>
+
+            <div> <?php $app->applyHook('mapasculturais.add_entity_modal.form:before'); ?> </div>
+
+            <form class="create-entity" data-entity="<?php echo $url; ?>" data-formid="<?php echo $_id; ?>">
                 <?php
                 foreach ($_required_keys as $_field_) {
                     if ($_new_entity->isPropertyRequired($_new_entity, $_field_)) {
@@ -2874,8 +2900,12 @@ class Theme extends MapasCulturais\Theme {
 
                 <?php $this->modalFooter(); ?>
 
+                <?php $app->applyHook('mapasculturais.add_entity_modal.footer'); ?>
+
                 <input type="submit" value="Adicionar <?php echo $_name; ?>">
             </form>
+
+            <div> <?php $app->applyHook('mapasculturais.add_entity_modal.form:after'); ?> </div>
         </div>
     <?php
     }
