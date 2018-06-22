@@ -11,13 +11,13 @@ if($this->controller->id == 'agent' || $this->controller->id == 'space'){
 
 
     <?php $this->applyTemplateHook('typeRelated','before'); ?>
-    <div class="entity-type <?php echo $entityRelated; ?>-type">
+    <div class="entity-type <?php echo $entityRelated; ?>-type" ng-show="showEntityRelated">
         <div class="icon icon-<?php echo $entityRelated; ?>"></div>
         <a href="#" class='<?php echo $class ?> required'
             data-original-title="<?php \MapasCulturais\i::esc_attr_e("Tipo do $entityTitle");?>"
             data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Selecione um tipo do $entityTitle");?>"
-            data-entity='<?php echo $entityRelated ?>'
-            data-value='<?php echo $controllerRelated->type ?>'>
+            data-entity='<?php echo $entityRelated; ?>'
+            data-value='<?php echo $controllerRelated->type; ?>'>
                 <?php echo $controllerRelated->type ? $controllerRelated->type->name : ''; ?>
         </a>
     </div>

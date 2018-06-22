@@ -100,8 +100,9 @@ return array(
             'type' => 'select',
             'options' => array(
                 'Sim'  => \MapasCulturais\i::__('Sim'),
-                'Nao' => \MapasCulturais\i::__('Não'),
-            )
+                'Não' => \MapasCulturais\i::__('Não'),
+            ),
+            'default_value' => 'Não'
         ),
         
         'agentSpaceRelatedId' => array(

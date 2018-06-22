@@ -36,12 +36,17 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
             <p>
                 <span class="label">
                     <?php \MapasCulturais\i::_e("Este agente também é um espaço onde ocorrem eventos?");?>
+                
+                
+                        <input name="fva-contagem" type="radio" ng-model="showEntityRelated" ng-value="true">Sim
+                        <input name="fva-contagem" type="radio" ng-model="showEntityRelated" ng-value="false">Não
+                    
                 </span>
                 <span class="js-editable  <?php echo ($entity->isPropertyRequired($entity,"agentSpaceRelated") && $editEntity? 'required': '');?>"
                     data-edit="agentSpaceRelated"
                     data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Não");?>"
-                    data-value="<?php echo $entity->agentSpaceRelated ?>">
-                        <?php echo $entity->agentSpaceRelated; ?>
+                    data-value="<?php echo $entity->agentSpaceRelated; ?>">
+                        <?php echo \MapasCulturais\i::__($entity->agentSpaceRelated); ?>
                 </span>
             </p>
         <?php endif; ?>
