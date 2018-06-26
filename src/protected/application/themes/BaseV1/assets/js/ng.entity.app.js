@@ -24,9 +24,6 @@
         $scope.setRedirectUrl = function() {
             loginService.setLastUrl();
         }
-        
-        if($('.js-editable[data-edit=agentSpaceRelated]').html().replace(/\s/g,"") == 'Sim')
-            $scope.showEntityRelated = true;
     }]);
 
     app.directive('onRepeatDone', ['$rootScope', '$timeout', function($rootScope, $timeout) {
