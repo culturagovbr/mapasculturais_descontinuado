@@ -384,7 +384,7 @@ MapasCulturais.Editables = {
             $(this).editable(config);
         });
         
-        $('.js-editable-type-related').each(function(){
+        $('.js-editable-typeSpaceLinked').each(function(){
             var entity = $(this).data('entity');
             
             $.each(MapasCulturais.entityTypes[entity], function(i, obj){
@@ -392,7 +392,7 @@ MapasCulturais.Editables = {
                 obj.value = obj.id;
             });
             var config = {
-                name: 'type-related',
+                name: 'typeSpaceLinked',
                 type: 'select',
                 source: MapasCulturais.entityTypes[entity]
             };
@@ -402,7 +402,7 @@ MapasCulturais.Editables = {
 
     getEditableElements : function(){
         if(MapasCulturais.isEditable)
-            return $('.js-editable, .js-editable-taxonomy, .js-editable-type, .js-editable-type-related, .js-editable-registrationCategory');
+            return $('.js-editable, .js-editable-taxonomy, .js-editable-type, .js-editable-typeSpaceLinked, .js-editable-registrationCategory');
         else
             return $('.js-xedit');
     },
@@ -1163,6 +1163,16 @@ $(function(){
             }
         });
 
+    });
+    
+    $('#linkedAgentSpace').bind('DOMNodeInserted', function() {
+        var showEnderecoCorrespondencia = $('#linkedAgentSpace').editable('getValue', true);
+
+        if(showEnderecoCorrespondencia == 'Sim'){
+            $('#typeSpaceLinked').show();
+        }else{
+            $('#typeSpaceLinked').hide();
+        }
     });
 });
 

@@ -193,6 +193,20 @@ return array(
             'validations' => array(
                 "v::startsWith('@')" => \MapasCulturais\i::__("O usuário informado é inválido. Informe no formato @usuario e tente novamente")
             )
+        ),
+        
+        'linkedAgentSpace' => array(
+            'label' => \MapasCulturais\i::__('Agente e Espaço linkados'),
+            'type' => 'select',
+            'options' => array(
+                'Sim'  => \MapasCulturais\i::__('Sim'),
+                'Não' => \MapasCulturais\i::__('Não'),
+            ),
+            'default_value' => 'Não'
+        ),
+        
+        'linkedAgentSpaceId' => array(
+            'label' => \MapasCulturais\i::__('Id linkado')
         )
     ),
 

@@ -95,8 +95,8 @@ return array(
             )
         ),
         
-        'agentSpaceRelated' => array(
-            'label' => \MapasCulturais\i::__('Agente e Espaço relacionados'),
+        'linkedAgentSpace' => array(
+            'label' => \MapasCulturais\i::__('Agente e Espaço linkados'),
             'type' => 'select',
             'options' => array(
                 'Sim'  => \MapasCulturais\i::__('Sim'),
@@ -105,8 +105,8 @@ return array(
             'default_value' => 'Não'
         ),
         
-        'agentSpaceRelatedId' => array(
-            'label' => \MapasCulturais\i::__('Id relacionado')
+        'linkedAgentSpaceId' => array(
+            'label' => \MapasCulturais\i::__('Id linkado')
         ),
 
         'emailPrivado' => array(

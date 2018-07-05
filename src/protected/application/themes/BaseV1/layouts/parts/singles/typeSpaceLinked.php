@@ -1,6 +1,6 @@
 <?php 
 $_entity = $this->controller->id; 
-$class = isset($disable_editable) ? '' : 'js-editable-type-related';
+$class = isset($disable_editable) ? '' : 'js-editable-typeSpaceLinked';
 
 if($this->controller->id == 'agent' || $this->controller->id == 'space'){
     $entityRelated = ($this->controller->id == 'agent') ? 'space' : 'agent';
@@ -10,8 +10,8 @@ if($this->controller->id == 'agent' || $this->controller->id == 'space'){
     ?>
 
 
-    <?php $this->applyTemplateHook('typeRelated','before'); ?>
-    <div class="entity-type <?php echo $entityRelated; ?>-type" ng-show="showEntityRelated">
+    <?php $this->applyTemplateHook('typeSpaceLinked','before'); ?>
+    <div class="entity-type <?php echo $entityRelated; ?>-type" id="typeSpaceLinked">
         <div class="icon icon-<?php echo $entityRelated; ?>"></div>
         <a href="#" class='<?php echo $class ?> required'
             data-original-title="<?php \MapasCulturais\i::esc_attr_e("Tipo do $entityTitle");?>"
@@ -22,6 +22,6 @@ if($this->controller->id == 'agent' || $this->controller->id == 'space'){
         </a>
     </div>
     <!--.entity-type-->
-    <?php $this->applyTemplateHook('typeRelated','after'); ?>
+    <?php $this->applyTemplateHook('typeSpaceLinked','after'); ?>
     
 <?php } ?>

@@ -593,6 +593,9 @@ abstract class Entity implements \JsonSerializable{
         $app = App::i();
 
         $requests = [];
+        
+        
+        
 
         try {
             $app->applyHookBoundTo($this, "entity($this).save:requests", [&$requests]);
@@ -614,6 +617,86 @@ abstract class Entity implements \JsonSerializable{
 
             } catch (Exceptions\WorkflowRequestTransport $e) {
                 $requests[] = $e->request;
+            }
+        }
+        
+        $class = self::getHookClassPath($this->getClassName());
+        if($class == 'Agent' || $class == 'Space'){
+            if($this->isLinkedAgentSpace() !== false){
+
+                $class = ($class == 'Agent') ? 'Space' : $class;
+                // $obj = new \stdClass;
+                if(is_null($this->isLinkedAgentSpace())){
+                    $class = "MapasCulturais\Entities\\$class";
+                    $obj = new $class();
+                }
+                
+                if(is_string($this->isLinkedAgentSpace())){
+                    $obj = $app->repo($class)->find($this->isLinkedAgentSpace());
+                }
+                
+                // \dump($app->getRegisteredMetadataByMetakey('site',$this));
+                // $app->log->debug("asafedev >> ENTROU " . $class);
+                
+                foreach ($app->getRegisteredMetadata($this) as $field => $value) {
+                    $meta = $value->key;
+                    // \dump($meta);
+                    if($meta == 'geoPais')
+                        break;
+                    
+                    if( $meta == 'opportunityTabName' ||
+                        $meta == 'useOpportunityTab'  ||
+                        $meta == 'sentNotification' ){
+                            continue;
+                    }
+                    
+                    // \dump($obj);
+                    // foreach ($app->getRegisteredMetadata($obj) as $f => $v) {
+                    //     if($value->key == $v->key)
+                    //         $obj->$meta = $this->$meta; 
+                    // }
+                    
+                    
+                    // if($app->getRegisteredMetadataByMetakey($meta,$this))
+                    //     $obj->$meta = $this->$meta; 
+                }
+
+                // \dump($this->id);die;
+                
+                // $obj->linkedAgentSpace  = $this->linkedAgentSpace;
+                $obj->site               = $this->site;
+                $obj->emailPrivado       = $this->emailPrivado;
+                $obj->emailPublico       = $this->emailPublico;
+                $obj->telefonePublico    = $this->telefonePublico;
+                $obj->telefone1          = $this->telefone1;
+                $obj->location           = $this->location;
+                $obj->endereco           = $this->endereco;
+                $obj->En_CEP             = $this->En_CEP;
+                $obj->En_Nome_Logradouro = $this->En_Nome_Logradouro;
+                $obj->En_Num             = $this->En_Num;
+                $obj->En_Complemento     = $this->En_Complemento;
+                $obj->En_Bairro          = $this->En_Bairro;
+                $obj->En_Municipio       = $this->En_Municipio;
+                $obj->En_Estado          = $this->En_Estado;
+                $obj->twitter            = $this->twitter;
+                $obj->facebook           = $this->facebook;
+                $obj->googleplus         = $this->googleplus;
+                $obj->instagram          = $this->instagram;
+                // $obj->status             = $this->status;
+                // $obj->_geoLocation       = $this->_geoLocation;
+
+                $obj->publicLocation     = $this->publicLocation;
+                $obj->longDescription    = $this->longDescription;
+                $obj->terms              = $this->terms;
+
+                $obj->name             = $this->name;
+                $obj->type             = $this->typeSpaceLinked;
+                $obj->owner            = $this;
+                $obj->shortDescription = $this->shortDescription;
+                $obj->linkedAgentSpaceId = $this->id;
+                // \dump($this->id);die;
+                $obj->save(true);
+                $this->linkedAgentSpaceId = $obj->id;
             }
         }
 
@@ -674,6 +757,8 @@ abstract class Entity implements \JsonSerializable{
             $e = new Exceptions\WorkflowRequest($requests);
             throw $e;
         }
+        
+        
     }
 
     /**
@@ -1091,5 +1176,14 @@ abstract class Entity implements \JsonSerializable{
 
         $app->applyHookBoundTo($this, 'entity(' . $hook_class_path . ').update:after', $args);
         $app->applyHookBoundTo($this, 'entity(' . $hook_class_path . ').save:after', $args);
+    }
+    
+    public function isLinkedAgentSpace(){
+        if($this->linkedAgentSpace == 'Sim'){
+            return $this->linkedAgentSpaceId;
+        }
+        else{
+            return false;
+        }
     }
 }
