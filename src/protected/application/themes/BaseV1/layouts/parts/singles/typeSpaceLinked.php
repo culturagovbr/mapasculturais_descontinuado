@@ -17,7 +17,7 @@ if($this->controller->id == 'agent' || $this->controller->id == 'space'){
             data-original-title="<?php \MapasCulturais\i::esc_attr_e("Tipo do $entityTitle");?>"
             data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Selecione um tipo do $entityTitle");?>"
             data-entity='<?php echo $entityRelated; ?>'
-            data-value='<?php echo $controllerRelated->type; ?>'>
+            data-value='<?php echo $entity->typeSpaceLinked; ?>'>
                 <?php echo $controllerRelated->type ? $controllerRelated->type->name : ''; ?>
         </a>
     </div>
