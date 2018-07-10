@@ -630,40 +630,12 @@ abstract class Entity implements \JsonSerializable{
                     $class = "MapasCulturais\Entities\\$class";
                     $obj = new $class();
                 }
-                
+
                 if(is_string($this->isLinkedAgentSpace())){
                     $obj = $app->repo($class)->find($this->isLinkedAgentSpace());
                 }
-                
-                // \dump($app->getRegisteredMetadataByMetakey('site',$this));
-                // $app->log->debug("asafedev >> ENTROU " . $class);
-                
-                foreach ($app->getRegisteredMetadata($this) as $field => $value) {
-                    $meta = $value->key;
-                    // \dump($meta);
-                    if($meta == 'geoPais')
-                        break;
-                    
-                    if( $meta == 'opportunityTabName' ||
-                        $meta == 'useOpportunityTab'  ||
-                        $meta == 'sentNotification' ){
-                            continue;
-                    }
-                    
-                    // \dump($obj);
-                    // foreach ($app->getRegisteredMetadata($obj) as $f => $v) {
-                    //     if($value->key == $v->key)
-                    //         $obj->$meta = $this->$meta; 
-                    // }
-                    
-                    
-                    // if($app->getRegisteredMetadataByMetakey($meta,$this))
-                    //     $obj->$meta = $this->$meta; 
-                }
 
-                // \dump($this->id);die;
-                
-                // $obj->linkedAgentSpace  = $this->linkedAgentSpace;
+                // $app->log->debug("asafedev >> ENTROU " . $class);    
                 $obj->site               = $this->site;
                 $obj->emailPrivado       = $this->emailPrivado;
                 $obj->emailPublico       = $this->emailPublico;
@@ -682,19 +654,17 @@ abstract class Entity implements \JsonSerializable{
                 $obj->facebook           = $this->facebook;
                 $obj->googleplus         = $this->googleplus;
                 $obj->instagram          = $this->instagram;
-                // $obj->status             = $this->status;
-                // $obj->_geoLocation       = $this->_geoLocation;
 
                 $obj->publicLocation     = $this->publicLocation;
                 $obj->longDescription    = $this->longDescription;
                 $obj->terms              = $this->terms;
 
-                $obj->name             = $this->name;
-                $obj->type             = $this->typeSpaceLinked;
-                $obj->owner            = $this;
-                $obj->shortDescription = $this->shortDescription;
+                $obj->name               = $this->name;
+                $obj->type               = $this->typeSpaceLinked;
+                $obj->owner              = $this;
+                $obj->shortDescription   = $this->shortDescription;
                 $obj->linkedAgentSpaceId = $this->id;
-                // \dump($this->id);die;
+
                 $obj->save(true);
                 $this->linkedAgentSpaceId = $obj->id;
             }

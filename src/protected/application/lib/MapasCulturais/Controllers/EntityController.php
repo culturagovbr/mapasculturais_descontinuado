@@ -83,7 +83,16 @@ abstract class EntityController extends \MapasCulturais\Controller{
         } else {
             $this->_requestedEntity = null;
         }
-
+        
+        if($this->_requestedEntity->linkedAgentSpace == 'Sim'){
+            $app = App::i();
+            
+            $class = ($this->_requestedEntity->getHookClassPath() == 'Agent') ? 'Space' : 'Agent';
+            $obj = $app->repo($class)->find($this->_requestedEntity->linkedAgentSpaceId);
+            
+            $this->_requestedEntity->typeSpaceLinked = $obj->type;
+        }
+        
         return $this->_requestedEntity;
     }
 
@@ -206,11 +215,8 @@ abstract class EntityController extends \MapasCulturais\Controller{
         if (is_null($data)) {
             $data = $this->postData;
         }
-        
-    // \dump($data['linkedAgentSpace']);die;
 
         $entity = $this->getRequestedEntity();
-        $entity->isLinkedAgenteSpace();
 
         $app = App::i();
         $app->applyHookBoundTo($this, "POST({$this->id}.index):data", ['data' => &$data]);
@@ -350,19 +356,12 @@ abstract class EntityController extends \MapasCulturais\Controller{
         if (is_null($data)) {
             $data = $this->postData;
         }
-// \dump($data);die;
-// foreach($data as $field=>$value){
-//     \dump($field);
-//     \dump($value);
-//     echo "_____________";
-// }die;
+
         $app = App::i();
-        
 
         $app->applyHookBoundTo($this, "PUT({$this->id}.single):data", ['data' => &$data]);
 
         $entity = $this->requestedEntity;
-        // \dump($entity->isLinkedAgentSpace());die;
 
         if(!$entity)
             $app->pass();
@@ -372,7 +371,6 @@ abstract class EntityController extends \MapasCulturais\Controller{
             $entity->$field = $value;
         }
 
-        // \dump($entity->getMetadata());die;
         if($errors = $entity->validationErrors){
             $this->errorJson($errors);
         }else{
