@@ -2801,7 +2801,7 @@ class Theme extends MapasCulturais\Theme {
         echo $dropdown;
     }
 
-    private function getEntityType($entity) {
+    private function getEntityType($entity,$modal_id) {
          $app = App::i();
          $_types = $app->getRegisteredEntityTypes($entity);
 
@@ -2813,9 +2813,16 @@ class Theme extends MapasCulturais\Theme {
                  }
              }
              $html .= "</select>";
-
              echo $html;
+
+             $this->addTypologiesHook($entity,$modal_id);
          }
+    }
+
+    private function addTypologiesHook($entity, $modal_id) {
+        if ("agente" == strtolower($entity->getEntityTypeLabel())) {
+            App::i()->applyHook('mapasculturais.add_entity_modal.tipologias_agentes', ['entity'=> $entity, 'modal_id' => $modal_id]);
+        }
     }
 
     private function modalFooter() {
@@ -2827,7 +2834,7 @@ class Theme extends MapasCulturais\Theme {
         echo "<label> $title </label> <span class='required'>*</span>";
     }
 
-    private function renderFieldMarkUp($field, $entity) {
+    private function renderFieldMarkUp($field, $entity, $modal_id) {
         $__known_types = [ 'name', 'shortDescription', 'type'];
         if (in_array($field, $__known_types)) {
             $title = $this->entityRequiredFields()[$field];
@@ -2843,7 +2850,7 @@ class Theme extends MapasCulturais\Theme {
                     echo $this->getShortDescription();
                     break;
                 case "type":
-                    $this->getEntityType($entity);
+                    $this->getEntityType($entity, $modal_id);
                     break;
             }
         }
@@ -2889,17 +2896,27 @@ class Theme extends MapasCulturais\Theme {
 
         $_modal_title = "Criar $_name - dados básicos";
         $app->applyHook('mapasculturais.add_entity_modal.title', [&$_modal_title]);
+
+        $extra_wrapper_classes = '';
+        $app->applyHook('mapasculturais.add_entity_modal.wrapper_class', [&$extra_wrapper_classes]);
         ?>
 
-        <div id="<?php echo $_id; ?>" class="js-dialog entity-modal" title="<?php echo $_modal_title; ?>"> <hr>
+        <div id="<?php echo $_id; ?>" class="js-dialog entity-modal <?php echo $extra_wrapper_classes; ?>" title="<?php echo $_modal_title; ?>"> <hr>
 
             <div> <?php $app->applyHook('mapasculturais.add_entity_modal.form:before'); ?> </div>
 
             <form class="create-entity" data-entity="<?php echo $url; ?>" data-formid="<?php echo $_id; ?>">
+
+                <p class="flash-message hidden">
+                    <span class="entidade">Entidade criada com sucesso!</span><br>
+                    Deseja ir para a página de edição de <span class="new-name">nome</span> agora?
+                    <input class="edit-entity" type="button" value="Ir para página de edição" />
+                </p>
+
                 <?php
                 foreach ($_required_keys as $_field_) {
                     if ($_new_entity->isPropertyRequired($_new_entity, $_field_)) {
-                        $this->renderFieldMarkUp($_field_, $_new_entity);
+                        $this->renderFieldMarkUp($_field_, $_new_entity, $_id);
                     }
                 }
                 $this->getEntityAreas($_new_entity, $entity);
