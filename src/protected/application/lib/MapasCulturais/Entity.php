@@ -660,18 +660,30 @@ abstract class Entity implements \JsonSerializable{
                 $obj->terms              = $this->terms;
 
                 $obj->name               = $this->name;
-                $obj->type               = $this->typeSpaceLinked;
+                $obj->type               = $this->typeLinked;
                 $obj->shortDescription   = $this->shortDescription;
                 $obj->linkedAgentSpaceId = $this->id;
+
+                $metadataEntity = [
+                    'agent' => [],
+                    'space' => []
+                ];
+
+                $app->applyHook('mapasculturais.linkedAgentSpaceMetatados', [&$metadataEntity]);
+
+                foreach ($metadataEntity as $metaEntity) {
+                    if(count($metaEntity) > 0){
+                        foreach ($metaEntity as $meta) {
+                            $obj->$meta = $this->$meta;
+                        }
+                    }
+                }
 
                 if($class == 'Space')
                     $obj->owner = $this;
 
                 $obj->save(true);
                 $this->linkedAgentSpaceId = $obj->id;
-
-                if(key_exists('creatingLinkedAgentSpace', $_SESSION))
-                    unset($_SESSION['creatingLinkedAgentSpace']);
             }
         }
 
@@ -733,7 +745,7 @@ abstract class Entity implements \JsonSerializable{
             throw $e;
         }
         
-        
+        unset($_SESSION['creatingLinkedAgentSpace']);
     }
 
     /**

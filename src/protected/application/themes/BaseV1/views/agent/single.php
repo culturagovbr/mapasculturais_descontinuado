@@ -56,7 +56,7 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
 
             <?php $this->part('singles/type', ['entity' => $entity]) ?>
             
-            <?php $this->part('singles/typeSpaceLinked', ['entity' => $entity]) ?>
+            <?php $this->part('singles/typeLinked', ['entity' => $entity]) ?>
 
             <?php $this->part('singles/name', ['entity' => $entity]) ?>
 
