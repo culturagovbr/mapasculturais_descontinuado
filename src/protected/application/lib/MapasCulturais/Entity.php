@@ -624,10 +624,10 @@ abstract class Entity implements \JsonSerializable{
         if($class == 'Agent' || $class == 'Space'){
             if($this->isLinkedAgentSpace() !== false && !key_exists('creatingLinkedAgentSpace', $_SESSION)){
 
-                $class = ($class == 'Agent') ? 'Space' : $class;
+                $class = ($class == 'Agent') ? 'Space' : 'Agent';
                 if(is_null($this->isLinkedAgentSpace())){
-                    $class = "MapasCulturais\Entities\\$class";
-                    $obj = new $class();
+                    $newClass = "MapasCulturais\Entities\\$class";
+                    $obj = new $newClass();
                 }
 
                 if(is_string($this->isLinkedAgentSpace())){
@@ -661,14 +661,17 @@ abstract class Entity implements \JsonSerializable{
 
                 $obj->name               = $this->name;
                 $obj->type               = $this->typeSpaceLinked;
-                $obj->owner              = $this;
                 $obj->shortDescription   = $this->shortDescription;
                 $obj->linkedAgentSpaceId = $this->id;
+
+                if($class == 'Space')
+                    $obj->owner = $this;
 
                 $obj->save(true);
                 $this->linkedAgentSpaceId = $obj->id;
 
-                unset($_SESSION['creatingLinkedAgentSpace']);
+                if(key_exists('creatingLinkedAgentSpace', $_SESSION))
+                    unset($_SESSION['creatingLinkedAgentSpace']);
             }
         }
 

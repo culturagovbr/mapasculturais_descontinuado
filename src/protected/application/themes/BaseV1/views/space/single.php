@@ -45,6 +45,8 @@ $this->entity = $entity;
             <?php $this->part('singles/type', ['entity' => $entity]) ?>
 
             <?php $this->part('entity-parent', ['entity' => $entity, 'child_entity_request' => $child_entity_request]) ?>
+            
+            <?php $this->part('singles/typeSpaceLinked', ['entity' => $entity]) ?>
 
             <?php $this->part('singles/name', ['entity' => $entity]) ?>
 
