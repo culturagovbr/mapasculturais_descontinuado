@@ -19,7 +19,7 @@ if(($this->controller->id == 'agent' || $this->controller->id == 'space') && $en
             data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Selecione um tipo do $entityTitle");?>"
             data-entity='<?php echo $entityRelated; ?>'
             data-value='<?php echo $entity->typeLinked; ?>'>
-                <?php echo $controllerRelated->type ? $controllerRelated->type->name : ''; ?>
+                <?php echo $entity->typeLinked ? $entity->typeLinked->name : ''; ?>
         </a>
     </div>
     <!--.entity-type-->

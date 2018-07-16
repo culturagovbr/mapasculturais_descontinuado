@@ -91,8 +91,21 @@ abstract class EntityController extends \MapasCulturais\Controller{
             $obj = $app->repo($class)->find($this->_requestedEntity->linkedAgentSpaceId);
             
             $this->_requestedEntity->typeLinked = $obj->type;
+
+            $metadataEntity = [
+                'agent' => [],
+                'space' => []
+            ];
+
+            $app->applyHook('mapasculturais.linkedAgentSpaceMetatados', [&$metadataEntity]);
+
+            if(count($metadataEntity[strtolower($class)]) > 0){
+                foreach ($metadataEntity[strtolower($class)] as $meta) {
+                    $this->_requestedEntity->$meta = $obj->$meta;
+                }
+            }
         }
-        
+
         return $this->_requestedEntity;
     }
 
