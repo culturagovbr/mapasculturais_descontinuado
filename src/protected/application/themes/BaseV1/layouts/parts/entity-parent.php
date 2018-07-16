@@ -19,7 +19,14 @@
                    data-value-name="<?php if($entity->parent) echo $entity->parent->name; ?>"
              ><?php if($entity->parent) echo $entity->parent->name; ?></span>
 
-        <?php elseif($entity instanceof MapasCulturais\Entities\Space): ?>
+        <?php elseif($entity instanceof MapasCulturais\Entities\Space || $entity->isLinkedAgentSpace()): ?>
+            <?php
+                if($entity instanceof MapasCulturais\Entities\Agent){
+                    $typeParent = 'parentLinked';
+                }else{
+                    $typeParent = 'parent';
+                }
+            ?>
             <span  class="js-search js-include-editable"
                     data-field-name='parentId'
                     data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Selecionar");?> <?php $this->dict('entities: parent space') ?>"
@@ -32,9 +39,9 @@
                     data-selection-format="parentSpace"
                     data-allow-clear="1"
                     title="<?php \MapasCulturais\i::esc_attr_e("Selecionar");?> <?php $this->dict('entities: parent space') ?>"
-                    data-value="<?php if($entity->parent) echo $entity->parent->id; ?>"
-                    data-value-name="<?php if($entity->parent) echo $entity->parent->name; ?>"
-              ><?php if($entity->parent) echo $entity->parent->name; ?></span>
+                    data-value="<?php if($entity->$typeParent) echo $entity->$typeParent->id; ?>"
+                    data-value-name="<?php if($entity->$typeParent) echo $entity->$typeParent->name; ?>"
+              ><?php if($entity->$typeParent) echo $entity->$typeParent->name; ?></span>
         <?php endif; ?>
     <?php endif; ?>
 

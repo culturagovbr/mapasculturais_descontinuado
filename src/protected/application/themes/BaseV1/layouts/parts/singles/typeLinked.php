@@ -5,7 +5,6 @@ if(($this->controller->id == 'agent' || $this->controller->id == 'space') && $en
     $class = isset($disable_editable) ? '' : 'js-editable-typeLinked';
 
     $entityRelated = ($this->controller->id == 'agent') ? 'space' : 'agent';
-    $controllerRelated = $app::i()->getControllerByEntity("MapasCulturais\Entities\\".ucfirst($entityRelated));
     
     $entityTitle = ($entityRelated == 'agent') ? 'Agente' : 'Espaço';
     ?>

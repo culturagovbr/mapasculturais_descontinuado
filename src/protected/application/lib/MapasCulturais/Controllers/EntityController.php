@@ -90,7 +90,8 @@ abstract class EntityController extends \MapasCulturais\Controller{
             $class = ($this->_requestedEntity->getHookClassPath() == 'Agent') ? 'Space' : 'Agent';
             $obj = $app->repo($class)->find($this->_requestedEntity->linkedAgentSpaceId);
             
-            $this->_requestedEntity->typeLinked = $obj->type;
+            $this->_requestedEntity->typeLinked   = $obj->type;
+            $this->_requestedEntity->parentLinked = $obj->parent;
 
             $metadataEntity = [
                 'agent' => [],

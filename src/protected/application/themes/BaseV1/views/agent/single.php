@@ -6,6 +6,8 @@ $this->bodyProperties['ng-controller'] = "EntityController";
 
 $this->addEntityToJs($entity);
 
+$child_entity_request = isset($child_entity_request) ? $child_entity_request : null;
+
 if($this->isEditable()){
     $this->addEntityTypesToJs($entity);
     $this->addTaxonoyTermsToJs('area');
@@ -57,6 +59,8 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
             <?php $this->part('singles/type', ['entity' => $entity]) ?>
             
             <?php $this->part('singles/typeLinked', ['entity' => $entity]) ?>
+
+            <?php $this->part('entity-parent', ['entity' => $entity, 'child_entity_request' => $child_entity_request]) ?>
 
             <?php $this->part('singles/name', ['entity' => $entity]) ?>
 
