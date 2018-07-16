@@ -679,8 +679,10 @@ abstract class Entity implements \JsonSerializable{
                     }
                 }
 
-                if($class == 'Space')
+                if($class == 'Space'){
                     $obj->owner = $this;
+                    $obj->parentId = $this->parentLinkedId;
+                }
 
                 $obj->save(true);
                 $this->linkedAgentSpaceId = $obj->id;

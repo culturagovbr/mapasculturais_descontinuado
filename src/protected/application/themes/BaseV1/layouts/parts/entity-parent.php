@@ -28,7 +28,7 @@
                 }
             ?>
             <span  class="js-search js-include-editable"
-                    data-field-name='parentId'
+                    data-field-name='<?php echo $typeParent; ?>Id'
                     data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Selecionar");?> <?php $this->dict('entities: parent space') ?>"
                     data-search-box-width="400px"
                     data-search-box-placeholder="<?php \MapasCulturais\i::esc_attr_e("Selecionar");?> <?php $this->dict('entities: parent space') ?>"
@@ -47,6 +47,6 @@
 
     <span class="warning pending js-pending-parent hltip" data-hltip-classes="hltip-warning" hltitle="<?php \MapasCulturais\i::esc_attr_e("Aguardando confirmação");?>" <?php if(!$child_entity_request) echo 'style="display:none"'?> ></span>
 
-<?php elseif($entity->parent): ?>
+<?php elseif($entity->parent && $entity instanceof MapasCulturais\Entities\Space): ?>
     <h4 class="entity-parent-title"><a href="<?php echo $entity->parent->singleUrl; ?>"><?php echo $entity->parent->name; ?></a></h4>
 <?php endif; ?>
