@@ -34,6 +34,8 @@ $this->entity = $entity;
     <header class="main-content-header">
         <?php $this->part('singles/header-image', ['entity' => $entity]); ?>
 
+        <?php $this->part('entity-linked', ['entity' => $entity]) ?>
+
         <?php $this->part('singles/entity-status', ['entity' => $entity]); ?>
 
         <!--.header-image-->

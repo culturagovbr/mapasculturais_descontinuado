@@ -33,21 +33,8 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
     <?php $this->applyTemplateHook('main-content','begin'); ?>
     <header class="main-content-header">
         <?php $this->part('singles/header-image', ['entity' => $entity]); ?>
-        
-        <?php if($this->isEditable()): ?>
-            <p>
-                <span class="label">
-                    <?php \MapasCulturais\i::_e("Este agente também é um espaço onde ocorrem eventos?");?>                    
-                </span>
-                <span class="js-editable  <?php echo ($entity->isPropertyRequired($entity,"linkedAgentSpace") && $editEntity? 'required': '');?>"
-                    id="linkedAgentSpace"
-                    data-edit="linkedAgentSpace"
-                    data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Não");?>"
-                    data-value="<?php echo $entity->linkedAgentSpace; ?>">
-                        <?php echo \MapasCulturais\i::__($entity->linkedAgentSpace); ?>
-                </span>
-            </p>
-        <?php endif; ?>
+
+        <?php $this->part('entity-linked', ['entity' => $entity]) ?>
 
         <?php $this->part('singles/entity-status', ['entity' => $entity]); ?>
 

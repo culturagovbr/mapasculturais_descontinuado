@@ -86,10 +86,10 @@ abstract class EntityController extends \MapasCulturais\Controller{
         
         if($this->_requestedEntity->linkedAgentSpace == 'Sim'){
             $app = App::i();
-            
-            $class = ($this->_requestedEntity->getHookClassPath() == 'Agent') ? 'Space' : 'Agent';
+
+            $class = $this->_requestedEntity->entityLinked()->getEntityType();
             $obj = $app->repo($class)->find($this->_requestedEntity->linkedAgentSpaceId);
-            
+
             $this->_requestedEntity->typeLinked   = $obj->type;
             $this->_requestedEntity->parentLinked = $obj->parent;
 

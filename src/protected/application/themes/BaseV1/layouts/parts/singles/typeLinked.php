@@ -4,9 +4,8 @@ if(($this->controller->id == 'agent' || $this->controller->id == 'space') && $en
     $_entity = $this->controller->id; 
     $class = isset($disable_editable) ? '' : 'js-editable-typeLinked';
 
-    $entityRelated = ($this->controller->id == 'agent') ? 'space' : 'agent';
-    
-    $entityTitle = ($entityRelated == 'agent') ? 'Agente' : 'Espaço';
+    $entityRelated = strtolower($entity->entityLinked()->getEntityType());
+    $entityTitle = $this->dict('entities: ' . strtolower($entity->entityLinked()->getEntityType()),false);
     ?>
 
 

@@ -1174,6 +1174,14 @@ $(function(){
             $('#typeLinked').hide();
         }
     });
+
+    $('#unlinkedAgentSpace').click(function(){
+        console.log($('#linkedAgentSpace').editable('getValue', true));
+        MapasCulturais.confirm('Esta operação é irreversível. Clique em salvar para aplicar a mudança.',function(){
+            $('#typeLinked').hide();
+            $('#linkedAgentSpace').editable('setValue', 'Nao');
+        });
+    });
 });
 
 (function ($) {
