@@ -21,13 +21,11 @@
 
         <?php elseif($entity instanceof MapasCulturais\Entities\Space || $entity->isLinkedAgentSpace()): ?>
             <?php
-                if($entity instanceof MapasCulturais\Entities\Agent){
+                $typeParent = 'parent';
+                if($entity instanceof MapasCulturais\Entities\Agent)
                     $typeParent = 'parentLinked';
-                }else{
-                    $typeParent = 'parent';
-                }
             ?>
-            <span  class="js-search js-include-editable"
+            <span  class="js-search js-include-editable <?php echo ($typeParent == 'parentLinked') ? 'entityLinked' : ''; ?>"
                     data-field-name='<?php echo $typeParent; ?>Id'
                     data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Selecionar");?> <?php $this->dict('entities: parent space') ?>"
                     data-search-box-width="400px"

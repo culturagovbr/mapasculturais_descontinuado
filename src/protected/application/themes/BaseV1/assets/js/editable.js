@@ -1164,21 +1164,11 @@ $(function(){
         });
 
     });
-    
-    $('#linkedAgentSpace').bind('DOMNodeInserted', function() {
-        var showEnderecoCorrespondencia = $('#linkedAgentSpace').editable('getValue', true);
-
-        if(showEnderecoCorrespondencia == 'Sim'){
-            $('#typeLinked').show();
-        }else{
-            $('#typeLinked').hide();
-        }
-    });
 
     $('#unlinkedAgentSpace').click(function(){
         console.log($('#linkedAgentSpace').editable('getValue', true));
         MapasCulturais.confirm('Esta operação é irreversível. Clique em salvar para aplicar a mudança.',function(){
-            $('#typeLinked').hide();
+            $('.entityLinked').remove();
             $('#linkedAgentSpace').editable('setValue', 'Nao');
         });
     });

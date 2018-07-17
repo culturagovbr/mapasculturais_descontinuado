@@ -10,7 +10,7 @@ if(($this->controller->id == 'agent' || $this->controller->id == 'space') && $en
 
 
     <?php $this->applyTemplateHook('typeLinked','before'); ?>
-    <div class="entity-type <?php echo $entityRelated; ?>-type" id="typeLinked">
+    <div class="entity-type <?php echo $entityRelated; ?>-type entityLinked">
         <div class="icon icon-<?php echo $entityRelated; ?>"></div>
         <a href="#" class='<?php echo $class ?> required'
             data-original-title="<?php \MapasCulturais\i::esc_attr_e("Tipo do $entityTitle");?>"
