@@ -621,6 +621,7 @@ abstract class Entity implements \JsonSerializable{
         }
         
         $class = self::getHookClassPath($this->getClassName());
+        $newClass = false;
         if($class == 'Agent' || $class == 'Space'){
             if($this->entityLinked() && $this->isLinkedAgentSpace() == false){
                 $objs  = [$this->entityLinked()];
@@ -637,68 +638,58 @@ abstract class Entity implements \JsonSerializable{
                 $this->linkedAgentSpaceId = '';
             }
             elseif($this->isLinkedAgentSpace() !== false && !key_exists('creatingLinkedAgentSpace', $_SESSION)){
-                $class = $this->entityLinked()->getEntityType();
-                if(is_null($this->isLinkedAgentSpace())){
+                if(is_string($this->isLinkedAgentSpace())){
+                    $class = $this->entityLinked()->getEntityType();
+                    $obj = $app->repo($class)->find($this->isLinkedAgentSpace());
+
+                    $obj->site               = $this->site;
+                    $obj->emailPrivado       = $this->emailPrivado;
+                    $obj->emailPublico       = $this->emailPublico;
+                    $obj->telefonePublico    = $this->telefonePublico;
+                    $obj->telefone1          = $this->telefone1;
+                    $obj->location           = $this->location;
+                    $obj->endereco           = $this->endereco;
+                    $obj->En_CEP             = $this->En_CEP;
+                    $obj->En_Nome_Logradouro = $this->En_Nome_Logradouro;
+                    $obj->En_Num             = $this->En_Num;
+                    $obj->En_Complemento     = $this->En_Complemento;
+                    $obj->En_Bairro          = $this->En_Bairro;
+                    $obj->En_Municipio       = $this->En_Municipio;
+                    $obj->En_Estado          = $this->En_Estado;
+                    $obj->twitter            = $this->twitter;
+                    $obj->facebook           = $this->facebook;
+                    $obj->googleplus         = $this->googleplus;
+                    $obj->instagram          = $this->instagram;
+
+                    $obj->publicLocation     = $this->publicLocation;
+                    $obj->longDescription    = $this->longDescription;
+
+                    $obj->name               = $this->name;
+                    $obj->type               = $this->typeLinked;
+                    $obj->shortDescription   = $this->shortDescription;
+
+                    if($class == 'Space'){
+                        $obj->owner = $this;
+                        $obj->parentId = $this->parentLinkedId;
+                    }
+
+                    $_SESSION['creatingLinkedAgentSpace'] = true;
+                    $obj->save(true);
+                }else{
+                    $class = ($this->getEntityType() == 'Agent') ? 'Space' : 'Agent';
                     $newClass = "MapasCulturais\Entities\\$class";
                     $obj = new $newClass();
+
+                    $obj->linkedAgentSpace = 'Sim';
+                    $obj->name               = $this->name;
+                    $obj->type               = $this->typeLinked;
+                    $obj->shortDescription   = $this->shortDescription;
+
+                    $_SESSION['creatingLinkedAgentSpace'] = true;
+                    $obj->save(true);
+
+                    $this->linkedAgentSpaceId = $obj->id;
                 }
-
-                if(is_string($this->isLinkedAgentSpace())){
-                    $obj = $app->repo($class)->find($this->isLinkedAgentSpace());
-                }
-
-                $_SESSION['creatingLinkedAgentSpace'] = true;
-
-                $obj->site               = $this->site;
-                $obj->emailPrivado       = $this->emailPrivado;
-                $obj->emailPublico       = $this->emailPublico;
-                $obj->telefonePublico    = $this->telefonePublico;
-                $obj->telefone1          = $this->telefone1;
-                $obj->location           = $this->location;
-                $obj->endereco           = $this->endereco;
-                $obj->En_CEP             = $this->En_CEP;
-                $obj->En_Nome_Logradouro = $this->En_Nome_Logradouro;
-                $obj->En_Num             = $this->En_Num;
-                $obj->En_Complemento     = $this->En_Complemento;
-                $obj->En_Bairro          = $this->En_Bairro;
-                $obj->En_Municipio       = $this->En_Municipio;
-                $obj->En_Estado          = $this->En_Estado;
-                $obj->twitter            = $this->twitter;
-                $obj->facebook           = $this->facebook;
-                $obj->googleplus         = $this->googleplus;
-                $obj->instagram          = $this->instagram;
-
-                $obj->publicLocation     = $this->publicLocation;
-                $obj->longDescription    = $this->longDescription;
-                $obj->terms              = $this->terms;
-
-                $obj->name               = $this->name;
-                $obj->type               = $this->typeLinked;
-                $obj->shortDescription   = $this->shortDescription;
-                $obj->linkedAgentSpaceId = $this->id;
-
-                $metadataEntity = [
-                    'agent' => [],
-                    'space' => []
-                ];
-
-                $app->applyHook('mapasculturais.linkedAgentSpaceMetatados', [&$metadataEntity]);
-
-                foreach ($metadataEntity as $metaEntity) {
-                    if(count($metaEntity) > 0){
-                        foreach ($metaEntity as $meta) {
-                            $obj->$meta = $this->$meta;
-                        }
-                    }
-                }
-
-                if($class == 'Space'){
-                    $obj->owner = $this;
-                    $obj->parentId = $this->parentLinkedId;
-                }
-
-                $obj->save(true);
-                $this->linkedAgentSpaceId = $obj->id;
             }
         }
 
@@ -717,6 +708,19 @@ abstract class Entity implements \JsonSerializable{
 
             }
             $app->em->persist($this);
+
+            if($is_new){
+                if(($class == 'Agent' || $class == 'Space') && !key_exists('creatingLinkedAgentSpace', $_SESSION)){
+                    $entityClass = ($class == 'Agent') ? 'AgentMeta' : 'SpaceMeta';
+                    $obj = $app->repo($class)->find($this->linkedAgentSpaceId);
+                    $__class = "MapasCulturais\Entities\\$entityClass";
+                    $newMeta = new $__class();
+                    $newMeta->key = 'linkedAgentSpaceId';
+                    $newMeta->owner = $obj;
+                    $newMeta->value = $this->id;
+                    $newMeta->save(true);
+                }
+            }
 
             if($flush){
                 $app->em->flush();

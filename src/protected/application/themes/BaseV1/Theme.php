@@ -2801,12 +2801,14 @@ class Theme extends MapasCulturais\Theme {
         echo $dropdown;
     }
 
-    private function getEntityType($entity,$modal_id) {
+    private function getEntityType($entity,$modal_id,$typeLinked = false) {
          $app = App::i();
          $_types = $app->getRegisteredEntityTypes($entity);
 
+         $name  = ($typeLinked) ? 'typeLinked' : 'type';
+
          if (!is_null($_types) && is_array($_types)) {
-             $html = "<br><select name='type'>";
+             $html = "<br><select name='$name'>";
              foreach ($_types as $tipo) {
                  if (is_object($tipo)) {
                      $html .= "<option value='$tipo->id'> $tipo->name </option>";
@@ -2914,12 +2916,38 @@ class Theme extends MapasCulturais\Theme {
                 </p>
 
                 <?php
+                if($entity == 'agent' || $entity == 'space') :
+                    ?>
+                    <div class="entity-required-field">
+                        <label><?php echo $app->getRegisteredMetadata($_new_entity)['linkedAgentSpace']->label; ?></label>
+                        <span class="required">*</span>
+                        <select name="linkedAgentSpace" data-entityid='<?php echo $_id; ?>'>
+                            <option value="Não" selected="selected"> Não </option>
+                            <option value="Sim"> Sim </option>
+                        </select>
+                    </div>
+                <?php
+                endif;
+
                 foreach ($_required_keys as $_field_) {
                     if ($_new_entity->isPropertyRequired($_new_entity, $_field_)) {
                         $this->renderFieldMarkUp($_field_, $_new_entity, $_id);
                     }
                 }
                 $this->getEntityAreas($_new_entity, $entity);
+
+                if($entity == 'agent' || $entity == 'space'){
+                    $linkedEntity = ($entity == 'agent') ? 'space' : 'agent';
+                    $__key = "entities: " . strtolower($linkedEntity);
+                    $_nameLinked = $app->view->dict($__key, false);
+
+                    $_entity_class_linked = $this->entityClassesShortcuts[$linkedEntity];
+                    $_new_entity_linked = new $_entity_class_linked();
+
+                    echo "<div class='fieldsEntityLinked' data-entityid='$_id' style='display:none;'><label>Tipo de $_nameLinked</label> <span class='required'>*</span>";
+                    $this->getEntityType($_new_entity_linked, $_id,true);
+                    echo "</div>";
+                }
                 ?>
                 <input type="hidden" name="parent_id" value="<?php echo $app->user->profile->id; ?>">
 
@@ -2934,6 +2962,4 @@ class Theme extends MapasCulturais\Theme {
         </div>
     <?php
     }
-
-
 }

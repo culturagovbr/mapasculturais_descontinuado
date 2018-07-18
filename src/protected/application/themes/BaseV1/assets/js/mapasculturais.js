@@ -11,6 +11,10 @@ function charCounter(obj){
 $(function(){
 //    $.fn.select2.defaults.separator = '; ';
 //    $.fn.editabletypes.select2.defaults.viewseparator = '; ';
+    $('form.create-entity select[name=linkedAgentSpace]').on('change',function(){
+        var entityid = $(this).data('entityid');
+        $(`.fieldsEntityLinked[data-entityid=${entityid}]`).toggle();
+    });
 
     $("form.create-entity").submit(function (e) {
         e.preventDefault();

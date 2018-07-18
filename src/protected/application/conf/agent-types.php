@@ -96,11 +96,11 @@ return array(
         ),
         
         'linkedAgentSpace' => array(
-            'label' => \MapasCulturais\i::__('Agente e Espaço linkados'),
+            'label' => \MapasCulturais\i::__('Este agente também é um espaço onde ocorrem eventos?'),
             'type' => 'select',
             'options' => array(
-                'Sim'  => \MapasCulturais\i::__('Sim'),
                 'Não' => \MapasCulturais\i::__('Não'),
+                'Sim'  => \MapasCulturais\i::__('Sim')
             ),
             'default_value' => 'Não'
         ),
