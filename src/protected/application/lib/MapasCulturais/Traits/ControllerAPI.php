@@ -107,9 +107,15 @@ trait ControllerAPI{
     }
 
     /**
-     * A generic API findOne method.
+     * @api {GET} /api/<controlle>/findOne/  A generic API findOne method.
+     * @apiName findOne
+     * @apiGroup ControllerAPI
+     * @apiVersion 4.0.0
      *
-     * This action finds one entity by the requested params and send the result to the API Responder.
+     * @apiDescription This action finds one entity by the requested
+     *                 params and send the result to the API Responder.
+     * 
+     * @apiParam {String} :A:select The Users-ID.
      *
      * @see \MapasCulturais\ApiOutput::outputItem()
      */

@@ -14,14 +14,14 @@
 <body>
 
 <script id="template-sidenav" type="text/x-handlebars-template">
-<nav id="scrollingNav">  
+<nav id="scrollingNav">
   <div class="sidenav-search">
-    <div>
-        <a href="./index.html?doctype=api">API</a>
-        <a href="./index.html?doctype=hook">HOOK</a>
-    </div>
-    <input class="form-control search" type="text" placeholder="{{__ "Filter..."}}">
+    <input class="form-control search" type="text" placeholder="{{__ "Filter..."}}" style="border-radius: 0;">
     <span class="search-reset">x</span>
+    <div class="btn-group" style="width: 100%;">
+        <a class="btn btn-success btn-custon" href="./index.html?doctype=api">API</a>
+        <a class="btn btn-success btn-custon" href="./index.html?doctype=hook">HOOK</a>
+    </div>
   </div>
   <ul class="sidenav nav nav-list list">
   {{#each nav}}
@@ -107,10 +107,11 @@
 <script id="template-article" type="text/x-handlebars-template">
   <article id="api-{{article.group}}-{{article.name}}-{{article.version}}" {{#if hidden}}class="hide"{{/if}} data-group="{{article.group}}" data-name="{{article.name}}" data-version="{{article.version}}">
     <div class="pull-left">
-      <h1>{{article.groupTitle}}{{#if article.title}} - {{article.title}}{{/if}}</h1>
+      <!-- <h1>{{article.groupTitle}}{{#if article.title}} - {{article.title}}{{/if}}</h1> -->
+      <h2>{{#if article.title}} {{article.title}}{{/if}}</h2>
     </div>
     {{#if template.withCompare}}
-    <div class="pull-right">
+    <!-- <div class="pull-right">
       <div class="btn-group">
         <button class="version btn btn-default dropdown-toggle" data-toggle="dropdown">
           <strong>{{article.version}}</strong>&nbsp;<span class="caret"></span>
@@ -122,7 +123,7 @@
         {{/each}}
         </ul>
       </div>
-    </div>
+    </div> -->
     {{/if}}
     <div class="clearfix"></div>
 
@@ -132,17 +133,13 @@
       </p>
     {{/if}}
 
-    {{#if article.description}}
-      <p>{{{nl2br article.description}}}</p>
-    {{/if}}
     <div class="row">
-    <span class="type type__{{toLowerCase article.type}} col-md-1">{{toLowerCase article.type}}</span>
-    <div class="col-md-11  no_margin no_padding">
-        <pre class="prettyprint language-html" data-type="{{toLowerCase article.type}}"><code>{{article.url}}</code></pre>
+        <span class="type type__{{toLowerCase article.type}} col-md-1">{{toLowerCase article.type}}</span>
+        <div class="col-md-11  no_margin no_padding">
+            <pre class="prettyprint language-html" data-type="{{toLowerCase article.type}}"><code>{{article.url}}</code></pre>
+        </div>
     </div>
     
-    </div>
-
     {{#if article.permission}}
       <p>
         {{__ "Permission:"}}
@@ -155,6 +152,10 @@
           {{/if}}
         {{/each}}
       </p>
+    {{/if}}
+    
+    {{#if article.description}}
+      <p>{{{nl2br article.description}}}</p>
     {{/if}}
 
     {{#if_gt article.examples.length compare=0}}
