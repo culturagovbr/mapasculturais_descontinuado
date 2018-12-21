@@ -325,22 +325,26 @@ abstract class Entity implements \JsonSerializable{
 
         $result = false;
 
-        if(strtolower($action) === '@control' && $this->usesAgentRelation()) {
-            if($this->userHasControl($user)){
-                $result = true;
-            } else if($this->isUserAdmin($user)){
-                $result = true;
+        if (!empty($user)) {
+
+            if(strtolower($action) === '@control' && $this->usesAgentRelation()) {
+                if($this->userHasControl($user)){
+                    $result = true;
+                } else if($this->isUserAdmin($user)){
+                    $result = true;
+                }
             }
-        }
 
-        if(method_exists($this, 'canUser' . $action)){
-            $method = 'canUser' . $action;
-            $result = $this->$method($user);
-        }elseif($action != '@control'){
-            $result = $this->genericPermissionVerification($user);
-        }
+            if(method_exists($this, 'canUser' . $action)){
+                $method = 'canUser' . $action;
+                $result = $this->$method($user);
+            }elseif($action != '@control'){
+                $result = $this->genericPermissionVerification($user);
+            }
 
-        $app->applyHookBoundTo($this, 'entity(' . $this->getHookClassPath() . ').canUser(' . $action . ')', ['user' => $user, 'result' => &$result]);
+            $app->applyHookBoundTo($this, 'entity(' . $this->getHookClassPath() . ').canUser(' . $action . ')', ['user' => $user, 'result' => &$result]);
+
+        }
 
         return $result;
     }
@@ -598,7 +602,7 @@ abstract class Entity implements \JsonSerializable{
         
 
         try {
-            $app->applyHookBoundTo($this, "entity($this).save:requests", [&$requests]);
+            $app->applyHookBoundTo($this, 'entity(' . $this->getHookClassPath() . ').save:requests', [&$requests]);
         } catch (Exceptions\WorkflowRequestTransport $e) {
             $requests[] = $e->request;
         }
@@ -1016,7 +1020,7 @@ abstract class Entity implements \JsonSerializable{
             if($this->usesAgentRelation()){
                 $this->deleteUsersWithControlCache();
             }
-            $this->addToRecreatePermissionsCacheList();
+            $this->enqueueToPCacheRecreation();
         }
     }
 
@@ -1071,7 +1075,7 @@ abstract class Entity implements \JsonSerializable{
             if($this->usesAgentRelation()){
                 $this->deleteUsersWithControlCache();
             }
-            $this->addToRecreatePermissionsCacheList();
+            $this->enqueueToPCacheRecreation();
         }
     }
 
@@ -1153,7 +1157,7 @@ abstract class Entity implements \JsonSerializable{
             if($this->usesAgentRelation()){
                 $this->deleteUsersWithControlCache();
             }
-            $this->addToRecreatePermissionsCacheList();
+            $this->enqueueToPCacheRecreation();
         }
     }
 

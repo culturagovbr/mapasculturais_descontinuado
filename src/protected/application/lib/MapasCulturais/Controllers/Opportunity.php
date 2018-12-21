@@ -109,22 +109,34 @@ class Opportunity extends EntityController {
         $this->requireAuthentication();
         $app = App::i();
 
+        if (is_array($this->urlData) && isset($this->urlData["id"])) {
+            $ID = (int) $this->urlData["id"];
+        }
+
         $entity = $this->requestedEntity;
 
         if(!$entity)
             $app->pass();
 
-
         $entity->checkPermission('canUserViewEvaluations');
 
         $app->controller('Registration')->registerRegistrationMetadata($entity);
 
-        $evaluations = $app->repo('RegistrationEvaluation')->findByOpportunity($entity);
+        $committee = $entity->getEvaluationCommittee();
+        $users = [];
+        foreach ($committee as $item) {
+            $users[] = $item->agent->user->id;
+        }
+
+        $evaluations = $app->repo('RegistrationEvaluation')->findByOpportunityAndUsersAndStatus($entity, $users);
 
         $filename = sprintf(\MapasCulturais\i::__("oportunidade-%s--avaliacoes"), $entity->id);
 
-        $this->reportOutput('report-evaluations', ['entity' => $entity, 'evaluations' => $evaluations], $filename);
+        $all_evaluations = $this->API_findEvaluations($ID);
 
+        $cfg = $entity->getEvaluationMethod()->getReportConfiguration($entity);
+
+        $this->reportOutput('report-evaluations', ['cfg' => $cfg, 'evaluations' => $evaluations, 'pending_evaluations' => $all_evaluations], $filename);
     }
 
     protected function reportOutput($view, $view_params, $filename){
@@ -172,23 +184,27 @@ class Opportunity extends EntityController {
     /**
     * @return \MapasCulturais\Entities\Opportunity
     */
-    protected function _getOpportunity(){
+    protected function _getOpportunity($opportunity_id = null) {
         $app = App::i();
-        
-        if(!isset($this->data['@opportunity'])){
-            $this->apiErrorResponse('parameter @opportunity is required');
-        }
-        
-        if(!is_numeric($this->data['@opportunity'])){
-            $this->apiErrorResponse('parameter @opportunity must be an integer');
+
+        if (!is_null($opportunity_id) && is_int($opportunity_id)) {
+            $opportunity = $app->repo('Opportunity')->find($opportunity_id);
+        } else {
+            if(!isset($this->data['@opportunity'])){
+                $this->apiErrorResponse('parameter @opportunity is required');
+            }
+
+            if(!is_numeric($this->data['@opportunity'])){
+                $this->apiErrorResponse('parameter @opportunity must be an integer');
+            }
+
+            $opportunity = $app->repo('Opportunity')->find($this->data['@opportunity']);
         }
 
-        $opportunity = $app->repo('Opportunity')->find($this->data['@opportunity']);
-        
         if(!$opportunity){
             $this->apiErrorResponse('opportunity not found');
         }
-        
+
         return $opportunity;
     }
     
@@ -244,16 +260,13 @@ class Opportunity extends EntityController {
         
         $this->apiResponse($fields);
     }
-    
-    
-    
+
     function API_findRegistrations() {
         $app = App::i();
         
         $app->registerFileGroup('registration', new \MapasCulturais\Definitions\FileGroup('zipArchive',[], '', true, null, true));
         
         $opportunity = $this->_getOpportunity();
-        
         $data = $this->data;
         $data['opportunity'] = "EQ({$opportunity->id})";
         
@@ -341,10 +354,7 @@ class Opportunity extends EntityController {
         
         $registrations = $query->find();
         $em = $opportunity->getEvaluationMethod();
-        
-        foreach($registrations as &$reg){
-            $reg['number'] = 'on-' . $reg['id'];
-            
+        foreach($registrations as &$reg) {
             if(in_array('consolidatedResult', $query->selecting)){
                 $reg['evaluationResultString'] = $em->valueToString($reg['consolidatedResult']);
             }
@@ -366,12 +376,14 @@ class Opportunity extends EntityController {
                 return $em->cmpValues($e1['consolidatedResult'], $e2['consolidatedResult']) * -1;
             });
         }
+
+        $total = $app->repo('Registration')->countByOpportunity($opportunity, false, -1);
         
-        $this->apiAddHeaderMetadata($this->data, $registrations, $query->getCountResult());
+        $this->apiAddHeaderMetadata($this->data, $registrations, $total);
         $this->apiResponse($registrations);
     }
     
-    function API_findEvaluations(){
+    function API_findEvaluations($opportunity_id = null) {
         $this->requireAuthentication();
         
         $app = App::i();
@@ -385,7 +397,7 @@ class Opportunity extends EntityController {
             $this->apiErrorResponse('invalid @order value');
         }
         
-        $opportunity = $this->_getOpportunity();
+        $opportunity = $this->_getOpportunity($opportunity_id);
 
         $committee_relation_query = new ApiQuery('MapasCulturais\Entities\EvaluationMethodConfigurationAgentRelation', [
             '@select' => 'id,agent',
@@ -513,7 +525,6 @@ class Opportunity extends EntityController {
         $_result = [];
         
         foreach($registrations as &$registration){
-            $registration['number'] = 'on-' . $registration['id'];
             foreach($valuer_by_user as $user_id => $valuer){
                 if(isset($registrations_by_valuer[$valuer['id']][$registration['id']])) {
 
@@ -558,7 +569,7 @@ class Opportunity extends EntityController {
                 $_result = array_filter($_result, function($e) { if($e['evaluation'] == null) return $e; });
             }
         }
-        
+
         list($order, $order_by) = explode(' ', $_order);
         
         $order_by = $order_by == 'asc' ? 1 : -1;
@@ -614,6 +625,11 @@ class Opportunity extends EntityController {
         } else {
             $result = $_result;
         }
+
+        if (!is_null($opportunity_id) && is_int($opportunity_id)) {
+            return $result;
+        }
+
         $this->apiAddHeaderMetadata($this->data, $result, count($_result));
         $this->apiResponse($result);
     }

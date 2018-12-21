@@ -1057,8 +1057,56 @@ return [
         __exec("ALTER TABLE ONLY evaluation_method_configuration ALTER COLUMN id SET DEFAULT nextval('evaluation_method_configuration_id_seq'::regclass);");
 		
 		__exec("SELECT setval('evaluation_method_configuration_id_seq', (select max(id) from evaluation_method_configuration), true);");
-
-
     },
+
+    'change opportunity field agent_id not null' => function() use ($conn) {
+        $conn->executeQuery(" ALTER TABLE opportunity ALTER COLUMN agent_id SET NOT NULL ");
+    },
+
+    'alter table registration add column number' => function() use($conn) {
+        if(!__column_exists('registration', 'number')){
+            $conn->executeQuery("ALTER TABLE registration ADD COLUMN number VARCHAR(24)");
+        }
+    },
+
+    'update registrations set number fixed'=> function () use($conn){
+        echo "\nsalvando número da inscrição para oportunidades de uma só fase ou para a primeira fase das inscrições\n";
+        $conn->executeQuery("UPDATE registration SET number = CONCAT('on-', id) WHERE opportunity_id IN (SELECT id FROM opportunity WHERE parent_id IS NULL)");
+        $regs = $conn->fetchAll("
+            SELECT r.id, m.value AS previous 
+            FROM registration r 
+            LEFT JOIN registration_meta m ON m.object_id = r.id AND m.key = 'previousPhaseRegistrationId'");
+        
+        echo "\nsalvando número da inscrição para demais fases das oportunidades\n";
+
+        $registrations = [];
+
+        foreach($regs as $reg){
+            $reg = (object) $reg;
+            $registrations[$reg->id] = $reg;
+        }
+
+        foreach($registrations as $reg){
+            if(!$reg->previous){
+                continue;
+            }
+
+            $current = $reg;
+            
+            while($current->previous){
+                print_r($current);
+                $current = $registrations[$current->previous];
+            }
+
+            echo "\n - inscrição de id {$reg->id} número {$current->id}\n";
+            $conn->executeQuery("UPDATE registration SET number = 'on-{$current->id}' WHERE id = $reg->id");
+        }
+    },
+
+    'alter table registration add column valuers_exceptions_list' => function() use($conn){
+        if(!__column_exists('registration', 'valuers_exceptions_list')){
+            $conn->executeQuery("ALTER TABLE registration ADD valuers_exceptions_list TEXT NOT NULL DEFAULT '{\"include\": [], \"exclude\": []}';");
+        }
+    }
 
 ] + $updates ;

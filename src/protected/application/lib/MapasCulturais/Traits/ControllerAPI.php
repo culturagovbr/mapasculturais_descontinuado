@@ -487,6 +487,11 @@ trait ControllerAPI{
             }
         }
         $image_transformations = include APPLICATION_PATH.'/conf/image-transformations.php';
+        $theme_class = "\\" . App::i()->config['themes.active'] . '\Theme';
+        $theme_path = $theme_class::getThemeFolder() . '/';
+        if (file_exists($theme_path . 'image-transformations.php')) {
+            $image_transformations = include $theme_path . 'image-transformations.php';
+        }
         $array = [];
         foreach ($file_groups as $key => $value) {
             $arr = [$key];
@@ -554,7 +559,6 @@ trait ControllerAPI{
         }
 
         $app->applyHookBoundTo($this, "API.{$this->action}({$this->id}).params", [&$api_params]);
-
         $query = new ApiQuery($this->entityClassName, $api_params);
         
         if($counting){
@@ -570,6 +574,8 @@ trait ControllerAPI{
             }
             $this->apiAddHeaderMetadata($api_params, $result, $count);
         }
+
+        $app->applyHookBoundTo($this, "API.{$this->action}({$this->id}).result" , [&$api_params,  &$result]);
         
         return $result;
     }

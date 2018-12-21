@@ -247,6 +247,17 @@ module.factory('EvaluationMethodConfigurationService', ['$rootScope', '$q', '$ht
                 }
             );
             return deferred.promise;
+        },
+        reopenValuerEvaluations: function(relation){
+            var deferred = $q.defer();
+
+            $http.post(this.getUrl('reopenValuerEvaluations'), {relationId: relation.id})
+            .success(
+                function(response){
+                    deferred.resolve(response);
+                }
+            );
+            return deferred.promise;
         }
     };
 }]);
@@ -1110,6 +1121,17 @@ module.controller('RegistrationFieldsController', ['$scope', '$rootScope', '$int
             }
         };
 
+        $scope.reopenEvaluations = function(relation){
+            if(confirm(labels.confirmReopenValuerEvaluations)){
+                relation.status = 1;
+    
+                EvaluationMethodConfigurationService.reopenValuerEvaluations(relation).
+                    error(function(){
+                        relation.status = 10;
+                    });
+            }
+        };
+
         $scope.deleteAdminRelation = function(relation){
             if(confirm(labels.confirmRemoveValuer)){
                 RelatedAgentsService.remove('group-admin', relation.agent.id).
@@ -1348,14 +1370,13 @@ module.controller('OpportunityController', ['$scope', '$rootScope', '$timeout', 
     }) : [];
 
 
-
     var defaultSelectFields = [
-        {fieldName: "number", title:"Inscrição" ,required:true},
-        {fieldName: "category", title:"Categorias" ,required:true},
-        {fieldName: "agents", title:"Agentes" ,required:true},
-        {fieldName: "attachments", title: "Anexos" ,required:true},
-        {fieldName: "evaluation", title: "Avaliação" ,required:true},
-        {fieldName: "status", title:"Status" ,required:true},
+        {fieldName: "number", title:labels["Inscrição"] ,required:true},
+        {fieldName: "category", title:labels['Categorias'] ,required:true},
+        {fieldName: "agents", title:labels['Agentes'] ,required:true},
+        {fieldName: "attachments", title:labels['Anexos']  ,required:true},
+        {fieldName: "evaluation", title: labels['Avaliação'] ,required:true},
+        {fieldName: "status", title:labels['Status'] ,required:true},
     ];
 
     MapasCulturais.opportunitySelectFields.forEach(function(e){

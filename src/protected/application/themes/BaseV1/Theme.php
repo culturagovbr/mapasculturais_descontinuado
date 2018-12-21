@@ -522,57 +522,6 @@ class Theme extends MapasCulturais\Theme {
                 'text' => i::__('oportunidades')
             ],
 
-// ======== Oportunidades
-            'entities: Opportunities' => [
-                'name' => i::__('texto "Oportunidades"'),
-                'description' => i::__('nome da entidade Oportunidade no plural'),
-                'examples' => [i::__('Oportunidades')],
-                'text' => i::__('Oportunidades')
-            ],
-            'entities: My Opportunities' => [
-                'name' => i::__('texto "Minhas Oportunidades"'),
-                'description' => i::__(''),
-                'examples' => [i::__('Minhas Oportunidades')],
-                'text' => i::__('Minhas Oportunidades')
-            ],
-            'entities: My opportunities' => [
-                'name' => i::__('texto "Minhas oportunidades"'),
-                'description' => i::__(''),
-                'examples' => [i::__('Minhas oportunidades')],
-                'text' => i::__('Minhas oportunidades')
-            ],
-            'entities: opportunity found' => [
-                'name' => i::__('texto "oportunidade encontrada"'),
-                'description' => i::__(''),
-                'examples' => [i::__('oportunidade encontrada')],
-                'text' => i::__('oportunidade encontrada')
-            ],
-            'entities: opportunities found' => [
-                'name' => i::__('texto "oportunidades encontradas"'),
-                'description' => i::__(''),
-                'examples' => [i::__('oportunidades encontradas')],
-                'text' => i::__('oportunidades encontradas')
-            ],
-            'entities: Opportunities of the agent' => [
-                'name' => i::__('texto "Oportunidades do agente"'),
-                'description' => i::__('Título da listagem das oportunidades do agente em seu perfil'),
-                'examples' => [i::__('Oportunidades do agente'), i::__('Editais do agente'), i::__('Convocatórias do agente')],
-                'text' => i::__('Oportunidades do agente')
-            ],
-            'entities: Opportunities of the space' => [
-                'name' => i::__('texto "Oportunidades do espaço"'),
-                'description' => i::__('Título da listagem das oportunidades do espaço'),
-                'examples' => [i::__('Oportunidades do espaço'), i::__('Editais do espaço'), i::__('Convocatórias do espaço')],
-                'text' => i::__('Oportunidades do espaço')
-            ],
-            'entities: Opportunities of the event' => [
-                'name' => i::__('texto "Oportunidades do evento"'),
-                'description' => i::__('Título da listagem das oportunidades do evento'),
-                'examples' => [i::__('Oportunidades do evento'), i::__('Editais do evento'), i::__('Convocatórias do evento')],
-                'text' => i::__('Oportunidades do evento')
-            ],
-
-
 // ======== Eventos
             'entities: Events' => [
                 'name' => i::__('texto "Eventos"'),
@@ -616,9 +565,6 @@ class Theme extends MapasCulturais\Theme {
                 'examples' => [i::__('eventos')],
                 'text' => i::__('eventos')
             ],
-
-
-
 
 // ======== Subsites
             'entities: Subsite Description' => [
@@ -677,9 +623,6 @@ class Theme extends MapasCulturais\Theme {
                 'skip' => true, // não aparece na configuração do subsite
                 'text' => i::__('adicionar novo subsite')
             ],
-
-
-
 
 // ========= Selos
             'entities: Seals' => [
@@ -1286,6 +1229,24 @@ class Theme extends MapasCulturais\Theme {
 
         });
 
+        $app->hook('template(event.<<create|edit|single>>.tab-about-service):before', function(){
+            $this->part('event-attendance', ['entity' => $this->data->entity]);
+        });
+
+        $app->hook('entity(opportunity).load:before', function($controller, $action) use ($app) {
+            if ($controller instanceof \MapasCulturais\Controllers\Opportunity && 'single' === $action) {
+                list(,$entity,$_id) = explode('/',$app->request()->getResourceUri());
+                $_id = (int) $_id;
+                if ('oportunidade' === $entity && $_id === 1) {
+                    $rcv = $app->repo('Opportunity')->find($_id);
+                    // Test's against RCV's specific features
+                    if (is_object($rcv) && is_null($rcv->subsiteId) && $rcv->name === "Rede Cultura Viva") {
+                        $app->response()->headers->set('Location',"http://culturaviva.gov.br/");
+                        $app->halt(200);
+                    }
+                }
+            }
+        });
     }
 
 
@@ -1387,6 +1348,14 @@ class Theme extends MapasCulturais\Theme {
                 'unserialize' => function($val){ return json_decode($val); },
             ]);
         });
+
+        $this->registerEventMetadata('event_attendance', array(
+            'label' => 'Público presente',
+            'type' => 'integer',
+            'validations' => [
+                'v::intVal()->positive()' => 'O valor deve ser um número inteiro positivo'
+            ]
+        ));
     }
 
     function head() {
@@ -1842,12 +1811,20 @@ class Theme extends MapasCulturais\Theme {
             'correctErrors' =>  i::__('Corrija os erros indicados abaixo.'),
             'registrationSent' =>  i::__('Inscrição enviada. Aguarde tela de sumário.'),
             'confirmRemoveValuer' => i::__('Você tem certeza que deseja excluir o avaliador?'),
+            'confirmReopenValuerEvaluations' => i::__('Você tem certeza que deseja reabrir as avaliações para este avaliador?'),
             'evaluated' => i::__('Avaliada'),
             'notEvaluated' => i::__('Não Avaliada'),
             'all' => i::__('Todas'),
             'sent' => i::__('Enviada'),
             'confirmEvaluationLabel' => i::__('Aplicar resultado das avaliações'),
             'applyEvaluations' => i::__('Deseja aplicar o resultado de todas as avaliações como o status das respectivas inscrições?'),
+            
+            'Inscrição' => i::__('Inscrição'),
+            'Categorias' => i::__('Categorias'),
+            'Agentes' => i::__('Agentes'),
+            'Anexos' => i::__('Anexos'),
+            'Avaliação' => i::__('Avaliação'),
+            'Status' => i::__('Status'),
         ]);
 
         $this->enqueueScript('app', 'entity.module.subsiteAdmins', 'js/ng.entity.module.subsiteAdmins.js', array('ng-mapasculturais'));

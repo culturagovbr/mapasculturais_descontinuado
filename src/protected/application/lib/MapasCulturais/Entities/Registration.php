@@ -9,6 +9,10 @@ use MapasCulturais\App;
  * Registration
  * @property-read \MapasCulturais\Entities\Agent $owner The owner of this registration
  * @property-read \MapasCulturais\Entities\Opportunity $opportunity
+ * 
+ * @property array valuersExcludeList
+ * @property array valuersIncludeList
+ * 
  * @property string $category
  *
  * @ORM\Table(name="registration")
@@ -46,6 +50,13 @@ class Registration extends \MapasCulturais\Entity
      */
     protected $id;
 
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="number", type="string", length=24, nullable=true)
+     */
+    protected $number;
 
     /**
      * @var string
@@ -115,6 +126,15 @@ class Registration extends \MapasCulturais\Entity
      */
     protected $status = self::STATUS_DRAFT;
 
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="valuers_exceptions_list", type="text", nullable=false)
+     */
+    protected $__valuersExceptionsList = '{"include": [], "exclude": []}';
+
+
 
     /**
     * @ORM\OneToMany(targetEntity="MapasCulturais\Entities\RegistrationMeta", mappedBy="owner", cascade="remove", orphanRemoval=true)
@@ -163,9 +183,18 @@ class Registration extends \MapasCulturais\Entity
 
     public $preview = false;
 
+    protected static $hooked = false;
 
     function __construct() {
         $this->owner = App::i()->user->profile;
+        if(!self::$hooked){
+            self::$hooked = true;
+            App::i()->hook('entity(' . $this->getHookClassPath() . ').randomId', function($id){
+                if(!$this->number){
+                    $this->number = 'on-' . $id;
+                }
+            });
+        }
         parent::__construct();
     }
 
@@ -392,9 +421,42 @@ class Registration extends \MapasCulturais\Entity
         return 1000;
     }
 
-    function getNumber(){
-        return 'on-' . $this->id;
+    function getValuersExceptionsList(){
+        return json_decode($this->__valuersExceptionsList);
     }
+
+    protected function _setValuersExceptionsList($object){
+        $this->checkPermission('modifyValuers');
+
+        if(is_object($object) && isset($object->exclude) && is_array($object->exclude) && isset($object->include) && is_array($object->include)){
+            $this->__valuersExceptionsList = json_encode($object);
+        } else {
+            throw new \Exception('Invalid __valuersExceptionsList format');
+        }
+    }
+
+    function setValuersExcludeList(array $user_ids){
+        $exceptions = $this->getValuersExceptionsList();
+        $exceptions->exclude = $user_ids;
+        $this->_setValuersExceptionsList($exceptions);
+    }
+
+    function setValuersIncludeList(array $user_ids){
+        $exceptions = $this->getValuersExceptionsList();
+        $exceptions->include = $user_ids;
+        $this->_setValuersExceptionsList($exceptions);
+    }
+
+    function getValuersIncludeList(){
+        $exceptions = $this->getValuersExceptionsList();
+        return $exceptions->include;
+    }
+    
+    function getValuersExcludeList(){
+        $exceptions = $this->getValuersExceptionsList();
+        return $exceptions->exclude;
+    }
+    
 
     function setStatus($status){
         // do nothing
@@ -412,8 +474,8 @@ class Registration extends \MapasCulturais\Entity
         $this->status = $status;
         $this->save(true);
         $app->enableAccessControl();
-        $app->addEntityToRecreatePermissionCacheList($this);
-        $app->addEntityToRecreatePermissionCacheList($this->opportunity);
+        $app->enqueueEntityToPCacheRecreation($this);
+        $app->enqueueEntityToPCacheRecreation($this->opportunity);
     }
 
     function setAgentsSealRelation() {
@@ -488,6 +550,22 @@ class Registration extends \MapasCulturais\Entity
         App::i()->applyHookBoundTo($this, 'entity(Registration).status(invalid)');
     }
 
+    function forceSetStatus(Registration $registration, $status = "pendent") {
+        if ("pendent" === $status) {
+            $_status = self::STATUS_SENT;
+        } else if ("invalid" === $status) {
+            $_status = self::STATUS_INVALID;
+        } else {
+            return;
+        }
+
+        $app = App::i();
+        $app->disableAccessControl();
+        $registration->status = $_status;
+        $registration->save(true);
+        $app->enableAccessControl();
+    }
+
     function setStatusToSent(){
         $this->_setStatusTo(self::STATUS_SENT);
         App::i()->applyHookBoundTo($this, 'entity(Registration).status(sent)');
@@ -519,8 +597,8 @@ class Registration extends \MapasCulturais\Entity
             $app->enableAccessControl();
         }
 
-        $app->addEntityToRecreatePermissionCacheList($this->opportunity);
-        $app->addEntityToRecreatePermissionCacheList($this);
+        $app->enqueueEntityToPCacheRecreation($this->opportunity);
+        $app->enqueueEntityToPCacheRecreation($this);
     }
 
     function cleanMaskedRegistrationFields(){
@@ -720,7 +798,16 @@ class Registration extends \MapasCulturais\Entity
             return true;
         }
 
-        if($this->getEvaluationMethod()->canUserEvaluateRegistration($this, $user)){
+        $can = $this->getEvaluationMethod()->canUserEvaluateRegistration($this, $user);
+
+        $exclude_list = $this->getValuersExcludeList();
+        $include_list = $this->getValuersIncludeList();
+
+        if($can && in_array($user->id, $exclude_list)){
+            return false;
+        }
+
+        if(!$can && in_array($user->id, $include_list)){
             return true;
         }
 
@@ -780,6 +867,24 @@ class Registration extends \MapasCulturais\Entity
     }
 
     protected function canUserEvaluate($user){
+        if($this->opportunity->canUser('@control')){
+            $evaluation_method_configuration = $this->getEvaluationMethodConfiguration();
+            $valuers = $evaluation_method_configuration->getRelatedAgents();
+            $is_valuer = false;
+            
+            if(isset($valuers['group-admin']) && is_array($valuers['group-admin'])){
+                foreach($valuers['group-admin'] as $agent){
+                    if($agent->user->id == $user->id){
+                        $is_valuer = true;
+                    }
+                }
+            }
+
+            if(!$is_valuer){
+                return false;
+            }
+        }
+
         $can = $this->canUserViewUserEvaluation($user);
 
         $evaluation_sent = false;
@@ -804,7 +909,20 @@ class Registration extends \MapasCulturais\Entity
             return false;
         }
 
-        return $this->getEvaluationMethod()->canUserEvaluateRegistration($this, $user);
+        $can = $this->getEvaluationMethod()->canUserEvaluateRegistration($this, $user);
+
+        $exclude_list = $this->getValuersExcludeList();
+        $include_list = $this->getValuersIncludeList();
+
+        if($can && in_array($user->id, $exclude_list)){
+            $can = false;
+        }
+
+        if(!$can && in_array($user->id, $include_list)){
+            $can = true;
+        }
+
+        return $can;
     }
 
     protected function canUserViewConsolidatedResult($user){
@@ -891,10 +1009,6 @@ class Registration extends \MapasCulturais\Entity
             'user' => $user
         ]);
 
-        if($evaluation){
-            $evaluation->checkPermission('view');
-        }
-
         return $evaluation;
     }
 
@@ -946,13 +1060,19 @@ class Registration extends \MapasCulturais\Entity
         return false;
     }
 
-    //============================================================= //
+    protected function canUserModifyValuers($user){
+        return $this->opportunity->canUser('@control', $user);
+    }
+
+     //============================================================= //
     // The following lines ara used by MapasCulturais hook system.
     // Please do not change them.
     // ============================================================ //
 
     /** @ORM\PrePersist */
-    public function prePersist($args = null){ parent::prePersist($args); }
+    public function prePersist($args = null){ 
+        parent::prePersist($args); 
+    }
     /** @ORM\PostPersist */
     public function postPersist($args = null){ parent::postPersist($args); }
 

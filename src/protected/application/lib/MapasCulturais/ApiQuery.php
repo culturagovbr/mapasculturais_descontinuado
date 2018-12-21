@@ -3,6 +3,7 @@
 namespace MapasCulturais;
 
 use Doctrine\ORM\Query;
+use \MapasCulturais\Entities\File;
 
 class ApiQuery {
     use Traits\MagicGetter;
@@ -534,7 +535,16 @@ class ApiQuery {
         
         $this->logDql($dql, __FUNCTION__, $params);
         
-        $result = $q->getResult(Query::HYDRATE_ARRAY);
+        $result = [];
+        $ids = [];
+        
+        // removes duplicated values
+        foreach($q->getResult(Query::HYDRATE_ARRAY) as $r){
+            if(!isset($ids[$r['id']])){
+                $ids[$r['id']] = true;
+                $result[] = $r;
+            }
+        }
         
         $this->processEntities($result);
 
@@ -771,6 +781,10 @@ class ApiQuery {
         
         if(!in_array('id', $this->_selectingProperties)){
             $this->_selectingProperties = array_merge(['id'], $this->_selectingProperties);
+        }
+
+        if($this->entityClassName == 'MapasCulturais\Entities\Registration'){
+            $this->_selectingProperties = array_merge(['number'], $this->_selectingProperties);
         }
         
         if (count($this->_selectingProperties) >= 1 && in_array('publicLocation', $this->entityProperties) && !in_array('publicLocation', $this->_selectingProperties)) {
@@ -1117,7 +1131,7 @@ class ApiQuery {
                     
                     $query->name = "{$this->name}->$prop";
 
-                    $query->where = "e.{$_target_property} IN ({$_subquery_where_id_in})";
+                    $query->where = (empty($query->where)) ? "e.{$_target_property} IN ({$_subquery_where_id_in})" : $query->where. " AND e.{$_target_property} IN ({$_subquery_where_id_in})";
                     
                     if($this->_usingSubquery){
                         foreach($this->_dqlParams as $k => $v){
@@ -1208,14 +1222,15 @@ class ApiQuery {
         
         $dql = "
             SELECT
-                f.id,
+                f.id,               
                 f.name,
                 f.description,
                 f._path,
                 f.group as file_group,
                 f.private,
                 fp.group as parent_group,
-                IDENTITY(f.owner) AS owner_id
+                IDENTITY(f.owner) AS owner_id,
+                f.private
             FROM
                 {$this->fileClassName} f
                     LEFT JOIN f.parent fp
@@ -1239,13 +1254,13 @@ class ApiQuery {
             if(!isset($files[$owner_id])){
                 $files[$owner_id] = [];
             }
-            if ($f['private']) {
-                $f['url'] = $app->storage->getPrivateUrlById($f['id']);
+
+            if ($f['private'] === TRUE) {
+               $f['url'] = $app->storage->getPrivateUrlById($f['id']);
             } else {
                 $f['url'] = $app->storage->getUrlFromRelativePath($f['_path']);
             }
-            
-            
+
             if($f['parent_group']) {
                 $f['transformed'] = true;
                 $f['mainGroup'] = $f['parent_group'];

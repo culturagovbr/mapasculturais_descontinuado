@@ -18,7 +18,7 @@
                 </p>
 
                 <p ng-if="field.fieldType === 'date'">
-                    <span class='js-editable-field js-include-editable' id="{{field.fieldName}}" data-viewformat="dd-mm-yyyy" data-name="{{field.fieldName}}" data-type="date" data-original-title="{{field.title}}" data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Informe");?>" data-value="{{entity[field.fieldName]}}"></span>
+                    <span class='js-editable-field js-include-editable' id="{{field.fieldName}}" data-yearrange="1900:+10" data-viewformat="dd-mm-yyyy" data-name="{{field.fieldName}}" data-type="date" data-original-title="{{field.title}}" data-emptytext="<?php \MapasCulturais\i::esc_attr_e("Informe");?>" data-value="{{entity[field.fieldName]}}"></span>
                 </p>
 
                 <p ng-if="field.fieldType === 'url'">
@@ -53,7 +53,7 @@
             <div ng-show="field.fieldType === 'file'" id="registration-file-{{field.id}}" >
                 <div class="label"> {{field.title}} {{field.required ? '*' : ''}}</div>
                 <div class="attachment-description">
-                    <span ng-if="field.description">{{field.description}}<span>
+                    <span ng-if="field.description">{{field.description}}</span>
                     <span ng-if="field.template">
                         (<a class="attachment-template" target="_blank" href="{{field.template.url}}"><?php \MapasCulturais\i::_e("baixar modelo");?></a>)
                     </span>
