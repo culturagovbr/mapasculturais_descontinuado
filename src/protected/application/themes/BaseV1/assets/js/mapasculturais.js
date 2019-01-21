@@ -17,6 +17,8 @@ $(function(){
 //    $.fn.select2.defaults.separator = '; ';
 //    $.fn.editabletypes.select2.defaults.viewseparator = '; ';
 
+    var labels = MapasCulturais.gettext.mapas;
+
     $("form.create-entity").submit(function (e) {
         $('.modal-loading').show();
         $(this).hide();
@@ -32,10 +34,7 @@ $(function(){
             success: function(r) {
                 if (r.id) {
                     var name = r.name;
-                    /*
-                     @TODO: usar string localizada
-                    */
-                    var msg = name + " criado com sucesso!";
+                    var msg = name + ' ' + labels['sucesso'];
                     MapasCulturais.Messages.success(msg);
 
                     if (r.editUrl) {
@@ -70,8 +69,6 @@ $(function(){
             }
         });
     });
-
-    var labels = MapasCulturais.gettext.mapas;
 
     MapasCulturais.TemplateManager.init();
     MapasCulturais.Modal.initKeyboard('.js-dialog');
@@ -196,26 +193,19 @@ $(function(){
         };
     }
 
-
     // confirm
-
     $('a.js-confirm-before-go').click(function() {
         if (!confirm($(this).data('confirm-text')))
             return false;
     });
 
-
-
     // confirm
-
     $('a.js-confirm-before-go').click(function() {
         if (!confirm($(this).data('confirm-text')))
             return false;
     });
-
 
     // positioning agent details box on mobile
-
     if ($(window).width() < 768) {
         $('.agentes-relacionados .avatar').on('click hover', function () {
             $('.descricao-do-agente').hide();
@@ -234,6 +224,8 @@ $(function(){
     setEvaluationFormHeight();
 
     $(window).resize(setEvaluationFormHeight);
+
+    $('.entity-modal .entity-dropdown').select2();
 });
 
 MapasCulturais.utils = {

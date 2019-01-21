@@ -1529,7 +1529,8 @@ class Theme extends MapasCulturais\Theme {
             'opportunity'   => i::__('oportunidade'),
             'selo'          => i::__('selo'),
             'Enviar'        => i::__('Enviar'),
-            'Cancelar'      => i::__('Cancelar')
+            'Cancelar'      => i::__('Cancelar'),
+            'sucesso'       => i::__('criado com sucesso!')
         ]);
         $locale_specific_js = file_exists(dirname(__FILE__)  . '/assets/js/locale-specific/' . i::get_locale() . '.js') ? 'js/locale-specific/' . i::get_locale() . '.js' : 'js/locale-specific/default.js' ;
         $this->enqueueScript('app', 'mapasculturais-locale-specific', $locale_specific_js, array('mapasculturais'));

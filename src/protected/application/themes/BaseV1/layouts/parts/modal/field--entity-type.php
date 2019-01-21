@@ -7,7 +7,7 @@ if (!$types) {
 $_title = empty($definition['label']) ? \MapasCulturais\i::esc_attr__("Tipo") : $definition['label'];
 ?>
 <?php $this->part("modal/title", ['title' => $_title]); ?>
-<select name='type'>
+<select name='type' class='entity-dropdown'>
     <?php foreach ($types as $_type) {
         if (is_object($_type)) { ?>
             <option value="<?php echo $_type->id; ?>"> <?php echo $_type->name; ?> </option>
