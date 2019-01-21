@@ -161,14 +161,23 @@
         }
     }
 
-    .entity-dropdown { display: block; }
+    .entity-dropdown {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .entity-required-field { margin: 10px 0 10px 0px; }
 
     input[type='checkbox'] {
         float: left;
         width: 3%;
     }
 
-    label { display: inline-block; }
+    label {
+        display: inline-block;
+        font-weight: bolder;
+        font-size: 14px;
+    }
 
     input, textarea { width: 100%; }
 
