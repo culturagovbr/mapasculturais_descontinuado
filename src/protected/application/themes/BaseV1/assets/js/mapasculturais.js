@@ -225,7 +225,9 @@ $(function(){
 
     $(window).resize(setEvaluationFormHeight);
 
+    // Improve modal's selects
     $('.entity-modal .entity-dropdown').select2();
+    $('.entity-modal .entity-required-field label[for]').css('font-weight', 'normal');
 });
 
 MapasCulturais.utils = {

@@ -2664,7 +2664,7 @@ class Theme extends MapasCulturais\Theme {
         $app->applyHook("modal({$entity_name}):before", [&$new_entity]);
     }
 
-    public function renderModalRequiredMetadata(\MapasCulturais\Entity $entity, $entity_name){
+    public function renderModalRequiredMetadata(\MapasCulturais\Entity $entity, $entity_name) {
         $app = App::i();
         $metadata = $app->getRegisteredMetadata($entity);
 
@@ -2691,7 +2691,7 @@ class Theme extends MapasCulturais\Theme {
         foreach($taxonomies as $taxonomy){
             $show_taxonomy = $taxonomy->required;
 
-            $app->applyHook("modal({$entity_name}).taxonomy({$taxonomy->slug})", [&$entity, &$taxonomy, &$show_meta]);
+            $app->applyHook("modal({$entity_name}).taxonomy({$taxonomy->slug})", [&$entity, &$taxonomy, &$show_taxonomy]);
 
             if($show_taxonomy){
                 $_attr = "terms[{$taxonomy->slug}][]";
@@ -2720,7 +2720,7 @@ class Theme extends MapasCulturais\Theme {
                 !$definition['isEntityRelation'] && 
                 ($definition['required'] || isset($properties_validations[$field]['required']) );
             
-            $app->applyHook("modal({$entity_name}).field({$field})", [&$entity, &$definition, &$show_field]);
+            $app->applyHook("modal({$entity_name}).field({$field})", [&$new_entity, &$definition, &$show_field]);
             
             if ($show_field) {
                 if($field === '_type' && $new_entity->usesTypes()){
@@ -2734,7 +2734,7 @@ class Theme extends MapasCulturais\Theme {
                 }
             }
         }
-        $app->applyHook("modal({$entity_name}).fields:after", [&$entity, &$fields]);
+        $app->applyHook("modal({$entity_name}).fields:after", [&$new_entity, &$properties]);
     }
 
     public function getModalClasses($use_modal) {
