@@ -663,6 +663,7 @@ class Registration extends \MapasCulturais\Entity
                     }
 
                     $erroredProperties  = [];
+
                     foreach($def->requiredProperties as $requiredProperty){
                         $app->disableAccessControl();
                         $value = $def->agent->$requiredProperty;

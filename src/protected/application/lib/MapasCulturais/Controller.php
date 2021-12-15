@@ -87,9 +87,9 @@ abstract class Controller{
 
 
     protected $action = null;
-    
+
     protected $method = null;
-    
+
     // =================== GETTERS ================== //
 
     /**
@@ -224,7 +224,6 @@ abstract class Controller{
      */
     public function callAction($method, $action_name, $arguments) {
         $app = App::i();
-
         if(@$app->config['app.log.requestData'] && $app->config['slim.log.level'] === \Slim\Log::DEBUG){
             $app->log->debug('===== POST DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
             $app->log->debug(print_r($this->postData,true));
@@ -239,12 +238,12 @@ abstract class Controller{
         $this->action = $action_name;
 
         $method = strtoupper($method);
-        
+
         $this->method = $method;
 
         // hook like GET(user.teste)
         $hook = $method . "({$this->id}.{$action_name})";
-        
+
         // hook like ALL(user.teste)
         $ALL_hook =  $method !== 'API' ? "ALL({$this->id}.{$action_name})" : null;
 
@@ -317,9 +316,9 @@ abstract class Controller{
      *
      * @param mixed $data
      */
-    public function json($data, $status = 200){
+    public function json($data, $status = 200, $flush = true){
         $app = App::i();
-        $app->persistPCachePendingQueue();
+        $app->persistPCachePendingQueue($flush);
         $app->contentType('application/json');
         $app->halt($status, json_encode($data));
     }

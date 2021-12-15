@@ -101,11 +101,11 @@ class Registration extends EntityController {
             $this->tmpFile = $tmpFile;
         });
 
-        
+
         $app->hook('<<GET|POST|PUT|PATCH|DELETE>>(registration.<<*>>):before', function() {
             $registration = $this->getRequestedEntity();
-            
-            
+
+
             if(!$registration || !$registration->id){
                 return;
             }
@@ -113,7 +113,7 @@ class Registration extends EntityController {
             $opportunity = $registration->opportunity;
             
             $this->registerRegistrationMetadata($opportunity);
-            
+
         });
 
         parent::__construct();
@@ -127,12 +127,12 @@ class Registration extends EntityController {
     }
 
     function registerRegistrationMetadata(\MapasCulturais\Entities\Opportunity $opportunity){
-        
+
         $app = App::i();
-        
+
         if($opportunity->projectName){
             $cfg = [ 'label' => \MapasCulturais\i::__('Nome do Projeto') ];
-            
+
             $metadata = new Definitions\Metadata('projectName', $cfg);
             $app->registerMetadata($metadata, 'MapasCulturais\Entities\Registration');
         }
@@ -242,7 +242,7 @@ class Registration extends EntityController {
 
     function GET_view(){
         $this->requireAuthentication();
-        
+
         $entity = $this->requestedEntity;
         if(!$entity){
             App::i()->pass();
@@ -355,7 +355,7 @@ class Registration extends EntityController {
             }
         }
     }
-    
+
     function POST_saveEvaluation(){
         $registration = $this->getRequestedEntity();
         if(isset($this->postData['uid'])){
@@ -363,7 +363,7 @@ class Registration extends EntityController {
         } else {
             $user = null;
         }
-        
+
         if(isset($this->urlData['status']) && $this->urlData['status'] === 'evaluated'){
             if($errors = $registration->getEvaluationMethod()->getValidationErrors($registration->getEvaluationMethodConfiguration(), $this->postData['data'])){
                 $this->errorJson($errors, 400);
@@ -448,6 +448,6 @@ class Registration extends EntityController {
         $app->disableAccessControl();
         $this->_finishRequest($registration);
         $app->enableAccessControl();
-    
+
     }
 }

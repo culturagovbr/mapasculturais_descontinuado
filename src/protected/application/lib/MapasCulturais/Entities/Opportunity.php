@@ -299,9 +299,9 @@ abstract class Opportunity extends \MapasCulturais\Entity
 
     public function getEntityTypeLabel($plural = false) {
         if ($plural)
-            return \MapasCulturais\i::__('Oportunidades');
+            return \MapasCulturais\i::__('Editais');
         else
-            return \MapasCulturais\i::__('Oportunidade');
+            return \MapasCulturais\i::__('Edital');
     }
 
     static function getValidations() {

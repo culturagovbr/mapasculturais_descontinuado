@@ -288,9 +288,9 @@ return array(
     'app.cache' => function_exists('apcu_add') ?
         new \Doctrine\Common\Cache\ApcuCache() :
         (
-            function_exists('apc_add') ?
-                new \Doctrine\Common\Cache\ApcCache() :
-                new \Doctrine\Common\Cache\FilesystemCache('/tmp/mapas-cache--')
+        function_exists('apc_add') ?
+            new \Doctrine\Common\Cache\ApcCache() :
+            new \Doctrine\Common\Cache\FilesystemCache('/tmp/mapas-cache--')
 
         ),
 
@@ -372,7 +372,7 @@ return array(
 
     ),
     'plugins' => [
-         'EvaluationMethodSimple' => ['namespace' => 'EvaluationMethodSimple'],
+        'EvaluationMethodSimple' => ['namespace' => 'EvaluationMethodSimple'],
 //        'OriginSite'    => ['namespace' => 'OriginSite','config' => ['siteId' => @$_SERVER['HTTP_HOST']]]
         //['namespace' => 'PluginNamespace', 'path' => 'path/to/plugin', 'config' => ['plugin' => 'config']]
     ],
@@ -453,7 +453,7 @@ return array(
             'agent'         => \MapasCulturais\i::__('Agente'),       'agents'        => \MapasCulturais\i::__('Agentes'),
             'space'         => \MapasCulturais\i::__('Espaço'),       'spaces'        => \MapasCulturais\i::__('Espaços'),
             'project'       => \MapasCulturais\i::__('Projeto'),      'projects'      => \MapasCulturais\i::__('Projetos'),
-            'opportunity'   => \MapasCulturais\i::__('Oportunidade'), 'opportunities' => \MapasCulturais\i::__('Oportunidades'),
+            'opportunity'   => \MapasCulturais\i::__('Edital'),       'opportunities' => \MapasCulturais\i::__('Editais'),
             'registration'  => \MapasCulturais\i::__('Inscrição'),    'registrations' => \MapasCulturais\i::__('Inscrições'),
             'file'          => \MapasCulturais\i::__('Arquivo'),      'files'         => \MapasCulturais\i::__('Arquivos'),
             'seal'          => \MapasCulturais\i::__('Selo'),         'seals'         => \MapasCulturais\i::__('Selos'),
