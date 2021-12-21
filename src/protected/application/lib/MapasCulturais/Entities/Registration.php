@@ -664,14 +664,17 @@ class Registration extends \MapasCulturais\Entity
 
                     $erroredProperties  = [];
 
-                    foreach($def->requiredProperties as $requiredProperty){
-                        $app->disableAccessControl();
-                        $value = $def->agent->$requiredProperty;
-                        $app->enableAccessControl();
-                        if(!$value){
-                            $erroredProperties[] = '{{' . $requiredProperty . '}}';
+                    if ($def->requiredProperties) {
+                        foreach($def->requiredProperties as $requiredProperty){
+                            $app->disableAccessControl();
+                            $value = $def->agent->$requiredProperty;
+                            $app->enableAccessControl();
+                            if(!$value){
+                                $erroredProperties[] = '{{' . $requiredProperty . '}}';
+                            }
                         }
                     }
+
                     if(is_array($erroredProperties) && count($erroredProperties) === 1){
                         $errors[] = sprintf(\MapasCulturais\i::__('O campo "%s" é obrigatório.'), $erroredProperties[0]);
                     }elseif(is_array($erroredProperties) && count($erroredProperties) > 1){
