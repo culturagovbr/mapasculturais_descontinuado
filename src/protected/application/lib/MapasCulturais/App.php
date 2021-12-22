@@ -874,6 +874,15 @@ class App extends \Slim\Slim{
                     return $user->is('superAdmin', $subsite_id);
                 }
             ],
+            'rcv_agente_area' => (object) [
+                'name' => i::__('Agente Area'),
+                'plural' => i::__('Agentes Area'),
+                'another_roles' => [],
+                'subsite' => false,
+                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
+                    return $user->is('superAdmin', $subsite_id);
+                }
+            ],
         ];
 
         foreach ($roles as $role => $cfg) {
