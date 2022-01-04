@@ -1,5 +1,7 @@
 <?php
 use MapasCulturais\Entities\Agent;
+
+$can_edit = $entity->canUser('modify');
 ?>
 <article class="objeto clearfix <?php if($entity->isUserProfile) echo 'agent-default'; ?>">
     <h1>
