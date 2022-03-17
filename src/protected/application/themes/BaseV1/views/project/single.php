@@ -11,7 +11,7 @@ $this->addEntityToJs($entity);
 $this->addProjectToJs($entity);
 
 if(!$entity->isNew() && $entity->canUser('@control')){
-   $this->addProjectEventsToJs($entity);
+    $this->addProjectEventsToJs($entity);
 }
 
 if($this->isEditable()){

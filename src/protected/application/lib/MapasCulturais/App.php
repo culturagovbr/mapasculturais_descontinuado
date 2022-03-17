@@ -874,42 +874,6 @@ class App extends \Slim\Slim{
                     return $user->is('superAdmin', $subsite_id);
                 }
             ],
-            'rcv_agente_area' => (object) [
-                'name' => i::__('Gestor do projeto'),
-                'plural' => i::__('Gestores do projeto'),
-                'another_roles' => [],
-                'subsite' => false,
-                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
-                    return $user->is('superAdmin', $subsite_id);
-                }
-            ],
-            'rcv_certificador_civil' => (object) [
-                'name' => i::__('Certificador da Sociedade Civil'),
-                'plural' => i::__('Certificadores da Sociedade Civil'),
-                'another_roles' => [],
-                'subsite' => false,
-                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
-                    return $user->is('superAdmin', $subsite_id);
-                }
-            ],
-            'rcv_certificador_publico' => (object) [
-                'name' => i::__('Certificador do Poder Publico'),
-                'plural' => i::__('Certificadores do Poder Publico'),
-                'another_roles' => [],
-                'subsite' => false,
-                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
-                    return $user->is('superAdmin', $subsite_id);
-                }
-            ],
-            'rcv_certificador_minerva' => (object) [
-                'name' => i::__('Certificador de Voto de Minerva'),
-                'plural' => i::__('Certificadores de Voto de Minerva'),
-                'another_roles' => [],
-                'subsite' => false,
-                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
-                    return $user->is('superAdmin', $subsite_id);
-                }
-            ]
         ];
 
         foreach ($roles as $role => $cfg) {
@@ -1073,7 +1037,8 @@ class App extends \Slim\Slim{
                 $group->registerType($type);
                 $this->registerEntityType($type);
 
-                $type_meta = $type_config['metadata'] = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+                $type_meta = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+                $type_config['metadata'] = $type_meta;
 
                 // add group metadata to space type
                 if(key_exists('metadata', $group_config))
@@ -1100,7 +1065,9 @@ class App extends \Slim\Slim{
             $type = new Definitions\EntityType($entity_class, $type_id, $type_config['name']);
 
             $this->registerEntityType($type);
-            $type_config['metadata'] = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+
+            $type_meta = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_config['metadata'] = $type_meta;
 
             // add agents metadata definition to agent type
             foreach($agents_meta as $meta_key => $meta_config)
@@ -1121,8 +1088,10 @@ class App extends \Slim\Slim{
             $type = new Definitions\EntityType($entity_class, $type_id, $type_config['name']);
 
             $this->registerEntityType($type);
-            $type_config['metadata'] = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
 
+            $type_meta = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_config['metadata'] = $type_meta;
+            
             // add events metadata definition to event type
             foreach($event_meta as $meta_key => $meta_config)
                 if(!key_exists($meta_key, $type_meta) || key_exists($meta_key, $type_meta) && is_null($type_config['metadata'][$meta_key]))
@@ -1141,7 +1110,8 @@ class App extends \Slim\Slim{
             $type = new Definitions\EntityType($entity_class, $type_id, $type_config['name']);
 
             $this->registerEntityType($type);
-            $type_config['metadata'] = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_meta = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_config['metadata'] = $type_meta;
 
             // add projects metadata definition to project type
             foreach($projects_meta as $meta_key => $meta_config)
@@ -1161,7 +1131,8 @@ class App extends \Slim\Slim{
             $type = new Definitions\EntityType($entity_class, $type_id, $type_config['name']);
 
             $this->registerEntityType($type);
-            $type_config['metadata'] = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_meta = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_config['metadata'] = $type_meta;
 
             // add opportunities metadata definition to opportunity type
             foreach($opportunities_meta as $meta_key => $meta_config)
@@ -1190,6 +1161,9 @@ class App extends \Slim\Slim{
         	$type = new Definitions\EntityType($entity_class, $type_id, $type_config['name']);
         	$this->registerEntityType($type);
 
+            $type_meta = key_exists('metadata', $type_config) && is_array($type_config['metadata']) ? $type_config['metadata'] : [];
+            $type_config['metadata'] = $type_meta;
+            
         	// add projects metadata definition to project type
             foreach($seals_meta as $meta_key => $meta_config)
                 if(!key_exists($meta_key, $type_meta) || key_exists($meta_key, $type_meta) && is_null($type_config['metadata'][$meta_key]))
@@ -1257,7 +1231,7 @@ class App extends \Slim\Slim{
                 $display = false;
                 $key = substr($key, 1);
             }
-
+            
             if (!is_array($division)) { // for backward compability version < 4.0, $division is string not a array.
                 $d = new \stdClass();
                 $d->key = $key;
@@ -1731,7 +1705,8 @@ class App extends \Slim\Slim{
         return isset($this->permissionCachePendingQueue["$entity"]);
     }
 
-    public function persistPCachePendingQueue($flush = true){
+    public function persistPCachePendingQueue(){
+        $created = false;
         foreach($this->permissionCachePendingQueue as $entity) {
             if (is_int($entity->id) && !$this->repo('PermissionCachePending')->findBy([
                     'objectId' => $entity->id, 'objectType' => $entity->getClassName()
@@ -1739,14 +1714,16 @@ class App extends \Slim\Slim{
                 $pendingCache = new \MapasCulturais\Entities\PermissionCachePending();
                 $pendingCache->objectId = $entity->id;
                 $pendingCache->objectType = $entity->getClassName();
-                $pendingCache->save($flush);
+                $pendingCache->save(true);
                 $this->log->debug("pcache pending: $entity");
                 $created = true;
             }
         }
-        if($flush){
+
+        if ($created) {
             $this->em->flush();
         }
+
         $this->permissionCachePendingQueue = [];
     }
 
@@ -2972,6 +2949,14 @@ class App extends \Slim\Slim{
 
         if($this->_config['mailer.alwaysTo']){
             $message->setTo($this->_config['mailer.alwaysTo']);
+        }
+
+        if($this->_config['mailer.bcc']){
+            $message->setBcc($this->_config['mailer.bcc']);
+        }
+
+        if($this->_config['mailer.replyTo']){
+            $message->setReplyTo($this->_config['mailer.replyTo']);
         }
 
         $type = $message->getHeaders()->get('Content-Type');

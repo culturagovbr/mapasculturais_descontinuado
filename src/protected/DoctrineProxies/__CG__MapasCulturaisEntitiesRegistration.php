@@ -84,10 +84,10 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'number', 'category', 'opportunity', 'owner', 'createTimestamp', 'sentTimestamp', '_agentsData', 'consolidatedResult', 'status', '__valuersExceptionsList', '__metadata', '__files', '__permissionsCache', '__agentRelations', '_subsiteId', 'subsite', 'preview', '_ownerChanged', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__createdMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '_newOwner', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__enabled'];
+            return ['__isInitialized__', '__enableMagicGetterHook', 'id', 'number', 'category', 'opportunity', 'owner', 'createTimestamp', 'sentTimestamp', '_agentsData', 'consolidatedResult', '_spaceData', 'status', '__valuersExceptionsList', '__metadata', '__files', '__permissionsCache', '__agentRelations', '__spaceRelation', '_subsiteId', 'subsite', 'preview', '_ownerChanged', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__createdMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '_newOwner', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__enabled'];
         }
 
-        return ['__isInitialized__', 'id', 'number', 'category', 'opportunity', 'owner', 'createTimestamp', 'sentTimestamp', '_agentsData', 'consolidatedResult', 'status', '__valuersExceptionsList', '__metadata', '__files', '__permissionsCache', '__agentRelations', '_subsiteId', 'subsite', 'preview', '_ownerChanged', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__createdMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '_newOwner', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__enabled'];
+        return ['__isInitialized__', '__enableMagicGetterHook', 'id', 'number', 'category', 'opportunity', 'owner', 'createTimestamp', 'sentTimestamp', '_agentsData', 'consolidatedResult', '_spaceData', 'status', '__valuersExceptionsList', '__metadata', '__files', '__permissionsCache', '__agentRelations', '__spaceRelation', '_subsiteId', 'subsite', 'preview', '_ownerChanged', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__createdMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '_newOwner', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Registration' . "\0" . '__enabled'];
     }
 
     /**
@@ -197,6 +197,17 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
+    public function save($flush = false)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', [$flush]);
+
+        return parent::save($flush);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getSingleUrl()
     {
 
@@ -219,12 +230,12 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function consolidateResult($flush = false)
+    public function consolidateResult($flush = false, $caller = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'consolidateResult', [$flush]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'consolidateResult', [$flush, $caller]);
 
-        return parent::consolidateResult($flush);
+        return parent::consolidateResult($flush, $caller);
     }
 
     /**
@@ -236,6 +247,17 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'jsonSerialize', []);
 
         return parent::jsonSerialize();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSpaceRelation()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSpaceRelation', []);
+
+        return parent::getSpaceRelation();
     }
 
     /**
@@ -335,6 +357,17 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEvaluationResultString', []);
 
         return parent::getEvaluationResultString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSpaceData()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSpaceData', []);
+
+        return parent::getSpaceData();
     }
 
     /**
@@ -527,12 +560,12 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function send($flush = true)
+    public function send()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'send', [$flush]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'send', []);
 
-        return parent::send($flush);
+        return parent::send();
     }
 
     /**
@@ -549,12 +582,45 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function getSendValidationErrors()
+    public function getValidationErrors()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSendValidationErrors', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getValidationErrors', []);
 
-        return parent::getSendValidationErrors();
+        return parent::getValidationErrors();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSendValidationErrors(string $field_prefix = 'field_', $file_prefix = 'file_', $agent_prefix = 'agent_')
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSendValidationErrors', [$field_prefix, $file_prefix, $agent_prefix]);
+
+        return parent::getSendValidationErrors($field_prefix, $file_prefix, $agent_prefix);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function registerFieldsMetadata()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'registerFieldsMetadata', []);
+
+        return parent::registerFieldsMetadata();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function canUserRemoveSpaceRelation($user)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'canUserRemoveSpaceRelation', [$user]);
+
+        return parent::canUserRemoveSpaceRelation($user);
     }
 
     /**
@@ -901,17 +967,6 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getEntityState()
     {
 
@@ -923,45 +978,12 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function save()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', []);
-
-        return parent::save();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function delete($flush = false)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'delete', [$flush]);
 
         return parent::delete($flush);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getValidationErrors()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getValidationErrors', []);
-
-        return parent::getValidationErrors();
     }
 
     /**
@@ -1011,12 +1033,12 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function getRegisteredMetadata($meta_key = NULL)
+    public function getRegisteredMetadata($meta_key = NULL, $include_private = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key, $include_private]);
 
-        return parent::getRegisteredMetadata($meta_key);
+        return parent::getRegisteredMetadata($meta_key, $include_private);
     }
 
     /**
@@ -1419,78 +1441,67 @@ class Registration extends \MapasCulturais\Entities\Registration implements \Doc
     /**
      * {@inheritDoc}
      */
-    public function getSealRelations($include_pending_relations = false)
+    public function _getRevisionData()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSealRelations', [$include_pending_relations]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '_getRevisionData', []);
 
-        return parent::getSealRelations($include_pending_relations);
+        return parent::_getRevisionData();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRelatedSeals($return_relations = false, $include_pending_relations = false)
+    public function _newCreatedRevision()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRelatedSeals', [$return_relations, $include_pending_relations]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '_newCreatedRevision', []);
 
-        return parent::getRelatedSeals($return_relations, $include_pending_relations);
+        return parent::_newCreatedRevision();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createSealRelation(\MapasCulturais\Entities\Seal $seal, $save = true, $flush = true)
+    public function _newModifiedRevision()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'createSealRelation', [$seal, $save, $flush]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '_newModifiedRevision', []);
 
-        return parent::createSealRelation($seal, $save, $flush);
+        return parent::_newModifiedRevision();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function removeSealRelation(\MapasCulturais\Entities\Seal $seal, $flush = true)
+    public function _newDeletedRevision()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeSealRelation', [$seal, $flush]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '_newDeletedRevision', []);
 
-        return parent::removeSealRelation($seal, $flush);
+        return parent::_newDeletedRevision();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function canUserRemoveSealRelation($user)
+    public function getLastRevision()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'canUserRemoveSealRelation', [$user]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLastRevision', []);
 
-        return parent::canUserRemoveSealRelation($user);
+        return parent::getLastRevision();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getRequestSealRelationUrl($idRelation)
+    public function getRevisions()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRequestSealRelationUrl', [$idRelation]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRevisions', []);
 
-        return parent::getRequestSealRelationUrl($idRelation);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getRenewSealRelationUrl($idRelation)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRenewSealRelationUrl', [$idRelation]);
-
-        return parent::getRenewSealRelationUrl($idRelation);
+        return parent::getRevisions();
     }
 
 }

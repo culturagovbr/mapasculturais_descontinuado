@@ -287,7 +287,7 @@ class Agent extends \MapasCulturais\Entity
         parent::__construct();
     }
 
-    public function getEntityTypeLabel($plural = false) {
+    public static function getEntityTypeLabel($plural = false) {
         if ($plural)
             return \MapasCulturais\i::__('Agentes');
         else

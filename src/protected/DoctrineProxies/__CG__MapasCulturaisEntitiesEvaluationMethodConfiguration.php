@@ -84,10 +84,10 @@ class EvaluationMethodConfiguration extends \MapasCulturais\Entities\EvaluationM
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', '_type', 'opportunity', '__agentRelations', '__metadata', '__permissionsCache', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__createdMetadata', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__enabled'];
+            return ['__isInitialized__', 'id', '_type', 'opportunity', '__agentRelations', '__metadata', '__permissionsCache', '_validationErrors', '__enableMagicGetterHook', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__createdMetadata', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__enabled'];
         }
 
-        return ['__isInitialized__', 'id', '_type', 'opportunity', '__agentRelations', '__metadata', '__permissionsCache', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__createdMetadata', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__enabled'];
+        return ['__isInitialized__', 'id', '_type', 'opportunity', '__agentRelations', '__metadata', '__permissionsCache', '_validationErrors', '__enableMagicGetterHook', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__createdMetadata', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\EvaluationMethodConfiguration' . "\0" . '__enabled'];
     }
 
     /**
@@ -439,7 +439,7 @@ class EvaluationMethodConfiguration extends \MapasCulturais\Entities\EvaluationM
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
@@ -571,34 +571,12 @@ class EvaluationMethodConfiguration extends \MapasCulturais\Entities\EvaluationM
     /**
      * {@inheritDoc}
      */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getEntityState()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityState', []);
 
         return parent::getEntityState();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
     }
 
     /**
@@ -714,12 +692,12 @@ class EvaluationMethodConfiguration extends \MapasCulturais\Entities\EvaluationM
     /**
      * {@inheritDoc}
      */
-    public function getRegisteredMetadata($meta_key = NULL)
+    public function getRegisteredMetadata($meta_key = NULL, $include_private = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key, $include_private]);
 
-        return parent::getRegisteredMetadata($meta_key);
+        return parent::getRegisteredMetadata($meta_key, $include_private);
     }
 
     /**

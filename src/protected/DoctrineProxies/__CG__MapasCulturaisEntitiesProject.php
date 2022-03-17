@@ -84,10 +84,10 @@ class Project extends \MapasCulturais\Entities\Project implements \Doctrine\ORM\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', '_type', 'name', 'shortDescription', 'longDescription', 'updateTimestamp', 'registrationFrom', 'registrationTo', 'createTimestamp', 'status', 'parent', '_children', 'owner', '_events', '_relatedOpportunities', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', 'subsite', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '_newOwner', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__createdMetadata', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__enabled'];
+            return ['__isInitialized__', '__enableMagicGetterHook', 'id', '_type', 'name', 'shortDescription', 'longDescription', 'updateTimestamp', 'registrationFrom', 'registrationTo', 'createTimestamp', 'status', 'parent', '_children', 'owner', '_events', '_relatedOpportunities', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', 'subsite', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '_newOwner', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__createdMetadata', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__enabled'];
         }
 
-        return ['__isInitialized__', 'id', '_type', 'name', 'shortDescription', 'longDescription', 'updateTimestamp', 'registrationFrom', 'registrationTo', 'createTimestamp', 'status', 'parent', '_children', 'owner', '_events', '_relatedOpportunities', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', 'subsite', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '_newOwner', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__createdMetadata', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__enabled'];
+        return ['__isInitialized__', '__enableMagicGetterHook', 'id', '_type', 'name', 'shortDescription', 'longDescription', 'updateTimestamp', 'registrationFrom', 'registrationTo', 'createTimestamp', 'status', 'parent', '_children', 'owner', '_events', '_relatedOpportunities', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', 'subsite', '_validationErrors', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '_newOwner', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__changedMetadata', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__createdMetadata', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\Project' . "\0" . '__enabled'];
     }
 
     /**
@@ -194,17 +194,6 @@ class Project extends \MapasCulturais\Entities\Project implements \Doctrine\ORM\
     }
 
     
-    /**
-     * {@inheritDoc}
-     */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -439,7 +428,7 @@ class Project extends \MapasCulturais\Entities\Project implements \Doctrine\ORM\
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
@@ -582,23 +571,12 @@ class Project extends \MapasCulturais\Entities\Project implements \Doctrine\ORM\
     /**
      * {@inheritDoc}
      */
-    public function save()
+    public function save($flush = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', [$flush]);
 
-        return parent::save();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
+        return parent::save($flush);
     }
 
     /**
@@ -758,12 +736,12 @@ class Project extends \MapasCulturais\Entities\Project implements \Doctrine\ORM\
     /**
      * {@inheritDoc}
      */
-    public function getRegisteredMetadata($meta_key = NULL)
+    public function getRegisteredMetadata($meta_key = NULL, $include_private = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key, $include_private]);
 
-        return parent::getRegisteredMetadata($meta_key);
+        return parent::getRegisteredMetadata($meta_key, $include_private);
     }
 
     /**

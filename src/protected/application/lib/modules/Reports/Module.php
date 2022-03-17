@@ -23,10 +23,10 @@ class Module extends \MapasCulturais\Module
     {
         $app = App::i();
 
-      /*  $config += [
+        $config += [
             'agent' => $app->config['report.agent'],
             'collective' => $app->config['report.collective'],
-        ]; */
+        ];
         parent::__construct($config);
     }
 

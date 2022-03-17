@@ -84,10 +84,10 @@ class ChatMessage extends \MapasCulturais\Entities\ChatMessage implements \Doctr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'thread', 'parent', 'user', 'payload', 'createTimestamp', '__permissionsCache', '_validationErrors', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\ChatMessage' . "\0" . '__enabled'];
+            return ['__isInitialized__', 'id', 'thread', 'parent', 'user', 'payload', 'createTimestamp', '__permissionsCache', '_validationErrors', '__enableMagicGetterHook', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\ChatMessage' . "\0" . '__enabled'];
         }
 
-        return ['__isInitialized__', 'id', 'thread', 'parent', 'user', 'payload', 'createTimestamp', '__permissionsCache', '_validationErrors', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\ChatMessage' . "\0" . '__enabled'];
+        return ['__isInitialized__', 'id', 'thread', 'parent', 'user', 'payload', 'createTimestamp', '__permissionsCache', '_validationErrors', '__enableMagicGetterHook', '_newParent', '__skipQueuingPCacheRecreation', '' . "\0" . 'MapasCulturais\\Entities\\ChatMessage' . "\0" . '__enabled'];
     }
 
     /**
@@ -384,7 +384,7 @@ class ChatMessage extends \MapasCulturais\Entities\ChatMessage implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
@@ -516,34 +516,12 @@ class ChatMessage extends \MapasCulturais\Entities\ChatMessage implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getEntityState()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityState', []);
 
         return parent::getEntityState();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
     }
 
     /**

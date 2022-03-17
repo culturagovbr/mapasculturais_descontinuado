@@ -62,8 +62,8 @@ use \MapasCulturais\App;
 abstract class Controller{
     use Traits\MagicGetter,
         Traits\MagicSetter,
-        Traits\MagicCallers,
-        Traits\Singleton;
+        Traits\MagicCallers;
+        
 
 
     /**
@@ -87,9 +87,47 @@ abstract class Controller{
 
 
     protected $action = null;
-
+    
     protected $method = null;
 
+    
+    /**
+     * Array of instances of this class and all subclasses.
+     * @var array
+     */
+    protected static $_singletonInstances = [];
+
+    /**
+     * 
+     * @var string controller id
+     */
+    protected $_id = null;
+
+    /**
+     * Returns the singleton instance. This method creates the instance when called for the first time.
+     * @return self
+     */
+    static public function i(string $controller_id): Controller {
+        $class = get_called_class();
+
+        $id = "{$class}:{$controller_id}";
+
+        if (!key_exists($id, self::$_singletonInstances)) {
+            self::$_singletonInstances[$id] = new $class;
+            self::$_singletonInstances[$id]->_id = $controller_id;
+        }
+
+        return self::$_singletonInstances[$id];
+    }
+
+    /**
+     * This class use Singleton
+     * @return true
+     */
+    public static function usesSingleton(){
+        return true;
+    }
+    
     // =================== GETTERS ================== //
 
     /**
@@ -100,7 +138,7 @@ abstract class Controller{
      * @return string The controller id.
      */
     public function getId(){
-        return App::i()->controllerId($this);
+        return $this->_id;
     }
 
     /**
@@ -224,6 +262,7 @@ abstract class Controller{
      */
     public function callAction($method, $action_name, $arguments) {
         $app = App::i();
+
         if(@$app->config['app.log.requestData'] && $app->config['slim.log.level'] === \Slim\Log::DEBUG){
             $app->log->debug('===== POST DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
             $app->log->debug(print_r($this->postData,true));
@@ -238,12 +277,21 @@ abstract class Controller{
         $this->action = $action_name;
 
         $method = strtoupper($method);
-
+        
         $this->method = $method;
+
+        foreach($app->config['ini.set'] as $pattern => $configs) {
+            $pattern = str_replace('*', '.*', $pattern);
+            if(preg_match("#{$pattern}#i", "{$this->method} {$this->id}/{$this->action}")) {
+                foreach($configs as $varname => $newvalue) {
+                    ini_set($varname, $newvalue);
+                }
+            }
+        }
 
         // hook like GET(user.teste)
         $hook = $method . "({$this->id}.{$action_name})";
-
+        
         // hook like ALL(user.teste)
         $ALL_hook =  $method !== 'API' ? "ALL({$this->id}.{$action_name})" : null;
 
@@ -282,17 +330,25 @@ abstract class Controller{
 
     }
 
+    function getTemplatePrefix()
+    {
+        return $this->id;
+    }
+
     /**
      * Render a template in the folder with the name of the controller id
      *
      * @param string $template the template name
      * @param type $data array with data to pass to the template
      */
-    public function render($template, $data = []){
+    public function render($template, $data=[])
+    {
         $app = App::i();
-        $app->applyHookBoundTo($this, 'controller(' . $this->id . ').render(' . $template . ')', ['template' => &$template, 'data' => &$data]);
-
-        $template = $this->id . '/' . $template;
+        $app->applyHookBoundTo($this, "controller({$this->id}).render($template)", [
+            "template" => &$template,
+            "data" => &$data
+        ]);
+        $template = "{$this->templatePrefix}/$template";
         $app->render($template, $data);
     }
 
@@ -302,11 +358,14 @@ abstract class Controller{
      * @param string $template the template name
      * @param type $data array with data to pass to the template
      */
-    public function partial($template, $data = []){
+    public function partial($template, $data=[])
+    {
         $app = App::i();
-        $app->applyHookBoundTo($this, 'controller(' . $this->id . ').partial(' . $template . ')', ['template' => &$template, 'data' => &$data]);
-
-        $template = $this->id . '/' . $template;
+        $app->applyHookBoundTo($this, "controller({$this->id}).partial($template)", [
+            "template" => &$template,
+            "data" => &$data
+        ]);
+        $template = "{$this->templatePrefix}/$template";
         $app->view->partial = true;
         $app->render($template, $data);
     }
@@ -316,9 +375,8 @@ abstract class Controller{
      *
      * @param mixed $data
      */
-    public function json($data, $status = 200, $flush = true){
+    public function json($data, $status = 200){
         $app = App::i();
-        $app->persistPCachePendingQueue($flush);
         $app->contentType('application/json');
         $app->halt($status, json_encode($data));
     }

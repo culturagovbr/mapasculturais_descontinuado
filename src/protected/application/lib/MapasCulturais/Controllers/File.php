@@ -35,10 +35,15 @@ class File extends EntityController {
     }
     
     function GET_privateFile() {
-    
         $this->requireAuthentication();
         
+        $app = App::i();
+        
         $file = $this->requestedEntity;
+
+        if(!$file){
+            $app->pass();
+        }
 
         $file->checkPermission('viewPrivateFiles');
         

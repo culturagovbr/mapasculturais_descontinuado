@@ -1,9 +1,11 @@
 <?php
 namespace MapasCulturais\Repositories;
+use MapasCulturais\App;
 use MapasCulturais\Traits;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class Registration extends \MapasCulturais\Repository{
+class Registration extends \MapasCulturais\Repository {
+    use Traits\RepositoryKeyword;
     /**
      *
      * @param \MapasCulturais\Entities\Opportunity $opportunity
@@ -44,7 +46,7 @@ class Registration extends \MapasCulturais\Repository{
      * @param mixed $status = all all|sent|Entities\Registration::STATUS_*|[Entities\Registration::STATUS_*, Entities\Registration::STATUS_*]
      * @return \MapasCulturais\Entities\Registration[]
      */
-    function findByUser($user, $status = 'all'){
+    function findByUser($user, $status = 'all', int $limit = null){
         if($user->is('guest')){
             return [];
         }
@@ -76,12 +78,10 @@ class Registration extends \MapasCulturais\Repository{
 
         $q = $this->_em->createQuery($dql);
         $q->setParameter('agents', $user->agents ? $user->agents->toArray() : [-1]);
-
+        $q->setMaxResults($limit);
         if( $status !== false ){
             $q->setParameter('status', $status);
         }
-
-        \MapasCulturais\App::i()->log->debug($dql);
 
         return $q->getResult();
     }
@@ -123,5 +123,48 @@ class Registration extends \MapasCulturais\Repository{
         $num = $q->getSingleScalarResult();
 
         return $num;
+    }
+
+    /**
+     * Returns the **FROM** part of DQL used to find the entities by keyword
+     * 
+     * @param string $keyword
+     * @return string
+     * 
+     * @hook **repo({ENTITY}).getIdsByKeywordDQL.join**
+     */
+    protected function _getKeywordDQLFrom($keyword){
+        $class = $this->getClassName();
+
+        $join = '';
+
+        App::i()->applyHookBoundTo($this, 'repo(' . $class::getHookClassPath() . ').getIdsByKeywordDQL.join', [&$join, $keyword]);
+
+        return "$class e JOIN e.owner o $join";
+    }
+
+
+    /**
+     * Returns the **WHERE** part of DQL used to find the entities by keyword
+     * 
+     * @param string $keyword
+     * @return string
+     * 
+     * @hook **repo({ENTITY}).getIdsByKeywordDQL.where**
+     */
+    protected function _getKeywordDQLWhere($keyword){
+        $class = $this->getClassName();
+
+        $where = '';
+
+        App::i()->applyHookBoundTo($this, 'repo(' . $class::getHookClassPath() . ').getIdsByKeywordDQL.where', [&$where, $keyword]);
+
+        return "
+            (
+                unaccent(lower(e.number)) LIKE unaccent(lower(:keyword)) OR 
+                unaccent(lower(e.category)) LIKE unaccent(lower(:keyword)) OR 
+                unaccent(lower(o.name)) LIKE unaccent(lower(:keyword))
+            )
+            $where";
     }
 }

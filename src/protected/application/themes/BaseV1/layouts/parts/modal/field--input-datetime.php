@@ -1,5 +1,5 @@
 <?php
-$className = mb_strtolower('');
+$className = mb_strtolower($entity_classname::getEntityTypeLabel());
 ?>
 <?php $this->part("modal/title", ['title' => $definition['label']]); ?>
 <?php if ($field == 'registrationTo'): ?>

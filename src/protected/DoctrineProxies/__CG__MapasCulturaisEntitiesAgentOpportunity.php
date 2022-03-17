@@ -34,8 +34,6 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
      * @var array<string, null> properties to be lazy loaded, indexed by property name
      */
     public static $lazyPropertiesNames = array (
-  'registrationFileConfigurations' => NULL,
-  'registrationFieldConfigurations' => NULL,
 );
 
     /**
@@ -44,15 +42,12 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
      * @see \Doctrine\Common\Proxy\Proxy::__getLazyProperties
      */
     public static $lazyPropertiesDefaults = array (
-  'registrationFileConfigurations' => NULL,
-  'registrationFieldConfigurations' => NULL,
 );
 
 
 
     public function __construct(?\Closure $initializer = null, ?\Closure $cloner = null)
     {
-        unset($this->registrationFileConfigurations, $this->registrationFieldConfigurations);
 
         $this->__initializer__ = $initializer;
         $this->__cloner__      = $cloner;
@@ -64,11 +59,6 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
      */
     public function __get($name)
     {
-        if (\array_key_exists($name, self::$lazyPropertiesNames)) {
-            $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [$name]);
-            return $this->$name;
-        }
-
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__get', [$name]);
         return parent::__get($name);
     }
@@ -80,34 +70,12 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
      */
     public function __set($name, $value)
     {
-        if (\array_key_exists($name, self::$lazyPropertiesNames)) {
-            $this->__initializer__ && $this->__initializer__->__invoke($this, '__set', [$name, $value]);
-
-            $this->$name = $value;
-
-            return;
-        }
-
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__set', [$name, $value]);
 
         return parent::__set($name, $value);
     }
 
-    /**
-     * 
-     * @param  string $name
-     * @return boolean
-     */
-    public function __isset($name)
-    {
-        if (\array_key_exists($name, self::$lazyPropertiesNames)) {
-            $this->__initializer__ && $this->__initializer__->__invoke($this, '__isset', [$name]);
 
-            return isset($this->$name);
-        }
-
-        return false;
-    }
 
     /**
      * 
@@ -116,10 +84,10 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'ownerEntity', 'parent', 'id', '_type', 'name', 'shortDescription', 'registrationFrom', 'registrationTo', 'publishedRegistrations', 'registrationCategories', 'createTimestamp', 'updateTimestamp', 'status', '_children', 'owner', 'evaluationMethodConfiguration', 'registrationFileConfigurations', 'registrationFieldConfigurations', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', '_validationErrors', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation'];
+            return ['__isInitialized__', 'ownerEntity', 'parent', '__enableMagicGetterHook', 'id', '_type', 'name', 'shortDescription', 'registrationFrom', 'registrationTo', 'publishedRegistrations', 'registrationCategories', 'createTimestamp', 'updateTimestamp', 'status', '_children', 'owner', 'evaluationMethodConfiguration', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', '_validationErrors', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation'];
         }
 
-        return ['__isInitialized__', 'ownerEntity', 'parent', 'id', '_type', 'name', 'shortDescription', 'registrationFrom', 'registrationTo', 'publishedRegistrations', 'registrationCategories', 'createTimestamp', 'updateTimestamp', 'status', '_children', 'owner', 'evaluationMethodConfiguration', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', '_validationErrors', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation'];
+        return ['__isInitialized__', 'ownerEntity', 'parent', '__enableMagicGetterHook', 'id', '_type', 'name', 'shortDescription', 'registrationFrom', 'registrationTo', 'publishedRegistrations', 'registrationCategories', 'createTimestamp', 'updateTimestamp', 'status', '_children', 'owner', 'evaluationMethodConfiguration', '__metadata', '__files', '__agentRelations', '__termRelations', '__sealRelations', '__permissionsCache', '_subsiteId', '_validationErrors', '_avatar', 'terms', '_newParent', '__skipQueuingPCacheRecreation'];
     }
 
     /**
@@ -141,7 +109,6 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
                 }
             };
 
-            unset($this->registrationFileConfigurations, $this->registrationFieldConfigurations);
         }
     }
 
@@ -241,6 +208,28 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
+    public function getRegistrationFileConfigurations()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegistrationFileConfigurations', []);
+
+        return parent::getRegistrationFileConfigurations();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRegistrationFieldConfigurations()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegistrationFieldConfigurations', []);
+
+        return parent::getRegistrationFieldConfigurations();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getEvaluationMethodDefinition()
     {
 
@@ -296,17 +285,6 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getExtraPermissionCacheUsers()
     {
 
@@ -340,12 +318,12 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
-    public function getAllRegistrations()
+    public function getAllRegistrations($status = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAllRegistrations', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAllRegistrations', [$status]);
 
-        return parent::getAllRegistrations();
+        return parent::getAllRegistrations($status);
     }
 
     /**
@@ -401,6 +379,17 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRegistrationTo', [$date]);
 
         return parent::setRegistrationTo($date);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOwnerEntity($entity)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setOwnerEntity', [$entity]);
+
+        return parent::setOwnerEntity($entity);
     }
 
     /**
@@ -472,6 +461,17 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
+    public function importFields($importSource)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'importFields', [$importSource]);
+
+        return parent::importFields($importSource);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function useRegistrationAgentRelation(\MapasCulturais\Definitions\RegistrationAgentRelation $def)
     {
 
@@ -511,6 +511,17 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isUserEvaluationsSent', [$user]);
 
         return parent::isUserEvaluationsSent($user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function registerRegistrationMetadata()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'registerRegistrationMetadata', []);
+
+        return parent::registerRegistrationMetadata();
     }
 
     /**
@@ -681,7 +692,7 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
@@ -824,23 +835,12 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
-    public function save()
+    public function save($flush = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', [$flush]);
 
-        return parent::save();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
+        return parent::save($flush);
     }
 
     /**
@@ -1000,12 +1000,12 @@ class AgentOpportunity extends \MapasCulturais\Entities\AgentOpportunity impleme
     /**
      * {@inheritDoc}
      */
-    public function getRegisteredMetadata($meta_key = NULL)
+    public function getRegisteredMetadata($meta_key = NULL, $include_private = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key, $include_private]);
 
-        return parent::getRegisteredMetadata($meta_key);
+        return parent::getRegisteredMetadata($meta_key, $include_private);
     }
 
     /**

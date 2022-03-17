@@ -2,7 +2,7 @@
 use MapasCulturais\i;
 $url = $app->createUrl($entity_name);
 $classes = $this->getModalClasses($use_modal);
-$name = mb_strtolower('');
+$name = mb_strtolower($entity_classname::getEntityTypeLabel());
 $evaluation_methods = $app->getRegisteredEvaluationMethods();
 $title = sprintf(i::__("Crie uma %s com informações básicas"), $name);
 

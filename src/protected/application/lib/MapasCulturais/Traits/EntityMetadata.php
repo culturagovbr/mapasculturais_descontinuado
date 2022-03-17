@@ -1,13 +1,14 @@
 <?php
 namespace MapasCulturais\Traits;
 
+use Exception;
 use MapasCulturais\App;
 
 /**
  * Defines that the entity has metadata.
  *
  * Use this trait only in subclasses of **\MapasCulturais\Entity**. A class with the same name suffixed with **Meta** is required.
- *
+ * 
  * For example: For a class named **Name\Space\EntityClass** a class named **Name\Space\EntityClassMeta** is required.
  *
  * This trait will make all metadata behave like real properties of the entity. So to set a metadata value you just need to
@@ -18,17 +19,17 @@ use MapasCulturais\App;
  * @example To set the metadata with the key 'site' you can do $entity->site = 'http://foo.bar/'; or $entity->setMetadata('site', 'http://foo.bar/');
  * @example To print the metadata with the key 'site' you do: echo $entity->site;
  * @example you can access all metadatas in the metadata property of the entity: foreach($entity->metadata as $metakey => $meta_value)
- *
+ * 
  * @property-read \MapasCulturais\MetadataDefinition[] $registeredMetadata array of registered metadata.
  * @property-read string $metadataClassName the metadata class name.
  * @property-read string $metadataMetadata metadata of the registered metadata for this entity.
  * @property-read array $metadata all metadata of this entity.
- * @property-read array $changedMetadata changed metadata.
- *
+ * @property-read array $changedMetadata changed metadata. 
+ * 
  * <code>
  * [$meta_key => ['key'=> $meta_key, 'oldValue'=> $metadata_object->value, 'newValue'=> $value]]
  * </code>
- *
+ * 
  * @property-read array $metadataValidationErrors Description
  *
  */
@@ -37,19 +38,19 @@ trait EntityMetadata{
 
     /**
      * Changed metadata.
-     *
+     * 
      * The items of this array have the below format:
      * <code>
      *  ['key'=> $meta_key, 'oldValue'=> $metadata_object->value, 'newValue'=> $value]
      * </code>
-     *
+     * 
      * @var array
      */
     private $__changedMetadata = [];
 
     /**
      * Created metadata.
-     *
+     * 
      * @var \MapasCulturais\Entity[]
      */
     private $__createdMetadata = [];
@@ -57,7 +58,7 @@ trait EntityMetadata{
 
     /**
      * This entity has metadata.
-     *
+     * 
      * @return true
      */
     public static function usesMetadata(){
@@ -83,10 +84,10 @@ trait EntityMetadata{
     function __metadata__get($name){
         if($def = $this->getRegisteredMetadata($name)){
             $value = $this->getMetadata($name);
-
+            
             if(is_callable($def->unserialize)){
                 $cb = $def->unserialize;
-                $value = $cb($value);
+                $value = $cb($value, $this, $def);
             }
             return $value;
         }
@@ -103,7 +104,7 @@ trait EntityMetadata{
         if($def = $this->getRegisteredMetadata($name)){
             if(is_callable($def->serialize)){
                 $cb = $def->serialize;
-                $value = $cb($value);
+                $value = $cb($value, $this, $def);
             }
             $this->setMetadata($name, $value);
             return true;
@@ -117,7 +118,7 @@ trait EntityMetadata{
      *
      * @return \MapasCulturais\MetadataDefinition|\MapasCulturais\MetadataDefinition[]
      */
-    function getRegisteredMetadata($meta_key = null){
+    function getRegisteredMetadata($meta_key = null, $include_private = false){
 
         $app = App::i();
 
@@ -127,17 +128,19 @@ trait EntityMetadata{
             $metas = $app->getRegisteredMetadata($this);
         }
 
-        $can_view = $this->canUser('viewPrivateData');
-
-        foreach($metas as $k => $v){
-            $private = $v->private;
-            if(is_callable($private)){
-                $private = \Closure::bind($private, $this);
-                if($private() && !$can_view){
+        if (!$include_private) {
+            $can_view = $this->canUser('viewPrivateData');
+    
+            foreach($metas as $k => $v){
+                $private = $v->private;
+                if(is_callable($private)){
+                    $private = \Closure::bind($private, $this);
+                    if($private() && !$can_view){
+                        unset($metas[$k]);
+                    }
+                }else if($private && !$can_view){
                     unset($metas[$k]);
                 }
-            }else if($private && !$can_view){
-                unset($metas[$k]);
             }
         }
 
@@ -150,9 +153,9 @@ trait EntityMetadata{
 
     /**
      * Virifies if the user can view private metadata of this entity.
-     *
+     * 
      * @param \MapasCulturais\Entities\User $user
-     *
+     * 
      * @return boolean
      */
     protected function canUserViewPrivateData($user){
@@ -160,7 +163,7 @@ trait EntityMetadata{
             return false;
         }
 
-        if($this->isUserAdmin($user) || $this->canUser('@control', $user)){
+        if($this->isUserAdmin($user) || $this->canUser('@control', $user) || $this->equals($user)){
             return true;
         }
 
@@ -205,8 +208,12 @@ trait EntityMetadata{
      */
     function getMetadata($meta_key = null, $return_metadata_object = false){
         // @TODO estudar como verificar se o objecto $this e $this->__metadata estão completos para caso contrário dar refresh
-
         if($meta_key){
+            $def = $this->getRegisteredMetadata($meta_key, true);
+            if(!$def){
+                return null;
+            }
+
             if(isset($this->__createdMetadata[$meta_key])){
                 $metadata_object = $this->__createdMetadata[$meta_key];
             }else{
@@ -221,7 +228,18 @@ trait EntityMetadata{
             if($return_metadata_object){
                 $result = is_object($metadata_object) ? $metadata_object : null;
             }else{
-                $result = is_object($metadata_object) ? $metadata_object->value : null;
+                if (is_object($metadata_object)) {
+                    $result = $metadata_object->value; 
+                } else if ($def->default_value) {
+                    if(is_callable($def->default_value)) {
+                        $callable = \Closure::bind($def->default_value, $this);
+                        $result = $callable($def); 
+                    } else {
+                        $result = $def->default_value;
+                    }
+                } else {
+                    $result = null;
+                }
             }
 
             return $result;
@@ -257,14 +275,17 @@ trait EntityMetadata{
      * @param mixed the value of the metadata.
      */
     function setMetadata($meta_key, $value){
+    	$app = App::i();
+        $metadata_definition = $this->getRegisteredMetadata($meta_key);
+        if (is_null($metadata_definition)) {
+            $class = $this->getClassName();
+            throw new Exception("The '{$class}::{$meta_key}' metadata is not registered");
+        }
 
         $metadata_entity_class = $this->getMetadataClassName();
-        $metadata_object = $this->getMetadata($meta_key, true);
-
-        $created = false;
+        $metadata_object = $app->repo($metadata_entity_class)->findOneBy(['owner' => $this, 'key' => $meta_key], ['id' => 'ASC']);        
 
         if(!$metadata_object){
-            $created = true;
             $metadata_object = new $metadata_entity_class;
             $metadata_object->key = $meta_key;
             $metadata_object->owner = $this;
@@ -297,6 +318,11 @@ trait EntityMetadata{
 
             $val = is_object($metadata_object) ? $metadata_object->value : null;
 
+            $unserialize = $metadata_definition->unserialize;
+            if (is_callable($unserialize)) {
+                $val = $unserialize($val);
+            }
+
             $metadata_value_errors = $metadata_definition->validate($this, $val);
 
             if(is_array($metadata_value_errors))
@@ -315,7 +341,7 @@ trait EntityMetadata{
     public function saveMetadata(){
         foreach(array_keys($this->__changedMetadata) as $meta_key){
             $metadata_object = $this->getMetadata($meta_key, true);
-            $metadata_object->save();
+            $metadata_object->save(true);
         }
     }
 

@@ -1,9 +1,13 @@
 <?php
 use MapasCulturais\Entities\Agent;
 
-$can_edit = $entity->canUser('modify');
+$_type = is_object($entity->type) ? $entity->type->name : "";
 ?>
 <article class="objeto clearfix <?php if($entity->isUserProfile) echo 'agent-default'; ?>">
+    <?php
+        $can_edit = true;
+        $app->applyHook('can-edit', ['can_edit' => &$can_edit, 'entity' => $entity]);
+    ?>
     <h1>
         <?php if($entity->isUserProfile): ?>
             <a class="icon icon-agent hltip active js-disable" title="<?php \MapasCulturais\i::esc_attr_e("Este é seu perfil.");?>"></a>
@@ -12,13 +16,12 @@ $can_edit = $entity->canUser('modify');
             <a class="icon icon-agent hltip" title="<?php \MapasCulturais\i::esc_attr_e("Definir este agente como seu perfil.");?>" href="<?php echo $app->createUrl('agent', 'setAsUserProfile', array($entity->id)); ?>"></a>
         <?php endif; ?>
 
-        <?php /* <a href="<?php if($can_edit) echo $entity->singleUrl; else echo "http://culturaviva.gov.br/cadastrar"; ?>"><?php echo htmlentities($entity->name); ?></a> */ ?>
-        <a href="<?php echo $entity->singleUrl; ?>"><?php echo htmlentities($entity->name); ?></a>
+        <a href="<?php if($can_edit) echo $entity->singleUrl; else echo "http://culturaviva.gov.br/cadastrar"; ?>"><?php echo htmlentities($entity->name); ?></a>
     </h1>
     <div class="objeto-meta">
         <?php $this->applyTemplateHook('panel-new-fields-before','begin', [ $entity ]); ?>
         <?php $this->applyTemplateHook('panel-new-fields-before','end'); ?>
-        <div><span class="label"><?php \MapasCulturais\i::_e("Tipo:");?></span> <?php echo $entity->type->name?></div>
+        <div><span class="label"><?php \MapasCulturais\i::_e("Tipo:");?></span> <?php echo $_type; ?></div>
         <div><span class="label"><?php \MapasCulturais\i::_e("Área(s) de atuação:");?></span> <?php echo implode(', ', $entity->terms['area'])?></div>
         <?php if(isset($entity->originSiteUrl)): ?>
             <div><span class="label">Url: </span><?php echo $entity->originSiteUrl;?></div>
@@ -26,6 +29,13 @@ $can_edit = $entity->canUser('modify');
     </div>
 
     <div class="entity-actions">
+        <?php
+        if(!$can_edit){
+            ?>
+            <a href="http://culturaviva.gov.br/cadastrar" target="_blank" rel='noopener noreferrer'>Usuário criado na rede cultura viva</a>
+            <?php
+        }else{
+        ?>
         <a class="btn btn-small btn-primary" href="<?php echo $entity->editUrl; ?>"><?php \MapasCulturais\i::_e("editar");?></a>
         <?php if(!$entity->isUserProfile && !isset($only_edit_button)): ?>
 
@@ -51,5 +61,6 @@ $can_edit = $entity->canUser('modify');
                 <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
+        <?php } ?>
     </div>
 </article>

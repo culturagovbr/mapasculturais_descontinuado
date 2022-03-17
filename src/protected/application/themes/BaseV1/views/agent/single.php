@@ -14,15 +14,19 @@ if($this->isEditable()){
 $this->includeMapAssets();
 $this->includeAngularEntityAssets($entity);
 $editEntity = $this->controller->action === 'create' || $this->controller->action === 'edit';
-?>
 
+?>
+<?php
+    $can_edit = true;
+    $app->applyHook('can-edit', ['can_edit' => &$can_edit, 'entity' => $entity]);
+?>
 <?php $this->applyTemplateHook('breadcrumb','begin'); ?>
 
 <?php $this->part('singles/breadcrumb', ['entity' => $entity,'entity_panel' => 'agents','home_title' => 'entities: My Agents']); ?><!--.part/singles/breadcrumb.php -->
 
 <?php $this->applyTemplateHook('breadcrumb','end'); ?>
 
-<?php $this->part('editable-entity', array('entity'=>$entity, 'action'=>$action)); ?><!--.part/editable-entity.php -->
+<?php /*if($can_edit) */$this->part('editable-entity', array('entity'=>$entity, 'action'=>$action)); ?><!--.part/editable-entity.php -->
 
 <article class="main-content agent">
     <?php $this->applyTemplateHook('main-content','begin'); ?>
@@ -39,6 +43,8 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
             <?php $this->part('singles/type', ['entity' => $entity]) ?><!--.part/singles/type.php -->
 
             <?php $this->part('singles/name', ['entity' => $entity]) ?><!--.part/singles/name.php -->
+
+            <?php $this->part('widget-areas', array('entity'=>$entity)); ?>
 
             <?php $this->applyTemplateHook('header-content','end'); ?>
         </div>
@@ -97,7 +103,6 @@ $editEntity = $this->controller->action === 'create' || $this->controller->actio
     
     <?php $this->part('related-seals.php', array('entity'=>$entity)); ?>
     
-    <?php $this->part('widget-areas', array('entity'=>$entity)); ?>
     <?php $this->part('widget-tags', array('entity'=>$entity)); ?>
     <?php $this->part('redes-sociais', array('entity'=>$entity)); ?>
 

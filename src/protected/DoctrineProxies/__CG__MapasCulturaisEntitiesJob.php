@@ -84,10 +84,10 @@ class Job extends \MapasCulturais\Entities\Job implements \Doctrine\ORM\Proxy\Pr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'type', 'iterations', 'iterationsCount', 'intervalString', 'createTimestamp', 'nextExecutionTimestamp', 'lastExecutionTimestamp', '_metadata', 'status', '_validationErrors'];
+            return ['__isInitialized__', 'id', 'type', 'iterations', 'iterationsCount', 'intervalString', 'createTimestamp', 'nextExecutionTimestamp', 'lastExecutionTimestamp', '_metadata', 'status', '_validationErrors', '__enableMagicGetterHook'];
         }
 
-        return ['__isInitialized__', 'id', 'type', 'iterations', 'iterationsCount', 'intervalString', 'createTimestamp', 'nextExecutionTimestamp', 'lastExecutionTimestamp', '_metadata', 'status', '_validationErrors'];
+        return ['__isInitialized__', 'id', 'type', 'iterations', 'iterationsCount', 'intervalString', 'createTimestamp', 'nextExecutionTimestamp', 'lastExecutionTimestamp', '_metadata', 'status', '_validationErrors', '__enableMagicGetterHook'];
     }
 
     /**
@@ -362,7 +362,7 @@ class Job extends \MapasCulturais\Entities\Job implements \Doctrine\ORM\Proxy\Pr
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
@@ -494,17 +494,6 @@ class Job extends \MapasCulturais\Entities\Job implements \Doctrine\ORM\Proxy\Pr
     /**
      * {@inheritDoc}
      */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getEntityState()
     {
 
@@ -516,23 +505,12 @@ class Job extends \MapasCulturais\Entities\Job implements \Doctrine\ORM\Proxy\Pr
     /**
      * {@inheritDoc}
      */
-    public function save()
+    public function save($flush = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'save', [$flush]);
 
-        return parent::save();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
+        return parent::save($flush);
     }
 
     /**

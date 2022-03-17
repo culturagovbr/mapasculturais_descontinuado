@@ -31,7 +31,7 @@ return;
 ?>
 
 <section class="main-section">
-    <h1><?= $entity_class->getEntityTypeLabel() ?></h1>
+    <h1><?= $entity_class::getEntityTypeLabel() ?></h1>
 
     <?php foreach ($data as $i => $serie) :
             if ($i == 0) continue;

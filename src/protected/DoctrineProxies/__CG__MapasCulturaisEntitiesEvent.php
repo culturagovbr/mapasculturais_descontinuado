@@ -197,17 +197,6 @@ class Event extends \MapasCulturais\Entities\Event implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function getEntityTypeLabel($plural = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityTypeLabel', [$plural]);
-
-        return parent::getEntityTypeLabel($plural);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function publish($flush = false)
     {
 
@@ -472,7 +461,7 @@ class Event extends \MapasCulturais\Entities\Event implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setStatus', [$status]);
@@ -610,17 +599,6 @@ class Event extends \MapasCulturais\Entities\Event implements \Doctrine\ORM\Prox
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEntityState', []);
 
         return parent::getEntityState();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function saveFlush($flush = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'saveFlush', [$flush]);
-
-        return parent::saveFlush($flush);
     }
 
     /**
@@ -780,12 +758,12 @@ class Event extends \MapasCulturais\Entities\Event implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function getRegisteredMetadata($meta_key = NULL)
+    public function getRegisteredMetadata($meta_key = NULL, $include_private = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRegisteredMetadata', [$meta_key, $include_private]);
 
-        return parent::getRegisteredMetadata($meta_key);
+        return parent::getRegisteredMetadata($meta_key, $include_private);
     }
 
     /**
