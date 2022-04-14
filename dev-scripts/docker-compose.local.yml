@@ -26,7 +26,7 @@ services:
       - DB_PASS=mapas
 
       - APP_LCODE=pt_BR,es_ES
-      - ACTIVE_THEME=MapasBR
+      - ACTIVE_THEME=SpCultura
       - APP_MODE=production
 
     depends_on:

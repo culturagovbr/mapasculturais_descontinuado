@@ -13,19 +13,19 @@ $app_mode = 'development'; // development ou production
 $assets_path = BASE_PATH . 'assets/';
 
 //if ($domain == '127.0.0.1:8001'){
-// if (($domain == '127.0.0.1:8001') || ($domain == '192.168.15.53:8001')){
+if (($domain == '127.0.0.1:8001') || ($domain == '192.168.15.53:8001')){
     $config['themes.active'] = 'CulturaViva';
     $config['base.url'] = 'http://dev.culturaviva.gov.br/';
 //    $config['base.assetUrl'] ='http://culturaviva.gov.br/assets/rcv/';
     $config['base.assetUrl'] ='http://dev.culturaviva.gov.br/assets/';
     $assets_path = BASE_PATH . 'assets/rcv/';
-// }    
+}    
 
 return array_merge($config,
     array(
-        'themes.active' => 'CulturaViva',
+        // 'themes.active' => 'CulturaViva',
         
-        'app.cache.namespace' => 'cultura.dev',
+        'app.cache.namespace' => $domain,
         // disable cache
 
         // 'app.usePermissionsCache' => false,
