@@ -874,6 +874,42 @@ class App extends \Slim\Slim{
                     return $user->is('superAdmin', $subsite_id);
                 }
             ],
+            'rcv_agente_area' => (object) [
+                'name' => i::__('Gestor do projeto'),
+                'plural' => i::__('Gestores do projeto'),
+                'another_roles' => [],
+                'subsite' => false,
+                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
+                    return $user->is('superAdmin', $subsite_id);
+                }
+            ],
+            'rcv_certificador_civil' => (object) [
+                'name' => i::__('Certificador da Sociedade Civil'),
+                'plural' => i::__('Certificadores da Sociedade Civil'),
+                'another_roles' => [],
+                'subsite' => false,
+                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
+                    return $user->is('superAdmin', $subsite_id);
+                }
+            ],
+            'rcv_certificador_publico' => (object) [
+                'name' => i::__('Certificador do Poder Publico'),
+                'plural' => i::__('Certificadores do Poder Publico'),
+                'another_roles' => [],
+                'subsite' => false,
+                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
+                    return $user->is('superAdmin', $subsite_id);
+                }
+            ],
+            'rcv_certificador_minerva' => (object) [
+                'name' => i::__('Certificador de Voto de Minerva'),
+                'plural' => i::__('Certificadores de Voto de Minerva'),
+                'another_roles' => [],
+                'subsite' => false,
+                'can_user_manage_role' => function(UserInterface $user, $subsite_id) {
+                    return $user->is('superAdmin', $subsite_id);
+                }
+            ]
         ];
 
         foreach ($roles as $role => $cfg) {
